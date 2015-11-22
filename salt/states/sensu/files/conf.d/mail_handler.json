@@ -1,0 +1,9 @@
+{
+  "handlers": {
+    "mail": {
+      "type": "pipe",
+      "command": "mailx -s 'sensu event' sawasy@gmail.com"
+    }
+  }
+}
+

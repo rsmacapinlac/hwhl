@@ -1,0 +1,16 @@
+{% from "sensu/pillar_map.jinja" import sensu with context -%}
+{
+  "rabbitmq": {
+    {%- if sensu.ssl.enable %}
+    "ssl": {
+      "cert_chain_file": "/etc/sensu/ssl/cert.pem",
+      "private_key_file": "/etc/sensu/ssl/key.pem"
+    },
+    {%- endif %}
+    "host": {{ sensu.rabbitmq.host|json }},
+    "port": {{ sensu.rabbitmq.port|json }},
+    "vhost": {{ sensu.rabbitmq.vhost|json }},
+    "user": {{ sensu.rabbitmq.user|json }},
+    "password": {{ sensu.rabbitmq.password|json }}
+  }
+}

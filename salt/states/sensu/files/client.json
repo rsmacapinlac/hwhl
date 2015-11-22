@@ -1,0 +1,13 @@
+{% from "sensu/pillar_map.jinja" import sensu with context %}
+{
+  "client": {
+    "name": "{{ salt['grains.get']('id') }}",
+    "address": "{{ grains['ip4_interfaces']['eth0'][0] }}",
+    {% if salt['pillar.get']('role') -%}
+    "subscriptions": [ {{ sensu.client.subscriptions|json }}, "{{ salt['pillar.get']('role') }}" ],
+    {% else -%}
+    "subscriptions": [ {{ sensu.client.subscriptions|json }} ],
+    {% endif -%}
+    "safe_mode": false
+  }
+}

@@ -1,0 +1,39 @@
+#n -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box       = 'dev-box-centrex-minion-app'
+  # This is the static box from Ubuntu. The download is slow, so I copied a point in time to my little webserver. Be gentle please. :D
+  # config.vm.box_url   = 'https://syslo.gd/virtualbox.box'
+  config.vm.box_url   = 'https://vagrantcloud.com/ubuntu/boxes/trusty64/versions/14.04/providers/virtualbox.box'
+
+  config.vm.network "private_network", ip: "172.28.128.15"
+  config.vm.hostname = "lawyer.dev.nucleoid.com"
+
+  ## For masterless, mount your salt file root
+  config.vm.synced_folder "../../salt", "/srv/salt/"
+  config.vm.synced_folder "../../configs/vagrant", "/vagrant/configs/"
+
+  # This is a hacky work around for the broken bootstrap script.
+  config.vm.provision "shell",
+    inline: "sudo sh -c 'echo lawyer.dev.nucleoid.com > /etc/hostname'; sudo hostname lawyer.dev.nucleoid.com"
+  config.vm.provision "shell",
+    inline: "sudo sh -c 'echo 172.28.128.10 salt.dev.nucleoid.com salt >> /etc/hosts';"
+  config.vm.provision "shell",
+    inline: "sudo sh -c 'echo 172.28.128.15 centrex.dev.nucleoid.com salt >> /etc/hosts';"
+  config.vm.provision "shell", 
+    inline: "sudo wget -O /etc/apt/sources.list https://gist.githubusercontent.com/sawasy/cdf4049cfb4d0615c48c/raw/a26b38898f101ad406df07c618339c1744f4a8af/sources.list"
+  config.vm.provision "shell",
+    inline: "sudo add-apt-repository -y ppa:saltstack/salt"
+  config.vm.provision "shell",
+    inline: "sudo apt-get update"
+  config.vm.provision "shell",
+    inline: "sudo apt-get install -y python-pip salt-minion python-gnupg"
+  config.vm.provision "shell",
+    inline: "sudo cp /vagrant/configs/minion /etc/salt/minion"
+  config.vm.provision "shell",
+    inline: "sudo service salt-minion restart"
+
+end
+

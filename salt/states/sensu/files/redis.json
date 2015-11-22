@@ -1,0 +1,7 @@
+{% from "sensu/pillar_map.jinja" import sensu with context -%}
+{
+  "redis": {
+    "host": {{ sensu.redis.host|json }},
+    "port": {{ sensu.redis.port|json }}
+  }
+}

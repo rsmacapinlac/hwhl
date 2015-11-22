@@ -1,0 +1,12 @@
+{% from "sensu/service_map.jinja" import services with context -%}
+{
+  "checks": {
+    "cpu_check": {
+      "handlers": ["default","slack"],
+      "command": "/etc/sensu/plugins/check-cpu.rb",
+      "interval": 15,
+      "standalone": false,
+      "subscribers": [ "all" ]
+    }
+  }
+}

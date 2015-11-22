@@ -1,0 +1,11 @@
+{% from "sensu/service_map.jinja" import services with context -%}
+{
+  "checks": {
+    "postfix_check": {
+      "handlers": ["default","slack"],
+      "command": "/etc/sensu/plugins/check-procs.rb -p postfix -C 1 ",
+      "interval": 60,
+      "subscribers": [ "all" ]
+    }
+  }
+}

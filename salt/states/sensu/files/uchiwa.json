@@ -1,0 +1,28 @@
+{% from "sensu/pillar_map.jinja" import sensu with context -%}
+{% macro get(value, item) -%}
+  {{ value.get(item, sensu.sites.get(item))|json }}
+{%- endmacro -%}
+{%- set sites = salt['pillar.get']('sensu:uchiwa:sites').items() %}
+{
+    "sensu": [
+        {%- for site, value in sites %}
+        {
+            "name": {{ site|json }},
+            "host": {{ get(value, 'host') }},
+            "ssl": {{ get(value, 'ssl') }},
+            "port": {{ get(value, 'port') }},
+            "user": {{ get(value, 'user') }},
+            "pass": {{ get(value, 'password') }},
+            "path": {{ get(value, 'path') }},
+            "timeout": {{ get(value, 'timeout') }}
+        }{% if not loop.last %},{% endif %}
+        {%- endfor %}
+    ],
+    "uchiwa": {
+        "user": {{ sensu.uchiwa.user|json }},
+        "pass": {{ sensu.uchiwa.password|json }},
+        "port": {{ sensu.uchiwa.port|json }},
+        "stats": {{ sensu.uchiwa.stats|json }},
+        "refresh": {{ sensu.uchiwa.refresh|json }}
+    }
+}

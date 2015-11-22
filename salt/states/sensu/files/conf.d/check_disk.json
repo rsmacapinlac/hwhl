@@ -1,0 +1,12 @@
+{% from "sensu/service_map.jinja" import services with context -%}
+{
+  "checks": {
+    "storage_check": {
+      "handlers": ["default","slack"],
+      "command": "/etc/sensu/plugins/check-disk-usage.rb",
+      "interval": 60,
+      "standalone": false,
+      "subscribers": [ "all" ]
+    }
+  }
+}

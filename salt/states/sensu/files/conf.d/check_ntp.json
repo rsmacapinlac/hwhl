@@ -1,0 +1,12 @@
+{% from "sensu/service_map.jinja" import services with context -%}
+{
+  "checks": {
+    "ntp_check": {
+      "handlers": [ "default", "slack" ],
+      "command": "/opt/sensu/embedded/bin/check-ntp.rb",
+      "interval": 30,
+      "standalone": false,
+      "subscribers": [ "all" ]
+    }
+  }
+}
