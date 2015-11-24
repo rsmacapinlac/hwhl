@@ -8,7 +8,7 @@ base:
     - motd
 
   '*.media.macapinlac.com':
-    - fileserver.media
+    - fileservers.media
 
   'laxus1.media.macapinlac.com':
     - plex.install
