@@ -3,11 +3,15 @@
 base:
   '*':
     - packages
-
-  '*.macapinlac.com':
     - ntp
     - logrotate
     - motd
+
+  '*.media.macapinlac.com':
+    - fileserver.media
+
+  'laxus1.media.macapinlac.com':
+    - plex.install
 
   'chewie.infra.macapinlac.com':
     - redis

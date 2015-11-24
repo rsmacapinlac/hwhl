@@ -223,7 +223,7 @@ interface: 192.168.12.205
 # If the autosign_file is specified, incoming keys specified in the
 # autosign_file will be automatically accepted. This is insecure.  Regular
 # expressions as well as globing lines are supported.
-#autosign_file: /etc/salt/autosign.conf
+autosign_file: /etc/salt/autosign.conf
 
 # Works like autosign_file, but instead allows you to specify minion IDs for
 # which keys will automatically be rejected. Will override both membership in
