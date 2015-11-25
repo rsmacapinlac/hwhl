@@ -9,9 +9,15 @@ base:
 
   '*.media.macapinlac.com':
     - fileservers.media
+    - users.media
 
   'laxus1.media.macapinlac.com':
     - plex.install
+
+  'hinata1.media.macapinlac.com':
+    - sabnzbd.install
+    - sabnzbd.config
+
 
   'chewie.infra.macapinlac.com':
     - redis
