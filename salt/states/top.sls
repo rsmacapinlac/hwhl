@@ -15,9 +15,13 @@ base:
     - plex.install
 
   'hinata1.media.macapinlac.com':
+    - mysql.client
     - sabnzbd.install
     - sabnzbd.config
+    - newznab.install
 
+  '*.db.macapinlac.com':
+    - mysql.server
 
   'chewie.infra.macapinlac.com':
     - redis

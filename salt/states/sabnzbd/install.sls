@@ -6,7 +6,6 @@
 sabnzbdplus:
   pkg.installed
 
-
 sabnzbdplus-theme-smpl:
   pkg.installed
 
