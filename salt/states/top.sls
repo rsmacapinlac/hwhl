@@ -21,6 +21,8 @@ base:
     - sabnzbd.config
     - newznab.install
     - newznab.config
+    - sickbeard.install
+    - sickbeard.config
     - apache.vhosts.standard
     - apache.modules
 
