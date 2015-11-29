@@ -23,6 +23,8 @@ base:
     - newznab.config
     - sickbeard.install
     - sickbeard.config
+    - transmission.install
+    - transmission.config
     - apache.vhosts.standard
     - apache.modules
 
