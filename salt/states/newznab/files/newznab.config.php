@@ -13,10 +13,10 @@ define('DB_INNODB', false);
 define('DB_PCONNECT', true);
 define('DB_ERRORMODE', PDO::ERRMODE_SILENT);
 
-define('NNTP_USERNAME', 'rsmacapinlac');
-define('NNTP_PASSWORD', '');
-define('NNTP_SERVER', 'secure.usenetserver.com');
-define('NNTP_PORT', '443');
+define('NNTP_USERNAME', '{{ salt['pillar.get']('newznab:newsgroup:username') }}');
+define('NNTP_PASSWORD', '{{ salt['pillar.get']('newznab:newsgroup:password') }}');
+define('NNTP_SERVER', '{{ salt['pillar.get']('newznab:newsgroup:server') }}');
+define('NNTP_PORT', '{{ salt['pillar.get']('newznab:newsgroup:port') }}');
 define('NNTP_SSLENABLED', true);
 
 define('CACHEOPT_METHOD', 'file');

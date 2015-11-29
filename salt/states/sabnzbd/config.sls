@@ -12,6 +12,7 @@
 /home/media/.sabnzbd/sabnzbd.ini:
   file.managed:
     - source: salt://sabnzbd/sabnzbd.ini
+    - template: jinja
     - replace: False
     - makedirs: True
     - user: media

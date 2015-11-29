@@ -47,5 +47,5 @@ svn://svn.newznab.com/nn/branches/nnplus:
     - force: True
     - trust: True
     - target: /var/www/nnplus
-    - username: 
-    - password: 
+    - username: {{  salt['pillar.get']('newznab:svn:username') }}
+    - password: {{  salt['pillar.get']('newznab:svn:password') }}

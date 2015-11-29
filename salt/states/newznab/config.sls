@@ -30,6 +30,7 @@ finalize_newznab_config:
   file.managed:
     - name: /var/www/nnplus/www/config.php
     - source: salt://newznab/files/newznab.config.php
+    - template: jinja
     - mode: 777
 
 copy_custom_update_config:

@@ -10,7 +10,6 @@ base:
   '*.media.macapinlac.com':
     - fileservers.media
     - users.media
-
     # TODO: setup key for the 'media' user
 
   'laxus1.media.macapinlac.com':
@@ -26,8 +25,6 @@ base:
     - apache.modules
 
     # TODO: auto start the newznab_screen_local.sh
-    # TODO: Set password information (for newsgroup) in excluded pillar info
-    # TODO: Set username and password configuration for newznab svn server into excluded pillar info
 
   'mavis.db.macapinlac.com':
     - mysql.database

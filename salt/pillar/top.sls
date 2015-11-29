@@ -8,6 +8,7 @@ base:
 
   'hinata1.media.macapinlac.com':
     - apache.newznab
+    - newznab.credentials
 
   'c3p0.infra.macapinlac.com':
     - saltmaster

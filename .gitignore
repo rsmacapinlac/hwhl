@@ -1,1 +1,2 @@
 .vagrant
+salt/pillar/newznab/credentials.sls
