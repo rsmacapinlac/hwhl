@@ -1,13 +1,10 @@
-# svn://svn.newznab.com/nn/branches/nnplus
-#  php5-dev php-pear php5-gd php5-mysql php5-curl
-
 apache2:
   pkg.installed
 
 php5:
   pkg.installed
 
-php-dev:
+php5-dev:
   pkg.installed
 
 php5-gd:
@@ -25,9 +22,30 @@ php5-mysql:
 subversion:
   pkg.installed
 
+unrar:
+  pkg.installed
+
+lame:
+  pkg.installed
+
+screen:
+  pkg.installed
+
+tmux:
+  pkg.installed
+
+/etc/php5/cli/php.ini:
+  file.managed:
+    - source: salt://newznab/files/php-cli.ini
+
+/etc/php5/apache2/php.ini:
+  file.managed:
+    - source: salt://newznab/files/php-apache2.ini
+
 svn://svn.newznab.com/nn/branches/nnplus:
   svn.latest:
+    - force: True
+    - trust: True
     - target: /var/www/nnplus
-# go donate to get the username and password
-#    - username:
-#    - password:
+    - username: 
+    - password: 

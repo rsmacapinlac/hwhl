@@ -6,5 +6,8 @@ base:
   'mavis.db.macapinlac.com':
     - mysql.media
 
+  'hinata1.media.macapinlac.com':
+    - apache.newznab
+
   'c3p0.infra.macapinlac.com':
     - saltmaster

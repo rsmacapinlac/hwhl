@@ -11,6 +11,8 @@ base:
     - fileservers.media
     - users.media
 
+    # TODO: setup key for the 'media' user
+
   'laxus1.media.macapinlac.com':
     - plex.install
 
@@ -19,9 +21,18 @@ base:
     - sabnzbd.install
     - sabnzbd.config
     - newznab.install
+    - newznab.config
+    - apache.vhosts.standard
+    - apache.modules
 
-  '*.db.macapinlac.com':
+    # TODO: auto start the newznab_screen_local.sh
+    # TODO: Set password information (for newsgroup) in excluded pillar info
+    # TODO: Set username and password configuration for newznab svn server into excluded pillar info
+
+  'mavis.db.macapinlac.com':
+    - mysql.database
     - mysql.server
+    - mysql.user
 
   'chewie.infra.macapinlac.com':
     - redis

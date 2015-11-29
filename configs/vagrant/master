@@ -411,7 +411,8 @@ autosign_file: /etc/salt/autosign.conf
 file_roots:
   base:
     - /srv/salt/states
-    - /srv/salt/formulae/sensu-formula
+    - /srv/salt/formulae/apache
+    - /srv/salt/formulae/mysql
 
 # The hash_type is the hash to use when discovering the hash of a file on
 # the master server. The default is md5, but sha1, sha224, sha256, sha384
@@ -522,9 +523,9 @@ file_roots:
 # Pillar is laid out in the same fashion as the file server, with environments,
 # a top file and sls files. However, pillar data does not need to be in the
 # highstate format, and is generally just key/value pairs.
-#pillar_roots:
-#  base:
-#    - /srv/salt/pillar
+pillar_roots:
+  base:
+    - /srv/salt/pillar
 #
 #ext_pillar:
 #  - hiera: /etc/hiera.yaml

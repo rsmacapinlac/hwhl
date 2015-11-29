@@ -12,8 +12,7 @@ Vagrant.configure("2") do |config|
   ## For masterless, mount your salt file root
   config.vm.synced_folder "../../configs/vagrant", "/vagrant/configs/"
 
-  # sabnzbd configuration
-  config.vm.network "forwarded_port", guest: 8080, host: 8080
+  config.vm.network "forwarded_port", guest: 3306, host: 3306
 
   # This is a hacky work around for the broken bootstrap script.
   config.vm.provision "shell",
