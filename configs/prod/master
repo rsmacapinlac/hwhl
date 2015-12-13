@@ -401,6 +401,9 @@ autoreject_file: /srv/hwhl-prod/configs/prod/autoreject.conf
 file_roots:
   base:
     - /srv/hwhl-prod/salt/states
+    - /srv/hwhl-prod/formulae/apache
+    - /srv/hwhl-prod/formulae/mysql
+    - /srv/hwhl-prod/formulae/nagios
 #   dev:
 #     - /srv/salt/dev/services
 #     - /srv/salt/dev/states
