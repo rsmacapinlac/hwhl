@@ -7,6 +7,9 @@ base:
     - logrotate
     - motd
 
+  '*.macapinlac.com':
+    - nagios.minion
+
   '*.media.macapinlac.com':
     - fileservers.media
     - users.media
@@ -38,7 +41,6 @@ base:
     - mysql.database
     - mysql.server
     - mysql.user
-    - nagios.minion
 
   # Warren is from FairyTail, he can communicate and get status updates from
   # everyone telepathically.
