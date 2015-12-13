@@ -223,12 +223,12 @@
 # If the autosign_file is specified, incoming keys specified in the
 # autosign_file will be automatically accepted. This is insecure.  Regular
 # expressions as well as globing lines are supported.
-autosign_file: /srv/hwhl-prod/configs/prod/autosign.conf
+autosign_file: /etc/salt/autosign.conf
 
 # Works like autosign_file, but instead allows you to specify minion IDs for
 # which keys will automatically be rejected. Will override both membership in
 # the autosign_file and the auto_accept setting.
-autoreject_file: /srv/hwhl-prod/configs/prod/autoreject.conf
+# autoreject_file: /srv/salt/configs/shared/autoreject.conf
 
 # Enable permissive access to the salt keys. This allows you to run the
 # master or minion as root, but have a non-root group be given access to
@@ -400,10 +400,10 @@ autoreject_file: /srv/hwhl-prod/configs/prod/autoreject.conf
 # Example:
 file_roots:
   base:
-    - /srv/hwhl-prod/salt/states
-    - /srv/hwhl-prod/formulae/apache
-    - /srv/hwhl-prod/formulae/mysql
-    - /srv/hwhl-prod/formulae/nagios
+    - /srv/salt/states
+    - /srv/salt/formulae/apache
+    - /srv/salt/formulae/mysql
+    - /srv/salt/formulae/nagios
 #   dev:
 #     - /srv/salt/dev/services
 #     - /srv/salt/dev/states
@@ -661,7 +661,7 @@ pillar_roots:
 # location. Remote logging works best when configured to use rsyslogd(8) (e.g.:
 # ``file:///dev/log``), with rsyslogd(8) configured for network logging. The URI
 # format is: <file|udp|tcp>://<host|socketpath>:<port-if-required>/<log-facility>
-#log_file: /var/log/salt/master
+log_file: /var/log/salt/master
 #log_file: file:///dev/log
 #log_file: udp://loghost:10514
 

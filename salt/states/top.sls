@@ -15,6 +15,9 @@ base:
     - users.media
     # TODO: setup key for the 'media' user
 
+  'salt.infra.macapinlac.com':
+    - saltstack.config
+
   'laxus1.media.macapinlac.com':
     - plex.install
 

@@ -11,9 +11,8 @@ Vagrant.configure("2") do |config|
 
   ## For masterless, mount your salt file root
   config.vm.synced_folder "../../salt", "/srv/salt/"
-  config.vm.synced_folder "../../../centrex", "/srv/centrex"
-  config.vm.synced_folder "../../configs/vagrant", "/vagrant/configs/"
-  config.vm.synced_folder "../../configs/gpgkeys", "/etc/salt/gpgkeys/"
+  config.vm.synced_folder "../../configs/bootstrap", "/vagrant/configs/"
+  #config.vm.synced_folder "../../configs/gpgkeys", "/etc/salt/gpgkeys/"
 
   # This is a hacky work around for the broken bootstrap script.
   config.vm.provision "shell",
@@ -33,7 +32,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell",
     inline: "sudo cp /vagrant/configs/autosign.conf /etc/salt/autosign.conf"
   config.vm.provision "shell",
-    inline: "sudo service salt-master restart;sudo service salt-minion restart"
+    inline: "sudo service salt-master restart; sudo service salt-minion restart"
 
 end
 
