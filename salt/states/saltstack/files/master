@@ -223,12 +223,12 @@
 # If the autosign_file is specified, incoming keys specified in the
 # autosign_file will be automatically accepted. This is insecure.  Regular
 # expressions as well as globing lines are supported.
-autosign_file: /etc/salt/autosign.conf
+autosign_file: /srv/salt/configs/shared/autosign.conf
 
 # Works like autosign_file, but instead allows you to specify minion IDs for
 # which keys will automatically be rejected. Will override both membership in
 # the autosign_file and the auto_accept setting.
-# autoreject_file: /srv/salt/configs/shared/autoreject.conf
+autoreject_file: /srv/salt/configs/shared/autoreject.conf
 
 # Enable permissive access to the salt keys. This allows you to run the
 # master or minion as root, but have a non-root group be given access to
@@ -401,6 +401,9 @@ autosign_file: /etc/salt/autosign.conf
 file_roots:
   base:
     - /srv/hwhl/salt/states
+    - /srv/hwhl/salt/formulae/apache
+    - /srv/hwhl/salt/formulae/mysql
+    - /srv/hwhl/salt/formulae/nagios
 #   dev:
 #     - /srv/salt/dev/services
 #     - /srv/salt/dev/states
@@ -523,7 +526,7 @@ file_roots:
 # highstate format, and is generally just key/value pairs.
 pillar_roots:
   base:
-    - /srv/hwhl-prod/salt/pillar
+    - /srv/salt/pillar
 #
 #ext_pillar:
 #  - hiera: /etc/hiera.yaml
