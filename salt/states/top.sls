@@ -7,14 +7,17 @@ base:
     - logrotate
     - motd
 
-  '*.macapinlac.com':
+  '^(\w+).(infra|db|media).macapinlac.com':
+    - match: pcre
     - nagios.minion
+    - network.static-ip
 
   '*.media.macapinlac.com':
     - fileservers.media
     - users.media
     # TODO: setup key for the 'media' user
 
+  # This is the self configuration of the saltmaster
   'salt.infra.macapinlac.com':
     - saltstack.config
 
