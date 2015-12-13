@@ -14,9 +14,6 @@ sysstat:
 htop:
   pkg.installed
 
-curl:
-  pkg.installed
-
 netcat:
   pkg.installed
 
@@ -27,5 +24,3 @@ nano:
   pkg:
     - removed
 
-mailutils:
-  pkg.installed

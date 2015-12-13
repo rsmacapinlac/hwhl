@@ -1,5 +1,9 @@
 # Doot doot
 base:
+  '^(\w+).(infra|db|media).macapinlac.com':
+    - match: pcre
+    - network.static-ips
+
   'shino.db.macapinlac.com':
     - mysql.media
     - nagios
