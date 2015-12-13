@@ -38,3 +38,9 @@ copy_custom_update_config:
     - name: /var/www/nnplus/misc/update_scripts/nix_scripts/newznab_screen_local.sh
     - source: salt://newznab/files/newznab_screen.sh
     - mode: 755
+
+/etc/init.d/newznab:
+  file.managed:
+    - source: salt://newznab/files/newznab.init.conf
+    - mode: 755
+

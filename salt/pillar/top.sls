@@ -1,14 +1,13 @@
 # Doot doot
 base:
-  '*':
-    - foo: bar
-
-  'mavis.db.macapinlac.com':
+  'shino.db.macapinlac.com':
     - mysql.media
+    - nagios
 
-  'hinata1.media.macapinlac.com':
+  'hinata.media.macapinlac.com':
     - apache.newznab
     - newznab.credentials
 
-  'c3p0.infra.macapinlac.com':
-    - saltmaster
+  'warren.infra.macapinlac.com':
+    - nagios
+    - apache.nagios

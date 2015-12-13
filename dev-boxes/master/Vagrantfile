@@ -13,6 +13,7 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "../../salt", "/srv/salt/"
   config.vm.synced_folder "../../../centrex", "/srv/centrex"
   config.vm.synced_folder "../../configs/vagrant", "/vagrant/configs/"
+  config.vm.synced_folder "../../configs/gpgkeys", "/etc/salt/gpgkeys/"
 
   # This is a hacky work around for the broken bootstrap script.
   config.vm.provision "shell",
