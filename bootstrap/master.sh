@@ -1,6 +1,8 @@
+#!/bin/sh
+
 sudo add-apt-repository -y ppa:saltstack/salt
 sudo apt-get update
-sudo apt-get install -y python-pip salt-master salt-minion python-gnupg git-core
+sudo apt-get install -y git-core python-pip salt-master salt-minion python-gnupg git-core
 
 sudo wget -O /etc/salt/master https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/configs/prod/master
 
