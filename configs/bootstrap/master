@@ -523,7 +523,7 @@ file_roots:
 # highstate format, and is generally just key/value pairs.
 pillar_roots:
   base:
-    - /srv/hwhl-prod/salt/pillar
+    - /srv/hwhl/salt/pillar
 #
 #ext_pillar:
 #  - hiera: /etc/hiera.yaml
