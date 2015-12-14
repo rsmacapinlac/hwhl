@@ -4,14 +4,14 @@ base:
     - match: pcre
     - network.static-ips
 
-  'shino.db.macapinlac.com':
+  'shino.db.macapinlac.*':
     - mysql.media
     - nagios
 
-  'hinata.media.macapinlac.com':
+  'hinata.media.macapinlac.*':
     - apache.newznab
     - newznab.credentials
 
-  'warren.infra.macapinlac.com':
+  'warren.infra.macapinlac.*':
     - nagios
     - apache.nagios

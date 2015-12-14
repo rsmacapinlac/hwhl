@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
 
   # This is a hacky work around for the broken bootstrap script.
   config.vm.provision "shell",
-    inline: "sudo sh -c 'echo shino.db.macapinlac.com > /etc/hostname'; sudo hostname shino.db.macapinlac.com"
+    inline: "sudo sh -c 'echo shino.db.macapinlac.dev > /etc/hostname'; sudo hostname shino.db.macapinlac.dev"
   config.vm.provision "shell",
     inline: "sudo wget -O /etc/apt/sources.list https://gist.githubusercontent.com/sawasy/cdf4049cfb4d0615c48c/raw/a26b38898f101ad406df07c618339c1744f4a8af/sources.list"
   config.vm.provision "shell",
