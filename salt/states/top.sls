@@ -10,7 +10,11 @@ base:
   '^(\w+).(infra|db|media).macapinlac.com':
     - match: pcre
     - nagios.minion
+
+  {% if grains['virtual'] == 'kvm' %}
+  '^(\w+).(infra|db|media).macapinlac.com':
     - network.static-ip
+  {% endif %}
 
   '*.media.macapinlac.com':
     - fileservers.media

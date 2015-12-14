@@ -1,4 +1,4 @@
-eth1:
+eth0:
   network.managed:
     - enabled: True
     - type: eth
