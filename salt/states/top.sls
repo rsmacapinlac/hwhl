@@ -7,28 +7,28 @@ base:
     - logrotate
     - motd
 
-  '^(\w+).(infra|db|media).macapinlac.*':
+  '^(\w+).(infra|db|media).local.macapinlac.*':
     - match: pcre
     - nagios.minion
 
-  '^(\w+).(infra|db|media).macapinlac.com':
+  '^(\w+).(infra|db|media).local.macapinlac.com':
     - match: pcre
     - network.static-ip
 
-  '*.media.macapinlac.*':
+  '*.media.local.macapinlac.*':
     - fileservers.media
     - users.media
     # TODO: setup key for the 'media' user
 
   # This is the self configuration of the saltmaster
-  'salt.infra.macapinlac.*':
+  'salt.infra.local.macapinlac.*':
     - saltstack.config
 
-  'laxus1.media.macapinlac.*':
+  'laxus1.media.local.macapinlac.*':
     - plex.install
 
   # Hinata is from Naruto, she's kinda always in the background.
-  'hinata.media.macapinlac.*':
+  'hinata.media.local.macapinlac.*':
     - mysql.client
     - newznab.install
     - newznab.config
@@ -38,7 +38,7 @@ base:
     - apache.modules
 
   # Kiba is from Naruto, he's kinda loud and most people talk to him.
-  'kiba.media.macapinlac.*':
+  'kiba.media.local.macapinlac.*':
     - sickbeard.install
     - sickbeard.config
     - transmission.install
@@ -46,14 +46,14 @@ base:
 
   # Shino is from Naurto, he's part of Team 8 and is probably the required
   # foundation to the team
-  'shino.db.macapinlac.*':
+  'shino.db.local.macapinlac.*':
     - mysql.database
     - mysql.server
     - mysql.user
 
   # Warren is from FairyTail, he can communicate and get status updates from
   # everyone telepathically.
-  'warren.infra.macapinlac.*':
+  'warren.infra.local.macapinlac.*':
     - nagios.server
     - nagios.config
     - apache.vhosts.standard

@@ -1,17 +1,17 @@
 # Doot doot
 base:
-  '^(\w+).(infra|db|media).macapinlac.com':
+  '^(\w+).(infra|db|media).local.macapinlac.com':
     - match: pcre
     - network.static-ips
 
-  'shino.db.macapinlac.*':
+  'shino.db.local.macapinlac.*':
     - mysql.media
     - nagios
 
-  'hinata.media.macapinlac.*':
+  'hinata.media.local.macapinlac.*':
     - apache.newznab
     - newznab.credentials
 
-  'warren.infra.macapinlac.*':
+  'warren.infra.local.macapinlac.*':
     - nagios
     - apache.nagios
