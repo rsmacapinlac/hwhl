@@ -21,10 +21,10 @@ base:
     # TODO: setup key for the 'media' user
 
   # This is the self configuration of the saltmaster
-  'salt.infra.local.macapinlac.*':
+  'makarov.infra.local.macapinlac.*':
     - saltstack.config
 
-  'laxus1.media.local.macapinlac.*':
+  'naruto.media.local.macapinlac.*':
     - plex.install
 
   # Hinata is from Naruto, she's kinda always in the background.
@@ -50,6 +50,9 @@ base:
     - mysql.database
     - mysql.server
     - mysql.user
+
+  'mirajane.infra.local.macapinlac.*':
+    - dnsmasq
 
   # Warren is from FairyTail, he can communicate and get status updates from
   # everyone telepathically.
