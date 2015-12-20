@@ -113,7 +113,7 @@ nagios:
   nrpe:
     # server_address: 127.0.0.1
     server_port: 5666
-    allowed_hosts: 172.28.128.30
+    allowed_hosts: 172.28.128.5 172.28.128.10
     command_timeout: 60
     connection_timeout: 300
     dont_blame_nrpe: 0
