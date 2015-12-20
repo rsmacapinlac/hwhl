@@ -54,6 +54,7 @@ base:
   # Shino is from Naurto, he's part of Team 8 and is probably the required
   # foundation to the team
   'shino.db.local.macapinlac.*':
+    - mysql
     - mysql.database
     - mysql.server
     - mysql.user

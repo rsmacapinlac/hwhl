@@ -1,8 +1,6 @@
 mysql:
   server:
     root_password: 'somepass'
-    mysqld:
-      bind-address: 172.28.128.20
 
   database:
     - newznab

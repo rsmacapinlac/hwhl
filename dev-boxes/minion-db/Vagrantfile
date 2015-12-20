@@ -7,7 +7,7 @@ Vagrant.configure("2") do |config|
   # This is the static box from Ubuntu. The download is slow, so I copied a point in time to my little webserver. Be gentle please. :D
   config.vm.box_url   = 'https://vagrantcloud.com/ubuntu/boxes/trusty64/versions/14.04/providers/virtualbox.box'
 
-  config.vm.network "private_network", ip: "172.28.128.20"
+  config.vm.network "private_network", ip: "172.28.128.30"
 
   ## For masterless, mount your salt file root
   config.vm.synced_folder "../../configs/vagrant", "/vagrant/configs/"
