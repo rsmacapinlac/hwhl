@@ -4,7 +4,7 @@
 // Config you must change - updated by installer.
 //=========================
 define('DB_TYPE', 'mysql');
-define('DB_HOST', '172.28.128.20');
+define('DB_HOST', 'shino.db.local.macapinlac.com');
 define('DB_PORT', 3306);
 define('DB_USER', 'newznab');
 define('DB_PASSWORD', 'newznab');
