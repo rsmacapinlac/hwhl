@@ -20,6 +20,10 @@
   file.managed:
     - source: salt://nagios/files/shino.db.local.macapinlac.com.cfg
 
+/etc/nagios3/conf.d/hinata.media.cfg:
+  file.managed:
+    - source: salt://nagios/files/hinata.media.local.macapinlac.com.cfg
+
 /etc/nagios3/conf.d/hostgroups_nagios2.cfg:
   file.managed:
     - source: salt://nagios/files/hostgroups_nagios2.cfg
