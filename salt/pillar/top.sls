@@ -1,8 +1,8 @@
 # Doot doot
 base:
-  '^(\w+).(infra|db|media).local.macapinlac.com':
-    - match: pcre
-    - network.static-ips
+
+  #'*.local.macapinlac.*':
+  #  - network.static-ip
 
   'shino.db.local.macapinlac.*':
     - mysql.media

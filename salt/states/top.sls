@@ -7,13 +7,16 @@ base:
     - logrotate
     - motd
 
+  '*.local.macapinlac.*':
+    - nagios.minion
+  #  - network.static-ip
+
   '^(\w+).(infra|db|media).local.macapinlac.*':
     - match: pcre
     - nagios.minion
 
   '^(\w+).(infra|db|media).local.macapinlac.com':
     - match: pcre
-    - network.static-ip
 
   '*.media.local.macapinlac.*':
     - fileservers.media

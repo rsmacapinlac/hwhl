@@ -7,7 +7,6 @@ file_roots:
     - /srv/hwhl/salt/formulae/apache
     - /srv/hwhl/salt/formulae/mysql
     - /srv/hwhl/salt/formulae/nagios
-    - /srv/hwhl/salt/formulae/bind
     - /srv/hwhl/salt/formulae/dnsmasq
 
 pillar_roots:

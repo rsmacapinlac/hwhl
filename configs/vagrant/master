@@ -414,6 +414,7 @@ file_roots:
     - /srv/salt/formulae/apache
     - /srv/salt/formulae/mysql
     - /srv/salt/formulae/nagios
+    - /srv/salt/formulae/dnsmasq
 
 # The hash_type is the hash to use when discovering the hash of a file on
 # the master server. The default is md5, but sha1, sha224, sha256, sha384
