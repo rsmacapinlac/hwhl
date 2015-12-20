@@ -27,6 +27,10 @@ base:
   'makarov.infra.local.macapinlac.*':
     - saltstack.config
 
+  # this is to setup a cron refresh from the repository
+  'makarov.infra.local.macapinlac.com':
+    - saltstack.cron_refresh
+
   'naruto.media.local.macapinlac.*':
     - plex.install
 
