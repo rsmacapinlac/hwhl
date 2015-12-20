@@ -17,7 +17,7 @@ USER=media
 CONFIG=
 
 # [optional] hostname/ip and port number to listen on:
-HOST=172.28.128.15
+HOST=0.0.0.0
 PORT=8080
 
 # [optional] extra command line options, if any:
