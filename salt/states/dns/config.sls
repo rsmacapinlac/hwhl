@@ -33,3 +33,15 @@ akane.infra.local.macapinlac.com:
     - ip: 192.168.1.100
     - names:
       - akane
+
+daikichi.infra.local.macapinlac.com:
+  host.present:
+    - ip: 192.168.1.74
+    - names:
+      - daikichi
+
+saber.infra.local.macapinlac.com:
+  host.present:
+    - ip: 192.168.1.102
+    - names:
+      - saber
