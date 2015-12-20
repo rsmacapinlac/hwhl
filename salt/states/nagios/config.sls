@@ -18,7 +18,7 @@
 
 /etc/nagios3/conf.d/mysql.cfg:
   file.managed:
-    - source: salt://nagios/files/shino.db.macapinlac.com.cfg
+    - source: salt://nagios/files/shino.db.local.macapinlac.com.cfg
 
 /etc/nagios3/conf.d/hostgroups_nagios2.cfg:
   file.managed:
