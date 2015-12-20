@@ -61,6 +61,9 @@ base:
 
   'mirajane.infra.local.macapinlac.*':
     - dnsmasq
+  # this is to setup the DNS entries for the servers
+  'mirajane.infra.local.macapinlac.com':
+    - dns.config
 
   # Warren is from FairyTail, he can communicate and get status updates from
   # everyone telepathically.
