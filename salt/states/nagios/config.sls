@@ -24,6 +24,10 @@
   file.managed:
     - source: salt://nagios/files/hinata.media.local.macapinlac.com.cfg
 
+/etc/nagios3/conf.d/laxus.media.cfg:
+  file.managed:
+    - source: salt://nagios/files/laxus.media.local.macapinlac.com.cfg
+
 /etc/nagios3/conf.d/hostgroups_nagios2.cfg:
   file.managed:
     - source: salt://nagios/files/hostgroups_nagios2.cfg
