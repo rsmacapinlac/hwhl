@@ -31,7 +31,7 @@ base:
   'makarov.infra.local.macapinlac.com':
     - saltstack.cron_refresh
 
-  'naruto.media.local.macapinlac.*':
+  'laxus.media.local.macapinlac.*':
     - plex.install
 
   # Hinata is from Naruto, she's kinda always in the background.
