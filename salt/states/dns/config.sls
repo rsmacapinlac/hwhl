@@ -28,7 +28,7 @@ hinata.db.local.macapinlac.com:
     - names:
       - hinata
 
-laxus.db.local.macapinlac.com:
+laxus.media.local.macapinlac.com:
   host.present:
     - ip: 192.168.1.40
     - names:
