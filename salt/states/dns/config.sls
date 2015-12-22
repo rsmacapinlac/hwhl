@@ -22,7 +22,7 @@ shino.db.local.macapinlac.com:
     - names:
       - shino
 
-hinata.db.local.macapinlac.com:
+hinata.media.local.macapinlac.com:
   host.present:
     - ip: 192.168.1.35
     - names:
