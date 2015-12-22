@@ -42,7 +42,7 @@ akane.infra.local.macapinlac.com:
 
 daikichi.infra.local.macapinlac.com:
   host.present:
-    - ip: 192.168.1.74
+    - ip: 192.168.1.101
     - names:
       - daikichi
 
