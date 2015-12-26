@@ -34,6 +34,12 @@ laxus.media.local.macapinlac.com:
     - names:
       - laxus
 
+kiba.media.local.macapinlac.com:
+  host.present:
+    - ip: 192.168.1.45
+    - names:
+      - kiba
+
 akane.infra.local.macapinlac.com:
   host.present:
     - ip: 192.168.1.100
