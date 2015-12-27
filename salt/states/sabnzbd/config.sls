@@ -1,6 +1,6 @@
 /etc/default/sabnzbdplus:
   file.managed:
-    - source: salt://sabnzbd/sabnzbdplus
+    - source: salt://sabnzbd/files/sabnzbdplus
 
 /home/media/.sabnzbd:
   file.directory:
@@ -11,7 +11,7 @@
 
 /home/media/.sabnzbd/sabnzbd.ini:
   file.managed:
-    - source: salt://sabnzbd/sabnzbd.ini
+    - source: salt://sabnzbd/files/sabnzbd.ini
     - template: jinja
     - replace: False
     - makedirs: True
