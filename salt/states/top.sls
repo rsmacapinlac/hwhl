@@ -41,6 +41,7 @@ base:
     - newznab.config
     - sabnzbd.install
     - sabnzbd.config
+    - sickbeard.sabnzb
     - apache.vhosts.standard
     - apache.modules
 

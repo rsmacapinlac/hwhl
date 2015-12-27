@@ -9,6 +9,7 @@ base:
     - nagios
 
   'hinata.media.local.macapinlac.*':
+    - mysql.media
     - apache.newznab
     - newznab.credentials
 
