@@ -15,8 +15,8 @@ base:
     - match: pcre
     - nagios.minion
 
-  '^(\w+).(infra|db|media).*':
-    - match: pcre
+  #'^(\w+).(infra|db|media).*':
+  #  - match: pcre
 
   '*.media.*':
     - fileservers.media
@@ -58,9 +58,10 @@ base:
     - mysql.user
 
   # Warren is from FairyTail, he can communicate and get status updates from
-  # everyone telepathically.
+  # everyone telepathically. (nagios)
   'warren.infra.*':
     - nagios.server
     - nagios.config
     - apache.vhosts.standard
     - apache.modules
+
