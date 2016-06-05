@@ -1,0 +1,21 @@
+#n -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box       = 'dev-box-hwhl-saltmaster'
+  # This is the static box from Ubuntu. The download is slow, so I copied a point in time to my little webserver. Be gentle please. :D
+  config.vm.box_url   = 'https://vagrantcloud.com/ubuntu/boxes/trusty64/versions/14.04/providers/virtualbox.box'
+
+  config.vm.network "private_network", ip: "172.28.128.10"
+
+  ## For masterless, mount your salt file root
+  config.vm.synced_folder "../../", "/srv/hwhl/"
+  config.vm.synced_folder "../../configs/bootstrap", "/vagrant/configs/"
+  #config.vm.synced_folder "../../configs/gpgkeys", "/etc/salt/gpgkeys/"
+
+  config.vm.provision "shell", path: '../setup-hostname.sh', args: 'makarov.infra.local.macapinlac.dev'
+  config.vm.provision "shell", path: '../setup-master.sh'
+
+end
+
