@@ -7,6 +7,10 @@ base:
   '*':
     - network
 
+  'warren.infra.*':
+    - sensu
+    - rabbitmq
+
   'shino.db.local.macapinlac.*':
     - mysql.media
     # - nagios

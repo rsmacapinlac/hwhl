@@ -7,6 +7,7 @@ base:
     - logrotate
     - motd
     - network.hosts
+    - sensu.client
 
   #'^(\w+).(infra|db|media).*':
   #  - match: pcre
@@ -20,18 +21,22 @@ base:
     - users.media
     # TODO: setup key for the 'media' user
 
-  # Warren is from FairyTail, he can communicate and get status updates from
-  # everyone telepathically. (nagios)
-  #'warren.infra.*':
-  #  - nagios
-  #  - apache.vhosts.standard
-  #  - apache.modules
-
   # This is the self configuration of the saltmaster
   'makarov.infra.*':
     - saltstack.master
     - saltstack.minion
     - saltstack.cron_refresh
+
+  # Warren is from FairyTail, he can communicate and get status updates from
+  # everyone telepathically. (nagios)
+  'warren.infra.*':
+    - sensu
+    - sensu.server
+    - sensu.api
+    - sensu.uchiwa
+    - redis.server
+    - rabbitmq
+    - rabbitmq.config
 
   'laxus.media.*':
     - plex.install
