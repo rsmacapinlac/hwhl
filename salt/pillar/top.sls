@@ -4,15 +4,18 @@ base:
   #'*.local.macapinlac.*':
   #  - network.static-ip
 
+  '*':
+    - network
+
   'shino.db.local.macapinlac.*':
     - mysql.media
-    - nagios
+    # - nagios
 
   'hinata.media.local.macapinlac.*':
     - mysql.media
     - apache.newznab
     - newznab.credentials
 
-  'warren.infra.local.macapinlac.*':
-    - nagios
-    - apache.nagios
+  #'warren.infra.*':
+  #  - nagios.server
+  #  - apache.nagios

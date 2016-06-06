@@ -4,23 +4,27 @@
 Vagrant.configure("2") do |config|
 
   config.vm.box_url   = 'https://vagrantcloud.com/ubuntu/boxes/trusty64/versions/14.04/providers/virtualbox.box'
-  config.vm.synced_folder "../../configs/vagrant", "/vagrant/configs/"
+  config.vm.synced_folder "../../", "/srv/hwhl/"
 
   config.vm.define :makarov do |makarov|
     makarov.vm.box = 'dev-box-hwhl-saltmaster-makarov'
     makarov.vm.network "private_network", ip: "172.28.128.10"
-    makarov.vm.synced_folder "../../", "/srv/hwhl/"
-    makarov.vm.synced_folder "../../configs/bootstrap", "/vagrant/configs/"
-    makarov.vm.provision "shell", path: '../setup-hostname.sh', args: 'makarov.infra.local.macapinlac.dev'
+    makarov.vm.provision "shell", path: '../setup-hostname.sh', args: 'makarov.infra.macapinlac.com'
     makarov.vm.provision "shell", path: '../setup-master.sh'
   end
 
   config.vm.define :warren do |warren|
-    warren.vm.box = 'dev-box-hwhl-nagios-warren'
+    warren.vm.box = 'dev-box-hwhl-monitoring-warren'
     warren.vm.network "private_network", ip: "172.28.128.15"
-    warren.vm.provision "shell", path: '../setup-hostname.sh', args: 'warren.infra.local.macapinlac.dev'
-    warren.vm.provision "shell", path: '../setup-master.sh'
+    warren.vm.provision "shell", path: '../setup-hostname.sh', args: 'warren.infra.macapinlac.com'
+    warren.vm.provision "shell", path: '../setup-minion.sh', args: '172.28.128.10'
   end
 
+  config.vm.define :mirajane do |mirajane|
+    mirajane.vm.box = 'dev-box-hwhl-redis-rabbitmq-mirajane'
+    mirajane.vm.network "private_network", ip: "172.28.128.20"
+    mirajane.vm.provision "shell", path: '../setup-hostname.sh', args: 'mirajane.infra.macapinlac.com'
+    mirajane.vm.provision "shell", path: '../setup-minion.sh', args: '172.28.128.10'
+  end
 end
 

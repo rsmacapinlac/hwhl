@@ -1,0 +1,34 @@
+#n -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box_url   = 'https://vagrantcloud.com/ubuntu/boxes/trusty64/versions/14.04/providers/virtualbox.box'
+  config.vm.synced_folder "../../configs/vagrant", "/vagrant/configs/"
+
+  config.vm.define :hinata do |hinata|
+    hinata.vm.box       = 'dev-box-hwhl-minion-media'
+    hinata.vm.network "private_network", ip: "172.28.128.15"
+
+    # sabnzbd configuration
+    hinata.vm.network "forwarded_port", guest: 8080, host: 8080
+
+    hinata.vm.provision "shell", path: '../setup-hostname.sh', args: 'hinata.media.local.macapinlac.dev'
+    hinata.vm.provision "shell", path: '../setup-minion.sh'
+  end
+
+
+  config.vm.define :shino do |shino|
+    shino.vm.box       = 'dev-box-hwhl-minion-db'
+
+    config.vm.network "private_network", ip: "172.28.128.30"
+
+    # mysql
+    config.vm.network "forwarded_port", guest: 3306, host: 3306
+
+    config.vm.provision "shell", path: '../setup-hostname.sh', args: 'shino.db.local.macapinlac.dev'
+    config.vm.provision "shell", path: '../setup-minion.sh'
+  end
+
+end
+

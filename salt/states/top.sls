@@ -6,14 +6,11 @@ base:
     - ntp
     - logrotate
     - motd
+    - network.hosts
 
-  #'*..macapinlac.*':
+  #'^(\w+).(infra|db|media).*':
+  #  - match: pcre
   #  - nagios.minion
-  #  - network.static-ip
-
-  '^(\w+).(infra|db|media).*':
-    - match: pcre
-    - nagios.minion
 
   #'^(\w+).(infra|db|media).*':
   #  - match: pcre
@@ -23,9 +20,17 @@ base:
     - users.media
     # TODO: setup key for the 'media' user
 
+  # Warren is from FairyTail, he can communicate and get status updates from
+  # everyone telepathically. (nagios)
+  #'warren.infra.*':
+  #  - nagios
+  #  - apache.vhosts.standard
+  #  - apache.modules
+
   # This is the self configuration of the saltmaster
   'makarov.infra.*':
-    - saltstack.config
+    - saltstack.master
+    - saltstack.minion
     - saltstack.cron_refresh
 
   'laxus.media.*':
@@ -56,12 +61,3 @@ base:
     - mysql.database
     - mysql.server
     - mysql.user
-
-  # Warren is from FairyTail, he can communicate and get status updates from
-  # everyone telepathically. (nagios)
-  'warren.infra.*':
-    - nagios.server
-    - nagios.config
-    - apache.vhosts.standard
-    - apache.modules
-

@@ -5,10 +5,6 @@ git-core:
   file.managed:
     - source: salt://saltstack/files/master
 
-/etc/salt/minion:
-  file.managed:
-    - source: salt://saltstack/files/master
-
 /etc/salt/autosign.conf:
   file.managed:
     - source: salt://saltstack/files/autosign.conf
