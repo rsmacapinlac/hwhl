@@ -6,6 +6,10 @@ file_roots:
     - /srv/hwhl/salt/states
     - /srv/hwhl/salt/formulae/apache
     - /srv/hwhl/salt/formulae/mysql
+    - /srv/hwhl/salt/formulae/sensu
+    - /srv/hwhl/salt/formulae/rabbitmq
+    - /srv/hwhl/salt/formulae/redis
+
 
 pillar_roots:
   base:
