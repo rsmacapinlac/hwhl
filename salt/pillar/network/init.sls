@@ -11,3 +11,12 @@ network:
     mirajane:
       role: infra
       ipaddr: 172.28.128.20
+    shino:
+      role: media
+      ipaddr: 172.28.128.30
+    hinata:
+      role: media
+      ipaddr: 172.28.128.50
+    kiba:
+      role: media
+      ipaddr: 172.28.128.55

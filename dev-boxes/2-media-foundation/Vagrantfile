@@ -4,30 +4,28 @@
 Vagrant.configure("2") do |config|
 
   config.vm.box_url   = 'https://vagrantcloud.com/ubuntu/boxes/trusty64/versions/14.04/providers/virtualbox.box'
-  config.vm.synced_folder "../../configs/vagrant", "/vagrant/configs/"
+  config.vm.synced_folder "../../", "/srv/hwhl/"
 
   config.vm.define :hinata do |hinata|
-    hinata.vm.box       = 'dev-box-hwhl-minion-media'
-    hinata.vm.network "private_network", ip: "172.28.128.15"
+    hinata.vm.box       = 'dev-box-hwhl-newsgroup-hinata'
+    hinata.vm.network "private_network", ip: "172.28.128.50"
 
     # sabnzbd configuration
     hinata.vm.network "forwarded_port", guest: 8080, host: 8080
 
-    hinata.vm.provision "shell", path: '../setup-hostname.sh', args: 'hinata.media.local.macapinlac.dev'
-    hinata.vm.provision "shell", path: '../setup-minion.sh'
+    hinata.vm.provision "shell", path: '../setup-hostname.sh', args: 'hinata.media.macapinlac.com'
+    hinata.vm.provision "shell", path: '../setup-minion.sh', args: '172.28.128.10'
   end
 
+  config.vm.define :kiba do |kiba|
+    kiba.vm.box       = 'dev-box-hwhl-download-kiba'
+    kiba.vm.network "private_network", ip: "172.28.128.55"
 
-  config.vm.define :shino do |shino|
-    shino.vm.box       = 'dev-box-hwhl-minion-db'
+    # sonarr port
+    kiba.vm.network "forwarded_port", guest: 8989, host: 8989
 
-    config.vm.network "private_network", ip: "172.28.128.30"
-
-    # mysql
-    config.vm.network "forwarded_port", guest: 3306, host: 3306
-
-    config.vm.provision "shell", path: '../setup-hostname.sh', args: 'shino.db.local.macapinlac.dev'
-    config.vm.provision "shell", path: '../setup-minion.sh'
+    kiba.vm.provision "shell", path: '../setup-hostname.sh', args: 'kiba.media.macapinlac.com'
+    kiba.vm.provision "shell", path: '../setup-minion.sh', args: '172.28.128.10'
   end
 
 end

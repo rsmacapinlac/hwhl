@@ -26,5 +26,16 @@ Vagrant.configure("2") do |config|
     mirajane.vm.provision "shell", path: '../setup-hostname.sh', args: 'mirajane.infra.macapinlac.com'
     mirajane.vm.provision "shell", path: '../setup-minion.sh', args: '172.28.128.10'
   end
+
+  config.vm.define :shino do |shino|
+    shino.vm.box       = 'dev-box-hwhl-minion-db'
+    shino.vm.network "private_network", ip: "172.28.128.30"
+
+    # mysql
+    shino.vm.network "forwarded_port", guest: 3306, host: 3306
+
+    shino.vm.provision "shell", path: '../setup-hostname.sh', args: 'shino.db.macapinlac.com'
+    shino.vm.provision "shell", path: '../setup-minion.sh', args: '172.28.128.10'
+  end
 end
 

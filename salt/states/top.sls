@@ -49,8 +49,9 @@ base:
 
   # Kiba is from Naruto, he's kinda loud and most people talk to him.
   'kiba.media.*':
-    - sickbeard.install
-    - sickbeard.config
+    - sonarr.install
+    # - sickbeard.install
+    # - sickbeard.config
     - transmission.install
     - transmission.config
 

@@ -1,1 +1,0 @@
-{"virtualbox":{"/srv/salt":{"guestpath":"/srv/salt","hostpath":"/Volumes/z/code/centrex/salt","disabled":false},"/vagrant/configs":{"guestpath":"/vagrant/configs","hostpath":"/Volumes/z/code/centrex/configs/vagrant","disabled":false},"/vagrant":{"guestpath":"/vagrant","hostpath":"/Volumes/z/code/centrex/dev-boxes/minion-app","disabled":false}}}
