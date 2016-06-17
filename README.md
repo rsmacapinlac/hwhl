@@ -14,10 +14,16 @@ password).
 
 # setup your salt master
 
-2. Make sure that your saltmaster has a static IP (this is needed when you're setting up the minions)
-3. Run this: `sh -c "$(wget https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/bootstrap/master.sh -O -)"`
+1. Make sure that your saltmaster has a static IP (this is needed when you're setting up the minions)
+2. Run this: `sh -c "$(wget https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/bootstrap/master.sh -O -)"`
 
 What it will do, it will set the hostname to `makarov.infra.macapinlac.com`.
 Then it will install the repository, copy the necessary SaltStack configuration
 and then restart the minion / master.
 
+## Setup your minions
+
+1. Make sure that you know your saltmaster's static IP
+2. Run this `sh -c "$(wget https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/bootstrap/minion.sh -O -)" hey <shino.db.macapinlac.com> <192.168.1.400>`
+
+Where shino.db.macapinlac.com is the hostname to set the minion to and 192.168.1.400 is the IP address of the saltmaster.
