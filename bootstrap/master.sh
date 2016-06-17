@@ -1,5 +1,7 @@
 #!/bin/sh
 
+sudo sh -c 'echo makarov.infra.macapinlac.com > /etc/hostname'; sudo hostname makarov.infra.macapinlac.com
+
 # get and install the saltstack
 sudo add-apt-repository -y ppa:saltstack/salt
 sudo apt-get update

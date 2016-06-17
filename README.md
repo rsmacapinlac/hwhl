@@ -11,3 +11,13 @@ received by donating.
 
 You also need a newsgroup subscription (with a server url, port, username and
 password).
+
+# setup your salt master
+
+2. Make sure that your saltmaster has a static IP (this is needed when you're setting up the minions)
+3. Run this: `sh -c "$(wget https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/bootstrap/master.sh -O -)"`
+
+What it will do, it will set the hostname to `makarov.infra.macapinlac.com`.
+Then it will install the repository, copy the necessary SaltStack configuration
+and then restart the minion / master.
+
