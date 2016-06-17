@@ -12,7 +12,7 @@ network:
       role: infra
       ipaddr: 172.28.128.20
     shino:
-      role: media
+      role: db
       ipaddr: 172.28.128.30
     hinata:
       role: media

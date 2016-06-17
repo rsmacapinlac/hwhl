@@ -7,6 +7,12 @@ configure_transmission:
     - name: /etc/transmission-daemon/settings.json
     - source: salt://transmission/files/settings.transmission.json
 
+/home/media/Downloads:
+  file.directory:
+    - mode: 777
+    - makedirs: True
+    - recurse:
+      - mode
 
 restart_transmission:
   service.running:

@@ -1,9 +1,14 @@
 mono-devel:
   pkg.installed
 
-/etc/init.d/nzbdrone:
+autostart_sonar:
   file.managed:
+    - name: /etc/init/nzbdrone.conf
     - source: salt://sonarr/files/nzbdrone
+
+  cmd.run:
+    - name: 'start nzbdrone'
+
 
 sonarr:
   pkgrepo.managed:

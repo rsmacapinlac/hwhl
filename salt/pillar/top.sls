@@ -7,11 +7,11 @@ base:
   '*':
     - network
 
-  'shino.db.local.macapinlac.*':
+  'shino.db.macapinlac.*':
     - mysql.media
     # - nagios
 
-  'hinata.media.local.macapinlac.*':
+  'hinata.media.macapinlac.*':
     - mysql.media
     - apache.newznab
     - newznab.credentials

@@ -1,6 +1,13 @@
 cifs-utils:
   pkg.installed
 
+winbind:
+  pkg.installed
+
+/etc/nsswitch.conf:
+  file.managed:
+    - source: salt://fileservers/files/nsswitch.conf
+
 /media/saber:
   file.directory:
     - mode: 777

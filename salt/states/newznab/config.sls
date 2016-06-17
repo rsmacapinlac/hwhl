@@ -44,3 +44,9 @@ copy_custom_update_config:
     - source: salt://newznab/files/newznab.init.conf
     - mode: 755
 
+/var/www/nnplus/misc/update_scripts/nix_scripts/newznab_screen_local.sh:
+  cron.present:
+    - user: root
+    - minute: 0
+    - hour: '*/3'
+

@@ -8,9 +8,9 @@ export NEWZNAB_PATH="/var/www/nnplus/misc/update_scripts"
 export NEWZNAB_SLEEP_TIME="600" # in seconds
 LASTOPTIMIZE=`date +%s`
 
-while :
+#while :
 
- do
+# do
 CURRTIME=`date +%s`
 cd ${NEWZNAB_PATH}
 /usr/bin/php5 ${NEWZNAB_PATH}/update_binaries.php
@@ -25,7 +25,7 @@ then
 	/usr/bin/php5 ${NEWZNAB_PATH}/update_theaters.php
 fi
 
-echo "waiting ${NEWZNAB_SLEEP_TIME} seconds..."
-sleep ${NEWZNAB_SLEEP_TIME}
+#echo "waiting ${NEWZNAB_SLEEP_TIME} seconds..."
+#sleep ${NEWZNAB_SLEEP_TIME}
 
-done
+#done

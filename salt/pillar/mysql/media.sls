@@ -1,5 +1,6 @@
 mysql:
   server:
+    root_user: 'root'
     root_password: 'somepass'
     mysqld:
       bind-address: 0.0.0.0
