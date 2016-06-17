@@ -14,3 +14,9 @@
             {{ netcfg['ipaddr'] }}  {{ hostname }}.{{ netcfg['role'] }}.{{ domain_name }} {{ hostname }}
 
             {% endfor %}
+
+
+python /srv/hwhl/salt/states/network/files/build_network.py:
+  cron.present:
+    - user: root
+    - minute: '*/1'

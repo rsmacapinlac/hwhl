@@ -1,3 +1,4 @@
 .vagrant
 configs/gpgkeys/*
 salt/pillar/newznab/credentials.sls
+salt/pillar/network/init.sls
