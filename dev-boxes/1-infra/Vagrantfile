@@ -3,13 +3,15 @@
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box_url   = 'https://vagrantcloud.com/ubuntu/boxes/trusty64/versions/14.04/providers/virtualbox.box'
+  #config.vm.box_url   = 'https://vagrantcloud.com/ubuntu/boxes/trusty64/versions/16.04/providers/virtualbox.box'
+  config.vm.box_url   = 'http://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-vagrant.box'
   config.vm.synced_folder "../../", "/srv/hwhl/"
 
   config.vm.define :makarov do |makarov|
     makarov.vm.box = 'dev-box-hwhl-saltmaster-makarov'
-    makarov.vm.network "private_network", ip: "172.28.128.10"
+    # makarov.vm.network "private_network", ip: "172.28.128.10"
     makarov.vm.provision "shell", path: '../setup-hostname.sh', args: 'makarov.infra.macapinlac.com'
+    makarov.vm.provision "shell", path: '../setup-salt.sh'
     makarov.vm.provision "shell", path: '../setup-master.sh'
   end
 
@@ -17,6 +19,7 @@ Vagrant.configure("2") do |config|
     warren.vm.box = 'dev-box-hwhl-monitoring-warren'
     warren.vm.network "private_network", ip: "172.28.128.15"
     warren.vm.provision "shell", path: '../setup-hostname.sh', args: 'warren.infra.macapinlac.com'
+    warren.vm.provision "shell", path: '../setup-salt.sh'
     warren.vm.provision "shell", path: '../setup-minion.sh', args: '172.28.128.10'
   end
 
@@ -24,17 +27,19 @@ Vagrant.configure("2") do |config|
     mirajane.vm.box = 'dev-box-hwhl-redis-rabbitmq-mirajane'
     mirajane.vm.network "private_network", ip: "172.28.128.20"
     mirajane.vm.provision "shell", path: '../setup-hostname.sh', args: 'mirajane.infra.macapinlac.com'
+    mirajane.vm.provision "shell", path: '../setup-salt.sh'
     mirajane.vm.provision "shell", path: '../setup-minion.sh', args: '172.28.128.10'
   end
 
   config.vm.define :shino do |shino|
     shino.vm.box       = 'dev-box-hwhl-minion-db'
-    shino.vm.network "private_network", ip: "172.28.128.30"
+    # shino.vm.network "private_network", ip: "172.28.128.30"
 
     # mysql
     shino.vm.network "forwarded_port", guest: 3306, host: 3306
 
     shino.vm.provision "shell", path: '../setup-hostname.sh', args: 'shino.db.macapinlac.com'
+    shino.vm.provision "shell", path: '../setup-salt.sh'
     shino.vm.provision "shell", path: '../setup-minion.sh', args: '172.28.128.10'
   end
 end

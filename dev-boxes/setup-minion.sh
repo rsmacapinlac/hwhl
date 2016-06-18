@@ -1,7 +1,5 @@
 #!/bin/bash
 
-sudo add-apt-repository -y ppa:saltstack/salt
-sudo apt-get update
 sudo apt-get install -y python-pip salt-minion python-gnupg
 
 # copy the minion configuration from the repo

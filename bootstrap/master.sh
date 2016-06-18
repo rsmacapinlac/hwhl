@@ -13,6 +13,7 @@ sudo cp /srv/hwhl/salt/states/saltstack/files/master /etc/salt/master
 sudo cp /srv/hwhl/salt/states/saltstack/files/minion /etc/salt/minion
 sudo sed -i "s/{{ pillar\['network'\]\['saltmaster'\] }}/localhost/g" /etc/salt/minion
 sudo cp /srv/hwhl/salt/states/saltstack/files/autosign.conf /etc/salt/autosign.conf
+sudo cp /srv/hwhl/salt/pillar/network/init.example.sls /srv/hwhl/satl/pillar/network/init.sls
 
 # sudo wget -O /etc/salt/master https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/configs/bootstrap/master
 # sudo wget -O /etc/salt/autosign.conf https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/configs/bootstrap/autosign.conf
