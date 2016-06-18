@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get -y install salt-master salt-minion
+sudo apt-get -y --force-yes install salt-master salt-minion
 
 # copy the master / minion config from the repo
 sudo cp /srv/hwhl/salt/states/saltstack/files/master /etc/salt/master
