@@ -2,7 +2,7 @@
 
 cd ~
 
-sudo apt-get update && sudo apt-get upgrade && sudo apt-get install -y git-core
+sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get install -y git-core
 
 wget https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/bootstrap/setup-hostname.sh
 wget https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/bootstrap/setup-salt.sh

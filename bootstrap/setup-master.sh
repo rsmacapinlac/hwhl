@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt-get install -y python-pip salt-master salt-minion python-gnupg
+sudo apt-get -y install python-pip salt-master salt-minion python-gnupg
 
 # copy the master / minion config from the repo
 sudo cp /srv/hwhl/salt/states/saltstack/files/master /etc/salt/master
