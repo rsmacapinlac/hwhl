@@ -1,21 +1,18 @@
-#!/bin/sh
+#!/bin/bash
 
-sudo sh -c 'echo makarov.infra.macapinlac.com > /etc/hostname'; sudo hostname makarov.infra.macapinlac.com
+cd ~
 
-# get and install the saltstack
-sudo add-apt-repository -y ppa:saltstack/salt
-sudo apt-get update
-sudo apt-get install -y git-core python-pip salt-master salt-minion python-gnupg
+sudo apt-get update && sudo apt-get upgrade && sudo apt-get install -y git-core
+
+wget https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/bootstrap/setup-hostname.sh
+wget https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/bootstrap/setup-salt.sh
+wget https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/bootstrap/setup-master.sh
+
+chmod +x setup-*
 
 cd /srv; sudo git clone https://github.com/rsmacapinlac/hwhl hwhl
 
-sudo cp /srv/hwhl/salt/states/saltstack/files/master /etc/salt/master
-sudo cp /srv/hwhl/salt/states/saltstack/files/minion /etc/salt/minion
-sudo sed -i "s/{{ pillar\['network'\]\['saltmaster'\] }}/localhost/g" /etc/salt/minion
-sudo cp /srv/hwhl/salt/states/saltstack/files/autosign.conf /etc/salt/autosign.conf
-sudo cp /srv/hwhl/salt/pillar/network/init.example.sls /srv/hwhl/satl/pillar/network/init.sls
+sudo ~/setup-hostname.sh makarov.infra.macapinlac.com
+sudo ~/setup-salt.sh
+sudo ~/setup-master.sh
 
-# sudo wget -O /etc/salt/master https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/configs/bootstrap/master
-# sudo wget -O /etc/salt/autosign.conf https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/configs/bootstrap/autosign.conf
-
-sudo service salt-master restart; sudo service salt-minion restart
