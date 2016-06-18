@@ -8,26 +8,26 @@ Vagrant.configure("2") do |config|
 
   config.vm.define :hinata do |hinata|
     hinata.vm.box       = 'dev-box-hwhl-newsgroup-hinata'
-    # hinata.vm.network "private_network", ip: "172.28.128.50"
+    hinata.vm.network "private_network", ip: "172.28.128.50"
 
     # sabnzbd configuration
     hinata.vm.network "forwarded_port", guest: 8080, host: 8080
 
-    hinata.vm.provision "shell", path: '../setup-hostname.sh', args: 'hinata.media.macapinlac.com'
-    hinata.vm.provision "shell", path: '../setup-salt.sh'
-    hinata.vm.provision "shell", path: '../setup-minion.sh', args: '172.28.128.10'
+    hinata.vm.provision "shell", path: '../../bootstrap/setup-hostname.sh', args: 'hinata.media.macapinlac.com'
+    hinata.vm.provision "shell", path: '../../bootstrap/setup-salt.sh'
+    hinata.vm.provision "shell", path: '../../bootstrap/setup-minion.sh', args: '172.28.128.10'
   end
 
   config.vm.define :kiba do |kiba|
     kiba.vm.box       = 'dev-box-hwhl-download-kiba'
-    # kiba.vm.network "private_network", ip: "172.28.128.55"
+    kiba.vm.network "private_network", ip: "172.28.128.55"
 
     # sonarr port
     kiba.vm.network "forwarded_port", guest: 8989, host: 8989
 
-    kiba.vm.provision "shell", path: '../setup-hostname.sh', args: 'kiba.media.macapinlac.com'
-    kiba.vm.provision "shell", path: '../setup-salt.sh'
-    kiba.vm.provision "shell", path: '../setup-minion.sh', args: '172.28.128.10'
+    kiba.vm.provision "shell", path: '../../bootstrap/setup-hostname.sh', args: 'kiba.media.macapinlac.com'
+    kiba.vm.provision "shell", path: '../../bootstrap/setup-salt.sh'
+    kiba.vm.provision "shell", path: '../../bootstrap/setup-minion.sh', args: '172.28.128.10'
   end
 
 end
