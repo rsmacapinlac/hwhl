@@ -3,8 +3,7 @@
 
 Vagrant.configure("2") do |config|
 
-  #config.vm.box_url   = 'https://vagrantcloud.com/ubuntu/boxes/trusty64/versions/16.04/providers/virtualbox.box'
-  config.vm.box_url   = 'http://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-vagrant.box'
+  config.vm.box_url   = 'https://vagrantcloud.com/ubuntu/boxes/trusty64/versions/16.04/providers/virtualbox.box'
   config.vm.synced_folder "../../", "/srv/hwhl/"
 
   config.vm.define :makarov do |makarov|

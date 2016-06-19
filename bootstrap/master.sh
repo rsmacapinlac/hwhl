@@ -10,8 +10,6 @@ wget https://raw.githubusercontent.com/rsmacapinlac/hwhl/master/bootstrap/setup-
 
 chmod +x setup-*
 
-cd /srv; sudo git clone https://github.com/rsmacapinlac/hwhl hwhl
-
 sudo ~/setup-hostname.sh makarov.infra.macapinlac.com
 sudo ~/setup-salt.sh
 sudo ~/setup-master.sh

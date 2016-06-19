@@ -5,6 +5,7 @@
     file.managed:
         - contents: |
             127.0.0.1 localhost
+            127.0.1.1 {{ salt['grains.get']('host') }}
             ::1 localhost
 
             {% raw %}
