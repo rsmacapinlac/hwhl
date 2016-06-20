@@ -1,6 +1,12 @@
 cifs-utils:
   pkg.installed
 
+libnss-winbind:
+  pkg.installed
+
+libpam-winbind:
+  pkg.installed
+
 winbind:
   pkg.installed
 
