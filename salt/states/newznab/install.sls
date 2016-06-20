@@ -1,28 +1,32 @@
 apache2:
   pkg.installed
 
-libapache2-mod-php:
-  pkg.installed
+php5-repo:
+  pkgrepo.managed:
+    - ppa: wolfnet/logstash
 
-php7.0:
-  pkg.installed
-
-php7.0-fpm:
-  pkg.installed
-
-php7.0-dev:
-  pkg.installed
-
-php7.0-gd:
-  pkg.installed
-
-#php-pear:
+# libapache2-mod-php:
 #  pkg.installed
 
-php7.0-curl:
+php5.6:
   pkg.installed
 
-php7.0-mysql:
+#php5.6-fpm:
+#  pkg.installed
+
+php5.6-dev:
+  pkg.installed
+
+php5.6-gd:
+  pkg.installed
+
+php-pear:
+  pkg.installed
+
+php5.6-curl:
+  pkg.installed
+
+php5.6-mysql:
   pkg.installed
 
 subversion:
@@ -37,11 +41,11 @@ lame:
 screen:
   pkg.installed
 
-/etc/php/7.0/cli/php.ini:
+/etc/php/5.6/cli/php.ini:
   file.managed:
     - source: salt://newznab/files/php-cli.ini
 
-/etc/php/7.0/fpm/php.ini:
+/etc/php/5.6/fpm/php.ini:
   file.managed:
     - source: salt://newznab/files/php-apache2.ini
 
