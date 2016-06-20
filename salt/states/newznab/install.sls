@@ -4,6 +4,9 @@ apache2:
 php7.0:
   pkg.installed
 
+php7.0-fpm:
+  pkg.installed
+
 php7.0-dev:
   pkg.installed
 
@@ -29,9 +32,6 @@ lame:
   pkg.installed
 
 screen:
-  pkg.installed
-
-tmux:
   pkg.installed
 
 /etc/php/7.0/cli/php.ini:
