@@ -1,6 +1,9 @@
 apache2:
   pkg.installed
 
+libapache2-mod-php:
+  pkg.installed
+
 php7.0:
   pkg.installed
 
