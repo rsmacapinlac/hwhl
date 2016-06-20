@@ -1,22 +1,22 @@
 apache2:
   pkg.installed
 
-php5:
+php7.0:
   pkg.installed
 
-php5-dev:
+php7.0-dev:
   pkg.installed
 
-php5-gd:
+php7.0-gd:
   pkg.installed
 
-php-pear:
+#php-pear:
+#  pkg.installed
+
+php7.0-curl:
   pkg.installed
 
-php5-curl:
-  pkg.installed
-
-php5-mysql:
+php7.0-mysql:
   pkg.installed
 
 subversion:
@@ -34,11 +34,11 @@ screen:
 tmux:
   pkg.installed
 
-/etc/php5/cli/php.ini:
+/etc/php7.0/cli/php.ini:
   file.managed:
     - source: salt://newznab/files/php-cli.ini
 
-/etc/php5/apache2/php.ini:
+/etc/php7.0/apache2/php.ini:
   file.managed:
     - source: salt://newznab/files/php-apache2.ini
 
