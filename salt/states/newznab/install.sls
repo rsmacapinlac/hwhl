@@ -34,11 +34,11 @@ screen:
 tmux:
   pkg.installed
 
-/etc/php7.0/cli/php.ini:
+/etc/php/7.0/cli/php.ini:
   file.managed:
     - source: salt://newznab/files/php-cli.ini
 
-/etc/php7.0/apache2/php.ini:
+/etc/php/7.0/fpm/php.ini:
   file.managed:
     - source: salt://newznab/files/php-apache2.ini
 
