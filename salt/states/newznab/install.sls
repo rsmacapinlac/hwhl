@@ -1,32 +1,22 @@
 apache2:
   pkg.installed
 
-php5-repo:
-  pkgrepo.managed:
-    - ppa: wolfnet/logstash
-
-# libapache2-mod-php:
-#  pkg.installed
-
-php5.6:
+php5:
   pkg.installed
 
-#php5.6-fpm:
-#  pkg.installed
-
-php5.6-dev:
+php5-dev:
   pkg.installed
 
-php5.6-gd:
+php5-gd:
   pkg.installed
 
 php-pear:
   pkg.installed
 
-php5.6-curl:
+php5-curl:
   pkg.installed
 
-php5.6-mysql:
+php5-mysql:
   pkg.installed
 
 subversion:
@@ -41,11 +31,14 @@ lame:
 screen:
   pkg.installed
 
-/etc/php/5.6/cli/php.ini:
+tmux:
+  pkg.installed
+
+/etc/php5/cli/php.ini:
   file.managed:
     - source: salt://newznab/files/php-cli.ini
 
-/etc/php/5.6/fpm/php.ini:
+/etc/php5/apache2/php.ini:
   file.managed:
     - source: salt://newznab/files/php-apache2.ini
 
