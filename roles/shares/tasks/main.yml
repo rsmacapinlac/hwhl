@@ -1,0 +1,44 @@
+- name: Install mounting dependencies
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  loop:
+    - nfs-common
+    - nfs4-acl-tools
+    - avahi-daemon
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Check mountpoint exist
+  become: yes
+  ansible.builtin.file:
+    path: "{{ item.destination }}"
+    state: directory
+    mode: '0755'
+  ignore_errors: true
+  loop: "{{ shares }}"
+
+#- name: Workaround ensure share is unmounted
+#  command: "umount /media/ContainerData"
+
+- name: Mount nfs or smb shares
+  become: yes
+  ansible.posix.mount:
+    fstype: "{{ item.type }}"
+    src: "{{ item.source }}"
+    path: "{{ item.destination }}"
+    opts: "{{ item.options }}"
+    state: mounted
+  loop: "{{ shares }}"
+
+# Workaround: https://github.com/ansible/ansible/issues/29814
+#- name: Mount share {{ share_name }}
+#  become: yes
+#  ansible.posix.mount:
+#    src: "{{ server }}:{{ share_name }}"
+#    path: "{{ mount_point }}"
+#    opts: defaults
+#    state: mounted
+#    fstype: nfs
+#  when: shares_mount_info.changed

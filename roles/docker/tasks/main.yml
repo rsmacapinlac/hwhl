@@ -1,0 +1,106 @@
+
+- name: Install dependencies
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  loop:
+    - ca-certificates
+    - curl
+    - gnupg
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+#- name: Download Docker gpg key (ubuntu)
+#  become: yes
+#  get_url:
+#    url: https://download.docker.com/linux/ubuntu/gpg
+#    dest: /usr/share/keyrings/docker-archive-keyring.gpg_armored
+#  when: ansible_distribution == 'Ubuntu'
+
+#- name: Download Docker gpg key (debian)
+#  become: yes
+#  get_url:
+#    url: https://download.docker.com/linux/debian/gpg
+#    dest: /usr/share/keyrings/docker-archive-keyring.gpg_armored
+#  when: ansible_distribution == 'Debian'
+
+#- name: De-Armor Docker GPG key
+#  become: yes
+#  shell:  'gpg --dearmor <  /usr/share/keyrings/docker-archive-keyring.gpg_armored > /usr/share/keyrings/docker.gpg'
+#  args:
+#    creates: /usr/share/keyrings/docker.gpg
+#  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+#- name: "Add Docker's repository to APT sources list (ubuntu)"
+#  become: yes
+#  ansible.builtin.apt_repository:
+#    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable"
+#    # repo: 'deb [arch="$(dpkg --print-architecture)" signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable"'
+#    state: present
+#  when: ansible_distribution == 'Ubuntu'
+
+
+#- name: "Add Docker's repository to APT sources list (debian)"
+#  become: yes
+#  ansible.builtin.apt_repository:
+#    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable"
+#    # repo: 'deb [arch="$(dpkg --print-architecture)" signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable"'
+#    state: present
+#  when: ansible_distribution == 'Debian'
+
+- name: Remove python-configparser package
+  apt:
+    name: python-configparser
+    state: absent
+- name: get docker convenience script
+  shell: curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
+  args:
+    creates: /tmp/get-docker.sh
+
+- name: install docker
+  shell: sh /tmp/get-docker.sh
+  args:
+    creates: /usr/bin/docker
+
+- name: Install Docker
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: latest
+    update_cache: yes
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Create "docker" group
+  group:
+    name: "docker"
+    state: present
+
+- name: Add "ansible" user to "docker" group
+  become: yes
+  user:
+    name: "ansible"
+    groups: "docker"
+    append: yes
+
+- name: Service folder where all docker-compose files will be put
+  become: yes
+  ansible.builtin.file:
+    path: /data/services
+    state: directory
+    owner: ansible
+    group: docker
+
+
+#- name: Ensure Docker starts
+#  service:
+#    name: docker
+#    state: started
+#    enabled: yes
+

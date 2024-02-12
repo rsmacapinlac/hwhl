@@ -1,0 +1,26 @@
+---
+- hosts: proxmox_all_lxc:proxmox_nodes_by_ip
+  remote_user: root
+  tasks:
+    - name: apt update
+      include_tasks: roles/common/tasks/apt-update.yml
+
+- hosts: "workstations"
+  tasks:
+    - name: apt update
+      include_tasks: roles/common/tasks/apt-update.yml
+
+- hosts: "proxmox_nodes_by_ip"
+  remote_user: root
+  tasks:
+    - name: Create 'homelab' user
+      ansible.builtin.user:
+        name: ansible
+        uid: 1001
+        shell: /bin/bash
+
+- hosts: docker:dns:proxy
+  remote_user: ansible
+  tasks:
+    - name: "Update containers"
+      include_tasks: roles/watchtower/tasks/update.yml

@@ -1,0 +1,23 @@
+---
+- name: Update DNS A record and CNAME entries
+  remote_user: ansible
+  hosts: "dns"
+  tasks:
+    - name: Update PiHole
+      include_tasks: roles/pihole/tasks/update.yml
+
+- name: Update Proxy routes
+  remote_user: ansible
+  hosts: "proxy"
+  tasks:
+    - name: Update Traefik
+      include_tasks: roles/traefik/tasks/update_routes.yml
+
+- name: Update Authelia configuration
+  remote_user: ansible
+  hosts: "proxy"
+  vars_files:
+    - group_vars/proxy.yml
+  tasks:
+    - name: Update authelia configuration
+      include_tasks: roles/authelia/tasks/update_configuration.yml

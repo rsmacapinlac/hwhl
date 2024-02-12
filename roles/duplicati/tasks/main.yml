@@ -1,0 +1,32 @@
+- name: Create a backup folder for the host
+  become: yes
+  ansible.builtin.file:
+    path: "/mnt/ContainerBackups/{{ ansible_hostname }}"
+    state: directory
+
+- name: Create services folder
+  become: yes
+  ansible.builtin.file:
+    path: /data/services
+    state: directory
+    owner: ansible
+
+- name: Create Duplicati data folder
+  become: yes
+  ansible.builtin.file:
+    path: "/data/containers/duplicati_{{ ansible_hostname }}"
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Setup docker compose file for Duplicati
+  become: yes
+  template:
+    src: docker-compose.j2
+    dest: /data/services/duplicati.yml
+    owner: ansible
+    group: docker
+
+- name: Run container
+  shell:
+    cmd: "docker compose -f /data/services/duplicati.yml up -d"

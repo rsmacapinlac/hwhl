@@ -1,0 +1,59 @@
+- name: Create services folder
+  become: true
+  ansible.builtin.file:
+    path: /data/services/
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Setup docker compose file for traefik
+  become: true
+  template:
+    src: docker-compose.j2
+    dest: /data/services/traefik.yml
+    owner: ansible
+    group: docker
+
+- name: Traefik folder
+  become: true
+  ansible.builtin.file:
+    path: /data/containers/traefik
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Traefik config
+  become: true
+  template:
+    src: traefik.yml.j2
+    dest: /data/containers/traefik/traefik.yml
+    owner: ansible
+    group: docker
+
+- name: Traefik routes
+  become: true
+  copy:
+    src: ../files/routes.yml
+    dest: /data/containers/traefik/config.yml
+    owner: ansible
+    group: docker
+
+- name: Traefik cert file
+  become: true
+  ansible.builtin.file:
+    path: /data/containers/traefik/acme.json
+    state: touch
+    mode: '0600'
+
+- name: Create proxy network
+  shell:
+    cmd: "docker network create proxy"
+  ignore_errors: true
+
+# Update the DNS records as well
+- include_tasks: update_routes.yml
+
+- name: Run container
+  shell:
+    cmd: "docker compose -f /data/services/traefik.yml up -d"
+

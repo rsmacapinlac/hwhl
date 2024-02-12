@@ -1,0 +1,29 @@
+- name: Install tmux
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  loop:
+    - tmux
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install tmux
+  become: yes
+  pacman:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  loop:
+    - tmux
+  tags:
+    - manjaro
+    - arch
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Clone TPM repository
+  become: no
+  git:
+    depth: 1
+    repo: 'https://github.com/tmux-plugins/tpm.git'
+    dest: ~/.tmux/plugins/tpm

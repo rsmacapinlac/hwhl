@@ -1,0 +1,61 @@
+- name: Install nvim
+  become: yes
+  pacman:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  loop:
+    - neovim
+    - ripgrep
+    - fd
+    - ttf-jetbrains-mono-nerd
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Install nvim dependencies and nvim build dependencies
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  loop:
+    # - neovim
+    - ninja-build
+    - gettext
+    - cmake
+    - unzip
+    - curl
+    - ripgrep
+    # - rust-fd-find
+    - fonts-jetbrains-mono
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Download stable release from the neovim repository
+  become: no
+  ansible.builtin.git:
+    depth: 1
+    version: stable
+    repo: https://github.com/neovim/neovim 
+    dest: /tmp/neovim
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Build neovim
+  become: no
+  shell:
+    cmd: "make CMAKE_BUILD_TYPE=RelWithDebInfo"
+    chdir: /tmp/neovim
+  tags:
+    - debian
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Build neovim package
+  become: no
+  shell:
+    cmd: "cpack -G DEB"
+    chdir: /tmp/neovim/build
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install a neovim package
+  become: yes
+  ansible.builtin.apt:
+    deb: /tmp/neovim/build/nvim-linux64.deb
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

@@ -1,0 +1,20 @@
+- name: Create services folder
+  become: true
+  ansible.builtin.file:
+    path: /data/services/
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Setup docker compose file for cloudflare-ddns
+  become: true
+  template:
+    src: docker-compose.j2
+    dest: /data/services/cloudflare-ddns.yml
+    owner: ansible
+    group: docker
+
+- name: Run container
+  become: true
+  shell:
+    cmd: "docker compose -f /data/services/cloudflare-ddns.yml up -d"

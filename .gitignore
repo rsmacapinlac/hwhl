@@ -1,0 +1,17 @@
+.vault-pass-file
+.become-pass-file
+.facts.json
+.envrc
+.env
+
+# exclude group_vars with sensitive information
+group_vars/all
+group_vars/arrs.yml
+group_vars/backup.yml
+group_vars/dns.yml
+group_vars/docker.yml
+group_vars/proxy.yml
+group_vars/photos.yml
+group_vars/documents.yml
+group_vars/nextcloud.yml
+group_vars/homepage.yml

@@ -1,0 +1,2 @@
+# pihole password (will be the same for each dns instance)
+pihole_password:

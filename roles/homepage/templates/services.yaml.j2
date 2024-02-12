@@ -1,0 +1,109 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/latest/configs/services
+
+- RitchiePlex:
+    - Overseerr:
+        icon: overseerr
+        href: https://plx-request.macapinlac.network
+        widget:
+          type: overseerr
+          url: https://overseerr.van.macapinlac.network
+          key: {{ overseerr_api_key }}
+    - Plex:
+        icon: plex
+        href: https://plx.macapinlac.network
+        widget:
+          type: plex
+          url: https://plex.van.macapinlac.network
+          key: {{ plex_token }} # see https://www.plexopedia.com/plex-media-server/general/plex-token/
+
+- Services:
+    - PhotoPrism:
+        icon: photoprism
+        href: https://photos.macapinlac.network
+    - Paperless:
+        icon: paperless-ngx
+        href: https://documents.macapinlac.network
+    - Tube Archivist:
+        icon: tube-archivist
+        href: https://ta.macapinlac.network
+    - LinkDing:
+        icon: linkding
+        href: https://bookmarks.macapinlac.network
+
+- PVR:
+    - Sonarr:
+        icon: sonarr
+        href: https://sonarr.van.macapinlac.network
+        widget:
+          type: sonarr
+          url: https://sonarr.van.macapinlac.network
+          key: {{ sonarr_api_key }}
+          enableQueue: true # optional, defaults to false
+    - Radarr:
+        icon: radarr
+        href: https://radarr.van.macapinlac.network
+        widget:
+          type: radarr
+          url: https://radarr.van.macapinlac.network
+          key: {{ radarr_api_key }}
+          enableQueue: true # optional, defaults to false
+    - Prowlarr:
+        icon: prowlarr
+        href: https://prowlarr.van.macapinlac.network
+        widget:
+          type: prowlarr
+          url: https://prowlarr.van.macapinlac.network
+          key: {{ prowlarr_api_key }}
+          enableQueue: true # optional, defaults to false
+
+- Downloaders:
+    - Sabnzbd:
+        icon: sabnzbd
+        href: https://sabnzbd.van.macapinlac.network
+        widget:
+          type: sabnzbd
+          url: https://sabnzbd.van.macapinlac.network
+          key: {{ sabnzbd_api_key }}
+    - Transmission:
+        icon: transmission
+        href: https://transmission.van.macapinlac.network
+        widget:
+          type: transmission
+          url: https://transmission.van.macapinlac.network
+
+- Core:
+    - Traefik:
+        icon: traefik
+        href: https://traefik.van.macapinlac.network
+        widget:
+          type: traefik
+          url: https://traefik.van.macapinlac.network
+          username: {{ traefik_username }} # optional
+          password: {{ traefik_password }}  # optional
+
+    - PiHole One:
+        icon: pi-hole
+        href: https://dns1.van.macapinlac.network
+        widget:
+          type: pihole
+          url: http://10.1.0.2:8080
+          fields: ["queries", "blocked_percent"]
+          key: {{ pihole_api_key }}
+    - PiHole Two:
+        icon: pi-hole
+        href: https://dns2.van.macapinlac.network
+        widget:
+          type: pihole
+          url: http://10.1.0.3:8080
+          fields: ["queries", "blocked_percent"]
+          key: {{ pihole_api_key }}
+    - PiHole Three:
+        icon: pi-hole
+        href: https://dns3.van.macapinlac.network
+        widget:
+          type: pihole
+          url: http://10.1.0.4:8080
+          fields: ["queries", "blocked_percent"]
+          key: {{ pihole_api_key }}

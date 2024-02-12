@@ -1,0 +1,18 @@
+- name: Install flatpak and flatpak software plugin
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  loop:
+    - flatpak
+    - gnome-software-plugin-flatpak
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Add the flathub to the system installation
+  become: yes
+  community.general.flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

@@ -1,0 +1,10 @@
+- name: Install productivity tools
+  become: true
+  community.general.flatpak:
+    name:
+      - md.obsidian.Obsidian
+      - com.todoist.Todoist
+      - com.discordapp.Discord
+      - fr.free.Homebank
+      - com.mattjakeman.ExtensionManager
+  when: ansible_distribution == 'Debian'

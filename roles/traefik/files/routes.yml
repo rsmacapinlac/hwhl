@@ -1,0 +1,815 @@
+http:
+#region routers
+  routers:
+    # external routes
+    bienn8n:
+      entryPoints:
+        - "https"
+      rule: "Host(`bienbot.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: bienn8n
+    biendb:
+      entryPoints:
+        - "https"
+      rule: "Host(`biendb.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: biendb
+    n8n:
+      entryPoints:
+        - "https"
+      rule: "Host(`automation.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: n8n
+    baserow:
+      entryPoints:
+        - "https"
+      rule: "Host(`db.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: baserow
+    audiobookshelf-external:
+      entryPoints:
+        - "https"
+      rule: "Host(`abs.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: audiobookshelf
+    ubooquity-external:
+      entryPoints:
+        - "https"
+      rule: "Host(`reading.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: ubooquity
+    chat:
+      entryPoints:
+        - "https"
+      rule: "Host(`chat.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: mattermost
+    kasm-external:
+      entryPoints:
+        - "https"
+      rule: "Host(`apps.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: kasm
+    linkding:
+      entryPoints:
+        - "https"
+      rule: "Host(`bookmarks.macapinlac.network`)"
+      middlewares:
+        - authelia
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: linkding
+    photoprism:
+      entryPoints:
+        - "https"
+      rule: "Host(`photos.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: photoprism
+    monica:
+      entryPoints:
+        - "https"
+      rule: "Host(`prm.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: monica
+    plex:
+      entryPoints:
+        - "https"
+      rule: "Host(`plx.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: plex
+    overseerr:
+      entryPoints:
+        - "https"
+      rule: "Host(`plx-request.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: overseerr
+    homeassistant:
+      entryPoints:
+        - "https"
+      rule: "Host(`ha.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: homeassistant
+    nextcloud:
+      entryPoints:
+        - "https"
+      rule: "Host(`nc.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: nextcloud
+    paperless-ng:
+      entryPoints:
+        - "https"
+      rule: "Host(`documents.macapinlac.network`)"
+      middlewares:
+        - authelia
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: paperless-ng
+    fresh-rss:
+      entryPoints:
+        - "https"
+      rule: "Host(`rss.macapinlac.network`)"
+      middlewares:
+        - authelia
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: fresh-rss
+    homepage:
+      entryPoints:
+        - "https"
+      rule: "Host(`van.macapinlac.network`)"
+      middlewares:
+        - authelia
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: homepage
+    tubearchivist:
+      entryPoints:
+        - "https"
+      rule: "Host(`ta.macapinlac.network`)"
+      middlewares:
+        - authelia
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: tubearchivist
+
+    # internal routes (add to the top)
+    audiobookshelf-internal:
+      entryPoints:
+        - "https"
+      rule: "Host(`audiobookshelf.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: audiobookshelf
+    it-tools:
+      entryPoints:
+        - "https"
+      rule: "Host(`it-tools.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: it-tools
+    overseerr-int:
+      entryPoints:
+        - "https"
+      rule: "Host(`overseerr.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: overseerr
+    monica-int:
+      entryPoints:
+        - "https"
+      rule: "Host(`monica.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: monica
+    linkding-int:
+      entryPoints:
+        - "https"
+      rule: "Host(`linkding.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: linkding
+    ubooquity:
+      entryPoints:
+        - "https"
+      rule: "Host(`ubooquity.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: ubooquity
+    kasm-internal:
+      entryPoints:
+        - "https"
+      rule: "Host(`kasm.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: kasm
+    octoprint:
+      entryPoints:
+        - "http"
+        - "https"
+      rule: "Host(`octoprint.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: octoprint
+    plex-internal:
+      entryPoints:
+        - "https"
+      rule: "Host(`plex.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: plex
+    oldbaserow:
+      entryPoints:
+        - "https"
+      rule: "Host(`oldbaserow.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: oldbaserow
+    oldn8n-int:
+      entryPoints:
+        - "https"
+      rule: "Host(`oldn8n.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: oldn8n
+    homeassistant-int:
+      entryPoints:
+        - "https"
+      rule: "Host(`homeassistant.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: homeassistant
+    photoprism-int:
+      entryPoints:
+        - "https"
+      rule: "Host(`photoprism.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: photoprism
+    radarr:
+      entryPoints:
+        - "https"
+      rule: "Host(`radarr.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: radarr
+    bazarr:
+      entryPoints:
+        - "https"
+      rule: "Host(`bazarr.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: bazarr
+    sonarr:
+      entryPoints:
+        - "https"
+      rule: "Host(`sonarr.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: sonarr
+    prowlarr:
+      entryPoints:
+        - "https"
+      rule: "Host(`prowlarr.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: prowlarr
+    sabnzbd:
+      entryPoints:
+        - "https"
+      rule: "Host(`sabnzbd.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: sabnzbd
+    nzbget:
+      entryPoints:
+        - "https"
+      rule: "Host(`nzbget.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: nzbget
+    transmission:
+      entryPoints:
+        - "https"
+      rule: "Host(`transmission.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: transmission
+    snippetbox:
+      entryPoints:
+        - "https"
+      rule: "Host(`snippetbox.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: snippetbox
+    tautulli:
+      entryPoints:
+        - "https"
+      rule: "Host(`tautulli.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: tautulli
+    homepage-int:
+      entryPoints:
+        - "https"
+      rule: "Host(`homepage.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: homepage
+    wg-easy:
+      entryPoints:
+        - "https"
+      rule: "Host(`wg-easy.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: wg-easy
+    dns1:
+      entryPoints:
+        - "https"
+      rule: "Host(`dns1.van.macapinlac.network`)"
+      middlewares:
+        - redirectregex-pihole
+        - default-headers
+        - addprefix-pihole
+        - https-redirectscheme
+      tls: {}
+      service: dns1
+    dns2:
+      entryPoints:
+        - "https"
+      rule: "Host(`dns2.van.macapinlac.network`)"
+      middlewares:
+        - redirectregex-pihole
+        - default-headers
+        - addprefix-pihole
+        - https-redirectscheme
+      tls: {}
+      service: dns2
+    dns3:
+      entryPoints:
+        - "https"
+      rule: "Host(`dns3.van.macapinlac.network`)"
+      middlewares:
+        - redirectregex-pihole
+        - default-headers
+        - addprefix-pihole
+        - https-redirectscheme
+      tls: {}
+      service: dns3
+
+    # portainer
+    manami:
+      entryPoints:
+        - "https"
+      rule: "Host(`manami.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: manami
+    doubashi:
+      entryPoints:
+        - "https"
+      rule: "Host(`doubashi.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: doubashi
+    arakita:
+      entryPoints:
+        - "https"
+      rule: "Host(`arakita.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: arakita
+    yamaguchi:
+      entryPoints:
+        - "https"
+      rule: "Host(`yamaguchi.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: yamaguchi
+    mizuta:
+      entryPoints:
+        - "https"
+      rule: "Host(`mizuta.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: mizuta
+    kishigami:
+      entryPoints:
+        - "https"
+      rule: "Host(`kishigami.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: kishigami
+    kakashi:
+      entryPoints:
+        - "https"
+      rule: "Host(`kakashi.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: kakashi
+    mizuki:
+      entryPoints:
+        - "https"
+      rule: "Host(`mizuki.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: mizuki
+    mikasa:
+      entryPoints:
+        - "https"
+      rule: "Host(`mikasa.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: mikasa
+    toudou:
+      entryPoints:
+        - "https"
+      rule: "Host(`toudou.van.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: toudou
+#endregion
+
+#region services
+  services:
+    bienn8n:
+      loadbalancer:
+        servers:
+          - url: "http://arakita.int.macapinlac.network:5678"
+        passhostheader: true
+    biendb:
+      loadbalancer:
+        servers:
+          - url: "http://arakita.int.macapinlac.network:8082"
+        passhostheader: true
+    tubearchivist:
+      loadbalancer:
+        servers:
+          - url: "http://doubashi.int.macapinlac.network:8000"
+        passhostheader: true
+    audiobookshelf:
+      loadbalancer:
+        servers:
+          - url: "http://manami.int.macapinlac.network:13378"
+        passhostheader: true
+    it-tools:
+      loadbalancer:
+        servers:
+          - url: "http://mizuta.int.macapinlac.network:8080"
+        passhostheader: true
+    ubooquity:
+      loadbalancer:
+        servers:
+          - url: "http://manami.int.macapinlac.network:2202"
+        passhostheader: true
+    mattermost:
+      loadbalancer:
+        servers:
+          - url: "https://10.1.0.29"
+        passhostheader: true
+    kasm:
+      loadbalancer:
+        servers:
+          - url: "https://mizuta.int.macapinlac.network:443"
+        passhostheader: true
+    octoprint:
+      loadbalancer:
+        servers:
+          - url: "http://quinella.int.macapinlac.network"
+        passhostheader: true
+    radarr:
+      loadbalancer:
+        servers:
+          - url: "http://kurumi.int.macapinlac.network:7878"
+        passhostheader: true
+    bazarr:
+      loadbalancer:
+        servers:
+          - url: "http://kurumi.int.macapinlac.network:6767"
+        passhostheader: true
+    sonarr:
+      loadbalancer:
+        servers:
+          - url: "http://kurumi.int.macapinlac.network:8989"
+        passhostheader: true
+    prowlarr:
+      loadbalancer:
+        servers:
+          - url: "http://kurumi.int.macapinlac.network:9696"
+        passhostheader: true
+    linkding:
+      loadbalancer:
+        servers:
+          - url: "http://mizuta.int.macapinlac.network:9090"
+        passhostheader: true
+    sabnzbd:
+      loadBalancer:
+        servers:
+          - url: "http://kurumi.int.macapinlac.network:8080"
+        passHostHeader: true
+    transmission:
+      loadBalancer:
+        servers:
+          - url: "http://kurumi.int.macapinlac.network:9091"
+        passHostHeader: true
+    snippetbox:
+      loadBalancer:
+        servers:
+          - url: "http://mizuta.int.macapinlac.network:5000"
+        passHostHeader: true
+    photoprism:
+      loadBalancer:
+        servers:
+          - url: "http://kishigami.int.macapinlac.network:2342"
+        passHostHeader: true
+    n8n:
+      loadBalancer:
+        servers:
+          - url: "http://mizuta.int.macapinlac.network:5678"
+        passHostHeader: true
+    baserow:
+      loadBalancer:
+        servers:
+          - url: "http://mizuta.int.macapinlac.network:8082"
+        passHostHeader: true
+    # to be decommed
+    oldn8n:
+      loadBalancer:
+        servers:
+          - url: "http://mizuta.int.macapinlac.network:5679"
+        passHostHeader: true
+    # to be decommed
+    oldbaserow:
+      loadBalancer:
+        servers:
+          - url: "http://mizuta.int.macapinlac.network:8085"
+        passHostHeader: true
+    monica:
+      loadBalancer:
+        servers:
+          - url: "http://mizuta.int.macapinlac.network:8083"
+        passHostHeader: true
+    plex:
+      loadBalancer:
+        servers:
+          - url: "http://manami.int.macapinlac.network:32400"
+        passHostHeader: true
+    overseerr:
+      loadBalancer:
+        servers:
+          - url: "http://doubashi.int.macapinlac.network:5055"
+        passHostHeader: true
+    homeassistant:
+      loadBalancer:
+        servers:
+          - url: "http://toudou.int.macapinlac.network:8123"
+        passHostHeader: true
+    nextcloud:
+      loadBalancer:
+        servers:
+          - url: "http://10.1.0.32:11000"
+        passHostHeader: true
+    paperless-ng:
+      loadBalancer:
+        servers:
+          - url: "http://kishigami.int.macapinlac.network:8000"
+        passHostHeader: true
+    fresh-rss:
+      loadBalancer:
+        servers:
+          - url: "http://mizuta.int.macapinlac.network:8081"
+        passHostHeader: true
+    homepage:
+      loadBalancer:
+        servers:
+          - url: "http://kishigami.int.macapinlac.network:3000"
+        passHostHeader: true
+    tautulli:
+      loadbalancer:
+        servers:
+          - url: "http://manami.int.macapinlac.network:8181"
+        passhostheader: true
+    wg-easy:
+      loadbalancer:
+        servers:
+          - url: "http://proxy.int.macapinlac.network:51821"
+        passhostheader: true
+    dns1:
+      loadbalancer:
+        servers:
+          - url: "http://10.1.0.2:8080"
+        passhostheader: true
+    dns2:
+      loadbalancer:
+        servers:
+          - url: "http://10.1.0.3:8080"
+    dns3:
+      loadbalancer:
+        servers:
+          - url: "http://10.1.0.4:8080"
+        passhostheader: true
+
+    # portainer
+    manami:
+      loadbalancer:
+        servers:
+          - url: "http://manami.int.macapinlac.network:9000"
+        passhostheader: true
+    doubashi:
+      loadbalancer:
+        servers:
+          - url: "http://doubashi.int.macapinlac.network:9000"
+        passhostheader: true
+    arakita:
+      loadbalancer:
+        servers:
+          - url: "http://arakita.int.macapinlac.network:9000"
+        passhostheader: true
+    yamaguchi:
+      loadbalancer:
+        servers:
+          - url: "http://yamaguchi.int.macapinlac.network:9000"
+        passhostheader: true
+    mizuta:
+      loadbalancer:
+        servers:
+          - url: "http://mizuta.int.macapinlac.network:9000"
+        passhostheader: true
+    kishigami:
+      loadbalancer:
+        servers:
+          - url: "http://kishigami.int.macapinlac.network:9000"
+        passhostheader: true
+    kakashi:
+      loadbalancer:
+        servers:
+          - url: "http://kakashi.int.macapinlac.network:9000"
+        passhostheader: true
+    mizuki:
+      loadbalancer:
+        servers:
+          - url: "http://mizuki.int.macapinlac.network:9000"
+        passhostheader: true
+    mikasa:
+      loadbalancer:
+        servers:
+          - url: "http://mikasa.int.macapinlac.network:9000"
+        passhostheader: true
+    toudou:
+      loadbalancer:
+        servers:
+          - url: "http://toudou.int.macapinlac.network:9000"
+        passhostheader: true
+#endregion
+#
+  middlewares:
+    https-redirectscheme:
+      redirectScheme:
+        scheme: https
+        permanent: true
+    authelia:
+      forwardAuth:
+        address: 'http://authelia:9091/api/verify?rd=https://auth.macapinlac.network'
+        trustForwardHeader: true
+        authResponseHeaders: 'Remote-User,Remote-Groups,Remote-Name,Remote-Email'
+    addprefix-pihole:
+      addPrefix:
+        prefix: "/admin"
+    redirectregex-pihole:
+      redirectRegex:
+        regex: /admin/$
+        replacement: /
+
+    default-headers:
+      headers:
+        frameDeny: true
+        sslRedirect: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 15552000
+        customFrameOptionsValue: SAMEORIGIN
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+
+    idrac:
+      headers:
+        frameDeny: true
+        sslRedirect: true
+        browserXssFilter: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsSeconds: 15552000
+        customFrameOptionsValue: SAMEORIGIN
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+
+    default-whitelist:
+      ipWhiteList:
+        sourceRange:
+        - "10.0.0.0/8"
+        - "10.1.0.0/24"
+        - "172.16.0.0/12"
+
+    secured:
+      chain:
+        middlewares:
+        - default-whitelist
+        - default-headers
+

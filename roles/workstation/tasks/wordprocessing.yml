@@ -1,0 +1,38 @@
+- name: Install libreoffice and dependencies
+  become: yes
+  pacman:
+    name: "{{item}}"
+    state: present
+  loop:
+    - libreoffice-still
+    - hunspell
+    - hunspell-en_us
+    - libmythes
+    - mythes-en
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Install fonts required for libreoffice
+  become: yes
+  pacman:
+    name: "{{item}}"
+    state: present
+  loop:
+    - ttf-caladea
+    - ttf-carlito
+    - ttf-dejavu
+    # - ttf-gentium-basic
+    - ttf-liberation
+    - ttf-linux-libertine-g
+    - noto-fonts
+    - adobe-source-code-pro-fonts
+    - adobe-source-sans-fonts
+    - adobe-source-serif-fonts
+    - arch
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Install ttf-fentium-basic
+  kewlfft.aur.aur:
+    use: yay
+    name:
+     - ttf-gentium-basic
+  when: ansible_distribution == 'Arch Linux'

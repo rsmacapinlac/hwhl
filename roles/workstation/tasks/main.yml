@@ -1,0 +1,125 @@
+- name: Install core tools (debian)
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  loop:
+    - curl
+    - vim
+    - xvfb
+    - software-properties-common
+    - apt-transport-https
+    - git
+    - zsh
+    - dirmngr
+    - nodejs
+    - npm
+    - rcm
+    - neofetch
+    - autorandr
+    - fd-find
+    - pipx
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install pywal (pipx)
+  community.general.pipx:
+    name: pywal
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install core tools
+  become: yes
+  pacman:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  loop:
+    - curl
+    - vim
+    - git
+    - zsh
+    - nodejs
+    - npm
+    # - rcm
+    - base-devel
+    - go
+    - neofetch
+    - autorandr
+    - pacman-contrib
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Enable paccache timer
+  become: yes
+  ansible.builtin.systemd:
+    enabled: yes
+    state: started
+    name: paccache
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Check out yay repository
+  become: no
+  ansible.builtin.git:
+    repo: https://aur.archlinux.org/yay-git.git
+    dest: ~/workspace/yay-git
+    force: yes
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Install yay
+  become: no
+  ansible.builtin.command:
+    chdir: ~/workspace/yay-git
+    cmd: makepkg -ic --noconfirm --noprogressbar
+  register: yaygit_install
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Install rcm using yay
+  kewlfft.aur.aur:
+    use: yay
+    name:
+      - rcm
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Change Ritchie's shell to zsh
+  become: yes
+  user:
+    name: ritchie
+    shell: /bin/zsh
+
+- name: Is oh-my-zsh installed
+  become: no
+  ansible.builtin.file:
+    path: ~/.oh-my-zsh
+    force: yes
+    state: absent
+
+- name: Download oh-my-zsh installer
+  become: yes
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+    dest: /tmp/install.sh
+
+- name: Install oh-my-zsh
+  become: no
+  ansible.builtin.command:
+    cmd: sh /tmp/install.sh
+    creates: ~/.oh-my-zsh
+  register: ohmyzsh_installer
+
+- name: Check out github dotfiles
+  become: no
+  ansible.builtin.git:
+    repo: git@github.com:rsmacapinlac/dots.git
+    accept_hostkey: true
+    dest: ~/workspace/dots
+
+- name: Check out github wallpapers utility
+  become: no
+  ansible.builtin.git:
+    repo: git@github.com:rsmacapinlac/wallpapers.git
+    accept_hostkey: true
+    dest: ~/workspace/wallpapers
+
+- name: Setup rcup with github dotfiles
+  become: no
+  ansible.builtin.command: env RCRC=$HOME/workspace/dots/rcrc rcup -f
+  register: rcup_output

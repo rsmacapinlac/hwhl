@@ -1,0 +1,23 @@
+
+- name: Copy DNS Records
+  become: true
+  copy:
+    src: ../files/a-records
+    dest: /data/containers/pihole/etc-pihole/custom.list
+    owner: ansible
+    group: docker
+
+- name: Copy CNAME Records
+  become: true
+  copy:
+    src: ../files/c-names
+    dest: /data/containers/pihole/etc-dnsmasq.d/05-pihole-custom-cname.conf
+    owner: ansible
+    group: docker
+
+- name: Restart PiHole
+  become: true
+  shell:
+    # cmd: "docker exec -it pihole pihole restartdns"
+    cmd: "docker compose -f /data/services/pihole.yml restart"
+  ignore_errors: true

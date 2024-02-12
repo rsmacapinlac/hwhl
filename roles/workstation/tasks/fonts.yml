@@ -1,0 +1,63 @@
+- name: Install recommended fonts (arch)
+  become: yes
+  pacman:
+    name: "{{item}}"
+    state: present
+  loop:
+    - ttf-caladea
+    - ttf-carlito
+    - ttf-dejavu
+    - ttf-liberation
+    - noto-fonts
+    - ttf-opensans
+    - otf-overpass
+    - ttf-roboto
+    - tex-gyre-fonts
+    - ttf-ubuntu-font-family
+    - noto-fonts-cjk
+    - noto-fonts-emoji
+    - noto-fonts-extra
+    - ttf-font-awesome
+    - ttc-iosevka
+    - ttf-inconsolata
+    - ttf-anonymous-pro
+    - ttf-jetbrains-mono
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Install recommended fonts
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+  loop:
+    - fonts-crosextra-caladea
+    - fonts-crosextra-carlito
+    #- ttf-dejavu
+    - fonts-liberation
+    - fonts-noto
+    - fonts-open-sans
+    #- otf-overpass
+    - fonts-roboto
+    #- fonts-tex-gyre
+    #- ttf-ubuntu-font-family
+    - fonts-noto-cjk
+    - fonts-noto-color-emoji
+    - fonts-noto-extra
+    - fonts-font-awesome
+    #- ttc-iosevka
+    - fonts-inconsolata
+    - fonts-anonymous-pro
+    - fonts-jetbrains-mono
+    - fonts-material-design-icons-iconfont
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install recommended fonts (aur)
+  kewlfft.aur.aur:
+    name: "{{item}}"
+    state: present
+    use: yay
+  loop:
+    - ttf-font-awesome-5
+    - ttf-material-design-icons
+  when: ansible_distribution == 'Arch Linux'
+

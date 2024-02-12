@@ -1,0 +1,2 @@
+- name: Watchtower (run-once) update all containers
+  command: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once --cleanup --remove-volumes --debug --include-restarting"

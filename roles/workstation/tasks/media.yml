@@ -1,0 +1,29 @@
+- name: Remove default Gnome video (totem)
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: absent
+  loop:
+    - totem
+    - totem-plugins
+  tags:
+    - debian
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install media command line apps
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+  loop:
+    - feh
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install media tools
+  become: yes
+  community.general.flatpak:
+    name:
+      - org.videolan.VLC
+      - com.ktechpit.wonderwall
+      - tech.feliciano.pocket-casts
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

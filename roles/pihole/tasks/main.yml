@@ -1,0 +1,67 @@
+- name: Create services folder
+  become: yes
+  ansible.builtin.file:
+    path: /data/services
+    state: directory
+    owner: ansible
+    group: docker
+  tags:
+    - debian
+    - ubuntu
+
+- name: Create pihole data folder
+  become: yes
+  ansible.builtin.file:
+    path: /data/containers/pihole
+    state: directory
+    owner: ansible
+    group: docker
+  tags:
+    - debian
+    - ubuntu
+
+- name: Setup docker compose file for PiHole
+  become: yes
+  template:
+    src: docker-compose.j2
+    dest: /data/services/pihole.yml
+    owner: ansible
+    group: docker
+  tags:
+    - debian
+    - ubuntu
+
+- name: Update resolv.d file (1.1.1.1)
+  become: true
+  lineinfile:
+    path: /etc/resolv.conf
+    line: 'nameserver 1.1.1.1'
+  ignore_errors: true
+  tags:
+    - debian
+    - ubuntu
+
+- name: Update resolv.d file (1.0.0.1)
+  become: true
+  lineinfile:
+    path: /etc/resolv.conf
+    line: 'nameserver 1.0.0.1'
+  ignore_errors: true
+  tags:
+    - debian
+    - ubuntu
+
+- name: Run container
+  become: yes
+  shell:
+    cmd: "docker compose -f /data/services/pihole.yml up -d"
+  tags:
+    - debian
+    - ubuntu
+
+# Update the DNS records as well
+- include_tasks: update.yml
+  tags:
+    - debian
+    - ubuntu
+

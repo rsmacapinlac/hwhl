@@ -1,0 +1,22 @@
+plugin: community.general.proxmox
+user: root@pam
+validate_certs: false
+want_proxmox_nodes_ansible_host: false
+want_facts: true
+keyed_groups:
+    # proxmox_tags_parsed is an example of a fact only returned when 'want_facts=true'
+  - key: proxmox_tags_parsed
+    separator: ""
+    prefix: group
+groups:
+  backups: "'backups' in (proxmox_tags_parsed|list)"
+  dns: "'dns' in (proxmox_tags_parsed|list)"
+  docker: "'docker' in (proxmox_tags_parsed|list)"
+  proxy: "'proxy' in (proxmox_tags_parsed|list)"
+  photos: "'photos' in (proxmox_tags_parsed|list)"
+  documents: "'documents' in (proxmox_tags_parsed|list)"
+  homepage: "'homepage' in (proxmox_tags_parsed|list)"
+  nextcloud: "'nextcloud' in (proxmox_tags_parsed|list)"
+  ritchieplex: "'ritchieplex' in (proxmox_tags_parsed|list)"
+compose:
+  ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ansible.utils.ipaddr('address')

@@ -1,0 +1,24 @@
+- name: Create services folder
+  ansible.builtin.file:
+    path: /data/services/
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Create data folder
+  ansible.builtin.file:
+    path: /data/containers/
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Setup docker compose file for NextCloud
+  template:
+    src: docker-compose.j2
+    dest: /data/services/nextcloud.yml
+    owner: ansible
+    group: docker
+
+- name: Run container
+  shell:
+    cmd: "docker compose -f /data/services/nextcloud.yml up -d"

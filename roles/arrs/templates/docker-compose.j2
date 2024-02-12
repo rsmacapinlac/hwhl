@@ -1,0 +1,160 @@
+version: "3"
+services:
+  prowlarr:
+    image: ghcr.io/linuxserver/prowlarr
+    container_name: prowlarr
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ timezone }}
+    volumes:
+      - /data/containers/prowlarr:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ timezone }}
+    volumes:
+      - /data/containers/radarr:/config
+{% for item in radarr %}
+      - {{ item.host_folder }}:{{ item.container }}
+{% endfor %}
+      - /data/arrs/Downloads/sabnzbd/complete:/sabnzbd
+      - /data/arrs/Downloads/transmission/completed:/transmission
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ timezone }}
+    volumes:
+      - /data/containers/sonarr:/config
+{% for item in sonarr %}
+      - {{ item.host_folder }}:{{ item.container }}
+{% endfor %}
+      - /data/arrs/Downloads/sabnzbd/complete:/sabnzbd
+      - /data/arrs/Downloads/transmission/completed:/transmission
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ timezone }}
+    volumes:
+      - /data/containers/bazarr:/config
+{% for item in sonarr %}
+      - {{ item.host_folder }}:{{ item.container }}
+{% endfor %}
+{% for item in radarr %}
+      - {{ item.host_folder }}:{{ item.container }}
+{% endfor %}
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+
+  mylar3:
+    image: lscr.io/linuxserver/mylar3:latest
+    container_name: mylar3
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ timezone }}
+    volumes:
+      - /data/containers/mylar3:/config
+
+{% for item in mylar3 %}
+      - {{ item.host_folder }}:{{ item.container }}
+{% endfor %}
+
+      # download folders
+      - /data/arrs/Downloads/sabnzbd/complete:/downloads
+    ports:
+      - 8090:8090
+    restart: unless-stopped
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ timezone }}
+    volumes:
+      - /data/containers/sabnzbd:/config
+      # download folders
+      - /data/arrs/Downloads/sabnzbd/complete:/downloads #optional
+      - /data/arrs/Downloads/sabnzbd/incomplete-downloads:/incomplete-downloads #optional
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+
+  transmission-openvpn:
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - /data/containers/transmission-openvpn/data:/data
+      - /data/containers/transmission-openvpn/config:/config
+      # download folders
+      - /data/arrs/Downloads/transmission/incomplete:/incomplete
+      - /data/arrs/Downloads/transmission/watch:/watch
+      - /data/arrs/Downloads/transmission/completed:/completed
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - OPENVPN_PROVIDER={{ transmission_openvpn_provider }}
+      - OPENVPN_CONFIG={{ transmission_openvpn_config }}
+      - OPENVPN_USERNAME={{ transmission_openvpn_username }}
+      - OPENVPN_PASSWORD={{ transmission_openvpn_password }}
+      - LOCAL_NETWORK={{ transmission_local_network }}
+      - TRANSMISSION_DOWNLOAD_DIR=/completed
+      - TRANSMISSION_INCOMPLETE_DIR=/incomplete
+      - TRANSMISSION_WATCH_DIR=/watch
+      - TRANSMISSION_RATIO_LIMIT=0
+      - TRANSMISSION_RATIO_LIMIT_ENABLED=true
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    ports:
+      - 9091:9091
+    image: haugene/transmission-openvpn:latest
+    container_name: transmission-openvpn
+    restart: unless-stopped
+
+
+  samba:
+    container_name: samba
+    image: dperson/samba
+    environment:
+      TZ: '{{ timezone }}'
+      USERID: 1001
+      GROUPID: 1001
+    networks:
+      - default
+    ports:
+      - "137:137/udp"
+      - "138:138/udp"
+      - "139:139/tcp"
+      - "445:445/tcp"
+    tmpfs:
+      - /tmp
+    restart: unless-stopped
+    volumes:
+      - /data/arrs/Downloads:/arrs/Downloads
+    command: '-s "Arrs Download share;/arrs/Downloads;yes;no;yes"'

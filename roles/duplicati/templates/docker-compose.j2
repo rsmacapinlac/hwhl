@@ -1,0 +1,17 @@
+version: "3.5"
+services:
+  duplicati:
+    image: lscr.io/linuxserver/duplicati:latest
+    container_name: duplicati
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ={{ timezone }}
+      # - CLI_ARGS= #optional
+    volumes:
+      - /data/containers/duplicati_{{ ansible_hostname}}:/config
+      - /data/containers:/data-containers
+      - {{ shares[0].destination }}/{{ ansible_hostname  }}:/backups
+    ports:
+      - 8200:8200
+    restart: unless-stopped

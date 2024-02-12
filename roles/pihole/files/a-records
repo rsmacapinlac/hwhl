@@ -1,0 +1,25 @@
+# Foundational components
+10.1.0.5 traefik.van.macapinlac.network
+10.1.0.5 proxy.int.macapinlac.network
+# temporary
+10.1.0.5 mikasa.int.macapinlac.network
+
+# desktops
+10.1.0.20 kaburagi.int.macapinlac.network
+10.1.0.21 urahada.int.macapinlac.network
+#
+#Raspberry Pi
+10.1.0.22 kurumi.int.macapinlac.network
+
+10.1.0.23 mizuki.int.macapinlac.network
+10.1.0.24 toudou.int.macapinlac.network
+# 10.1.0.26 kousei.int.macapinlac.network
+10.1.0.27 fuki.int.macapinlac.network
+10.1.0.28 kakashi.int.macapinlac.network
+# 10.1.0.29 is for bakugo (Mattermost turnkey)
+10.1.0.30 kishigami.int.macapinlac.network
+10.1.0.31 mizuta.int.macapinlac.network
+10.1.0.32 yamaguchi.int.macapinlac.network
+10.1.0.33 arakita.int.macapinlac.network
+10.1.0.34 doubashi.int.macapinlac.network
+10.1.0.35 manami.int.macapinlac.network

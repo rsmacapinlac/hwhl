@@ -1,0 +1,51 @@
+- name: Install Ranger and dependencies
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+  loop:
+    - ranger
+    - mc
+    - atool
+    - elinks
+    - ffmpegthumbnailer
+    - highlight
+    - imagemagick
+    - libcaca-dev
+    - lynx
+    - mediainfo
+    - odt2txt
+    #- image-exiftool-perl
+    #- poppler
+    #- python-chardet
+    #- python-pillow
+    - transmission-cli
+    - ueberzug
+    - w3m
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install Ranger and dependencies
+  become: yes
+  pacman:
+    name: "{{item}}"
+    state: present
+  loop:
+    - ranger
+    - mc
+    - atool
+    - elinks
+    - ffmpegthumbnailer
+    - highlight
+    - imagemagick
+    - libcaca
+    - lynx
+    - mediainfo
+    - odt2txt
+    - perl-image-exiftool
+    - poppler
+    - python-chardet
+    - python-pillow
+    - transmission-cli
+    - ueberzug
+    - w3m
+  when: ansible_distribution == 'Arch Linux'

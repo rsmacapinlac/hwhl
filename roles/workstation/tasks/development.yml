@@ -1,0 +1,10 @@
+- name: Install RVM
+  shell: "curl -sSL https://get.rvm.io | bash"
+
+# - name: RVM fix permissions
+#   shell:
+#     cmd: "rvm fix-permissions system; rvm fix-permissions user"
+#   tags:
+#     - ubuntu
+#     - debian
+#     - code-server

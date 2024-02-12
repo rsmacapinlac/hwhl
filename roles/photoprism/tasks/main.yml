@@ -1,0 +1,17 @@
+- name: Create services folder
+  ansible.builtin.file:
+    path: /data/services/
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Setup docker compose file for photoprism
+  template:
+    src: docker-compose.j2
+    dest: /data/services/photoprism.yml
+    owner: ansible
+    group: docker
+
+- name: Run container
+  shell:
+    cmd: "docker compose -f /data/services/photoprism.yml up -d"

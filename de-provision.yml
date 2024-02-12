@@ -1,0 +1,28 @@
+- name: "De-provision DNS lxc's"
+  remote_user: root
+  hosts: proxmox_control_node_by_ip
+  tasks:
+    - name: Stop DNS container
+      community.general.proxmox:
+        vmid: "{{ item.vmid }}"
+        hostname: '{{ item.name }}'
+        node: '{{ item.proxmox_node  }}'
+        api_user: '{{ proxmox_api.api_user }}'
+        # api_password: '{{ proxmox_api.api_user_password }}'
+        api_host: '{{ proxmox_api.api_host }}'
+        api_token_id: '{{ proxmox_api.api_token_id }}'
+        api_token_secret: '{{ proxmox_api.api_token_secret }}'
+        state: 'stopped'
+      loop: '{{ lxcs_dns }}'
+    - name: Destroy DNS container
+      community.general.proxmox:
+        vmid: "{{ item.vmid }}"
+        hostname: '{{ item.name }}'
+        node: '{{ item.proxmox_node  }}'
+        api_user: '{{ proxmox_api.api_user }}'
+        # api_password: '{{ proxmox_api.api_user_password }}'
+        api_host: '{{ proxmox_api.api_host }}'
+        api_token_id: '{{ proxmox_api.api_token_id }}'
+        api_token_secret: '{{ proxmox_api.api_token_secret }}'
+        state: 'absent'
+      loop: '{{ lxcs_dns }}'

@@ -1,0 +1,11 @@
+- name: apt-update
+  become: yes
+  import_tasks: apt-update.yml
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Run the equivalent of "pacman -Sy" as a separate step
+  become: yes
+  community.general.pacman:
+    update_cache: true
+  when: ansible_distribution == 'Arch Linux'
+

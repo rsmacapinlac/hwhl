@@ -1,0 +1,30 @@
+- name: Create services folder
+  become: true
+  ansible.builtin.file:
+    path: /data/services/
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Setup docker compose file for authelia
+  become: true
+  template:
+    src: docker-compose.j2
+    dest: /data/services/authelia.yml
+    owner: ansible
+    group: docker
+
+- name: Authelia config folder
+  become: true
+  ansible.builtin.file:
+    path: /data/containers/authelia
+    state: directory
+    owner: ansible
+    group: docker
+
+# Update the DNS records as well
+- include_tasks: update_configuration.yml
+
+- name: Run container
+  shell:
+    cmd: "docker compose -f /data/services/authelia.yml up -d"

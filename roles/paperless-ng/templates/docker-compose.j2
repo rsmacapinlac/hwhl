@@ -1,0 +1,23 @@
+version: '3'
+services:
+  paperless-ng:
+    image: lscr.io/linuxserver/paperless-ng
+    container_name: paperless-ng
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=America/Vancouver
+      # - REDIS_URL= #optional
+      - PAPERLESS_ENABLE_HTTP_REMOTE_USER=true
+      - PAPERLESS_LOGOUT_REDIRECT_URL=https://auth.macapinlac.network/logout
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /data/containers/paperless-ng:/config
+      - /mnt/Documents:/data
+    ports:
+      - 8000:8000
+    restart: unless-stopped

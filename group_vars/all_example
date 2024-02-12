@@ -1,0 +1,30 @@
+# Add your timezone (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+timezone:
+
+proxmox_api:
+  api_user:
+  # ip address of the proxmox api
+  api_host:
+  api_token_id:
+  api_token_secret:
+
+
+# these machines will be your DNS
+lxcs_dns:
+  - name: 'dns0'
+    ip_addr: 192.168.0.2
+    gateway: 192.168.0.1
+    nameserver: '1.1.1.1,1.0.0.1'
+    root_password:
+    pubkey:
+    vmid:
+    proxmox_node:
+
+  - name: 'dns2'
+    ip_addr: 192.168.0.3
+    gateway: 192.168.0.1
+    nameserver: '1.1.1.1,1.0.0.1'
+    root_password:
+    pubkey:
+    vmid:
+    proxmox_node:

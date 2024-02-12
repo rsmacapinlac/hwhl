@@ -1,0 +1,17 @@
+- name: "Remove share from fstab {{ mount_point }}"
+  become: yes
+  ansible.posix.mount:
+    path: "{{ mount_point }}"
+    state: absent_from_fstab
+
+- name: "Unmount share {{ mount_point }}"
+  become: yes
+  ansible.posix.mount:
+    path: "{{ mount_point }}"
+    state: unmounted
+
+- name: "Remove mountpoint {{ mount_point }}"
+  become: yes
+  ansible.builtin.file:
+    path: "{{ mount_point }}"
+    state: absent

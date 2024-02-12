@@ -1,0 +1,40 @@
+- name: Install pass and necessary tools
+  become: yes
+  pacman:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  loop:
+    - pass
+    - pass-otp
+    - xclip
+    - qrencode
+  tags:
+    - arch
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Install core tools (debian)
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+  loop:
+    - pass
+    - pass-otp
+    - xclip
+    - qrencode
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Check out pass repository
+  become: no
+  ansible.builtin.git:
+    repo: git@github.com:rsmacapinlac/cautious-dollop.git
+    accept_hostkey: true
+    dest: ~/.password-store
+
+- name: Install Bitwarden client (debian)
+  become: yes
+  flatpak:
+    name: com.bitwarden.desktop
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

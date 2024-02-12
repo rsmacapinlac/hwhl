@@ -1,0 +1,147 @@
+---
+
+- name: Install Window Managers (arch)
+  become: yes
+  pacman:
+    name: "{{item}}"
+    state: present
+  loop:
+    - awesome
+    - i3-gaps
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Install Window Managers (debian)
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+  loop:
+    - awesome
+    - awesome-extra
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install AwesomeWM config dependencies
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+  loop:
+    - neofetch
+    - autorandr
+    - polybar
+    - rofi
+    - arandr
+    - autorandr
+    - compton
+    - python3-pip
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install Core tools (debian)
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+  loop:
+    - avahi-daemon
+    - libnss-mdns
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install pywal python package
+  community.general.pipx:
+    name: pywal
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install Gnome apps
+  become: yes
+  apt:
+    name: "{{item}}"
+    state: present
+  loop:
+    - gnome-tweaks
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Install core tools (arch)
+  become: yes
+  pacman:
+    name: "{{item}}"
+    state: present
+  loop:
+    - avahi
+    - neofetch
+    - nss-mdns
+    - smbclient
+    - gvfs-smb
+    - polybar
+    - rofi
+    - arandr
+    - blueman
+    - bluez
+    - bluez-utils
+    - networkmanager
+    - network-manager-applet
+    - pavucontrol
+    - cbatticon
+    - filelight
+    - ncdu
+    - man-db
+    - wireguard-tools
+    - systemd-resolvconf
+    - lxappearance
+    - materia-gtk-theme
+    - font-manager
+    - discord
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Enable Bluetooth
+  become: yes
+  ansible.builtin.systemd:
+    enabled: yes
+    state: started
+    name: bluetooth
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Enable NetworkManager
+  become: yes
+  ansible.builtin.systemd:
+    enabled: yes
+    state: started
+    name: NetworkManager
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Install Display Managers
+  become: yes
+  pacman:
+    name: "{{item}}"
+    state: present
+  loop:
+    - lightdm
+    - lightdm-webkit2-greeter
+    - ly
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Enable ly
+  become: yes
+  ansible.builtin.systemd:
+    enabled: yes
+    name: ly
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Disable lightdm
+  become: yes
+  ansible.builtin.systemd:
+    enabled: no
+    name: lightdm
+  when: ansible_distribution == 'Arch Linux'
+
+- name: Install Desktop tools
+  become: yes
+  pacman:
+    name: "{{item}}"
+    state: present
+  loop:
+    - firefox
+    - obsidian
+    - homebank
+    - vlc
+    - nextcloud-client
+  when: ansible_distribution == 'Arch Linux'

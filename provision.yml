@@ -1,0 +1,41 @@
+- name: "Provision DNS lxc's"
+  remote_user: root
+  hosts: proxmox_control_node_by_ip
+  tasks:
+    - name: Create DNS containers
+      community.general.proxmox:
+        vmid: "{{ item.vmid }}"
+        hostname: '{{ item.name }}'
+        node: '{{ item.proxmox_node  }}'
+        api_user: '{{ proxmox_api.api_user }}'
+        api_host: '{{ proxmox_api.api_host }}'
+        api_token_id: '{{ proxmox_api.api_token_id }}'
+        api_token_secret: '{{ proxmox_api.api_token_secret }}'
+        memory: 2048
+        swap: 4096
+        # https://github.com/ansible-collections/community.general/commit/d7b89cde46b921adcc2334e3d9fc09c50701b46b
+        # storage: 'local-lvm'
+        disk: 'local-lvm:64'
+        password: '{{ item.root_password }}'
+        pubkey: '{{ item.pubkey }}'
+        timezone: '{{ timezone }}'
+        cores: 1
+        ostemplate: local:vztmpl/debian-12-standard_12.2-1_amd64.tar.zst
+        netif: '{"net0":"name=eth0,gw={{ item.gateway }},ip={{ item.ip_addr }}/24,bridge=vmbr0"}'
+        nameserver: '{{ item.nameserver }}'
+        unprivileged: false
+        tags:
+          - dns
+          - docker
+      loop: '{{ lxcs_dns }}'
+    - name: Start DNS containers
+      community.general.proxmox:
+        vmid: "{{ item.vmid }}"
+        hostname: '{{ item.name }}'
+        node: '{{ item.proxmox_node  }}'
+        api_user: '{{ proxmox_api.api_user }}'
+        api_host: '{{ proxmox_api.api_host }}'
+        api_token_id: '{{ proxmox_api.api_token_id }}'
+        api_token_secret: '{{ proxmox_api.api_token_secret }}'
+        state: started
+      loop: '{{ lxcs_dns }}'

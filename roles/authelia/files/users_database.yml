@@ -1,0 +1,24 @@
+---
+###############################################################
+#                         Users Database                      #
+###############################################################
+
+# This file can be used if you do not have an LDAP set up.
+
+# List of users
+users:
+  ritchie:
+    displayname: "Ritchie"
+    password: "$argon2id$v=19$m=65536,t=3,p=4$A8JcNaoXJbPVfsiAz06jMA$1Tb6wPAeTYnzPnPfXxJKWuRWluvUtCtW/s0hK3INO7s"
+    email: ritchie@macapinlac.com
+    groups:
+      - admins
+      - dev
+  chyler:
+    displayname: "Chyler"
+    password: "$argon2id$v=19$m=65536,t=3,p=4$Bc3ebR9/pqwhy+3NFOFy/g$FcbphSan5Am74see4Bc4hPPgfQ+swgeldhcrohUCuBI"
+    email: chyler@macapinlac.com
+    groups:
+      - admins
+      - dev
+...

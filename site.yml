@@ -1,0 +1,105 @@
+---
+- hosts: "proxmox_nodes_by_ip"
+  remote_user: root
+  roles:
+    - role: proxmox
+
+- hosts: "proxmox_all_lxc"
+  remote_user: root
+  tasks:
+    - name: Apt update
+      include_tasks: roles/common/tasks/apt-update.yml
+    - name: Add users
+      include_tasks: roles/common/tasks/users.yml
+
+- hosts: "raspberrypi"
+  remote_user: pi
+  tasks:
+    - name: Add users
+      include_tasks: roles/common/tasks/users.yml
+
+- hosts: "arrs"
+  remote_user: ansible
+  vars_files:
+    - group_vars/docker.yml
+    - group_vars/backup.yml
+    - group_vars/arrs.yml
+  roles:
+    - role: portainer
+    - role: watchtower
+    - role: shares
+    - role: duplicati
+    - role: arrs
+
+- hosts: "docker"
+  remote_user: ansible
+  vars_files:
+    - group_vars/docker.yml
+  roles:
+    - role: portainer
+    - role: watchtower
+
+- hosts: "backups"
+  remote_user: ansible
+  vars_files:
+    - group_vars/backup.yml
+  roles:
+    - role: shares
+    - role: duplicati
+
+- hosts: "dns"
+  remote_user: ansible
+  roles:
+    - role: pihole
+
+- hosts: "proxy"
+  remote_user: ansible
+  roles:
+    - role: traefik
+    - role: authelia
+    - role: cloudflare-ddns
+    - role: wg-easy
+
+- hosts: "photos"
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: photoprism
+
+- hosts: "documents"
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: paperless-ng
+
+- hosts: "homepage"
+  remote_user: ansible
+  vars_files:
+    - group_vars/photos.yml
+  roles:
+    - role: homepage
+
+- hosts: "nextcloud"
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: nextcloud
+
+- hosts: "ritchieplex"
+  remote_user: ansible
+  roles:
+    - role: shares
+      vars:
+        - mount_point: /mnt/Yukari
+        - server: yukari.local
+        - share_name: /volume1/SavedMedia
+    - role: shares
+      vars:
+        - mount_point: /mnt/Daikichi
+        - server: daikichi.local
+        - share_name: /nfs/Media
+    - role: shares
+      vars:
+        - mount_point: /mnt/Daikichi_MyBook
+        - server: daikichi.local
+        - share_name: /nfs/My_Book_1230-1

@@ -1,0 +1,45 @@
+- name: Remove firefox snap
+  become: yes
+  community.general.snap:
+    name: firefox
+    state: absent
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Remove firefox-esr
+  become: yes
+  ansible.builtin.apt:
+    name: firefox-esr
+    state: absent
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Change apt priority to use source
+  become: yes
+  ansible.builtin.copy:
+    src: ../files/firefox-apt-priority
+    dest: /etc/apt/preferences.d/mozilla-firefox
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Setup firefox unattended-upgrades
+  become: yes
+  template:
+    src: ../templates/firefox-unattended-upgrades.j2
+    dest: /etc/apt/apt.conf.d/51-unattended-upgrades-firefox
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Add firefox repository
+  become: yes
+  ansible.builtin.apt_repository:
+    repo: ppa:mozillateam/ppa
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install firefox (ubuntu)
+  become: yes
+  ansible.builtin.apt:
+    name: firefox
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install firefox (debian)
+  become: yes
+  flatpak:
+    name: org.mozilla.firefox
+  when: ansible_distribution == 'Debian'
