@@ -574,22 +574,22 @@ http:
     radarr:
       loadbalancer:
         servers:
-          - url: "http://kurumi.int.macapinlac.network:7878"
+          - url: "http://shinkai.int.macapinlac.network:7878"
         passhostheader: true
     bazarr:
       loadbalancer:
         servers:
-          - url: "http://kurumi.int.macapinlac.network:6767"
+          - url: "http://shinkai.int.macapinlac.network:6767"
         passhostheader: true
     sonarr:
       loadbalancer:
         servers:
-          - url: "http://kurumi.int.macapinlac.network:8989"
+          - url: "http://shinkai.int.macapinlac.network:8989"
         passhostheader: true
     prowlarr:
       loadbalancer:
         servers:
-          - url: "http://kurumi.int.macapinlac.network:9696"
+          - url: "http://shinkai.int.macapinlac.network:9696"
         passhostheader: true
     linkding:
       loadbalancer:
@@ -599,12 +599,12 @@ http:
     sabnzbd:
       loadBalancer:
         servers:
-          - url: "http://kurumi.int.macapinlac.network:8080"
+          - url: "http://shinkai.int.macapinlac.network:8080"
         passHostHeader: true
     transmission:
       loadBalancer:
         servers:
-          - url: "http://kurumi.int.macapinlac.network:9091"
+          - url: "http://shinkai.int.macapinlac.network:9091"
         passHostHeader: true
     snippetbox:
       loadBalancer:

@@ -9,6 +9,7 @@ keyed_groups:
     separator: ""
     prefix: group
 groups:
+  arrs: "'arrs' in (proxmox_tags_parsed|list)"
   backups: "'backups' in (proxmox_tags_parsed|list)"
   dns: "'dns' in (proxmox_tags_parsed|list)"
   docker: "'docker' in (proxmox_tags_parsed|list)"

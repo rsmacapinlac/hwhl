@@ -22,7 +22,6 @@
   remote_user: ansible
   vars_files:
     - group_vars/docker.yml
-    - group_vars/backup.yml
     - group_vars/arrs.yml
   roles:
     - role: portainer

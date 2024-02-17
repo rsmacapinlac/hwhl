@@ -5,6 +5,7 @@
     state: present
     update_cache: yes
   loop:
+    - cifs-utils
     - nfs-common
     - nfs4-acl-tools
     - avahi-daemon
