@@ -15,7 +15,6 @@
     group: docker
 
 - name: Setup docker compose file for wg-easy
-  become: true
   template:
     src: docker-compose.j2
     dest: /data/services/wg-easy.yml
@@ -23,5 +22,6 @@
     group: docker
 
 - name: Run container
+  become: true
   shell:
     cmd: "docker compose -f /data/services/wg-easy.yml up -d"

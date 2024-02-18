@@ -51,10 +51,12 @@
   roles:
     - role: pihole
 
-- hosts: "proxy"
+- hosts: "proxy_external"
   remote_user: ansible
+  vars_files:
+    - group_vars/proxy.yml
   roles:
-    - role: traefik
+    - role: traefik_external
     - role: authelia
     - role: cloudflare-ddns
     - role: wg-easy

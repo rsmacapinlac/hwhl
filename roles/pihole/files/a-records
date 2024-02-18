@@ -1,8 +1,9 @@
 # Foundational components
-10.1.0.5 traefik.van.macapinlac.network
-10.1.0.5 proxy.int.macapinlac.network
+10.1.0.60 traefik.van.macapinlac.network
+10.1.0.60 proxy.int.macapinlac.network
+
 # temporary
-10.1.0.5 mikasa.int.macapinlac.network
+10.1.0.60 mikasa.int.macapinlac.network
 
 # desktops
 10.1.0.20 kaburagi.int.macapinlac.network

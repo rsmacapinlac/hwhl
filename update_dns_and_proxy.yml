@@ -8,14 +8,14 @@
 
 - name: Update Proxy routes
   remote_user: ansible
-  hosts: "proxy"
+  hosts: "proxy_external"
   tasks:
     - name: Update Traefik
-      include_tasks: roles/traefik/tasks/update_routes.yml
+      include_tasks: roles/traefik_external/tasks/update_routes.yml
 
 - name: Update Authelia configuration
   remote_user: ansible
-  hosts: "proxy"
+  hosts: "proxy_external"
   vars_files:
     - group_vars/proxy.yml
   tasks:

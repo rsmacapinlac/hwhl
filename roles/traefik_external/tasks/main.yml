@@ -46,6 +46,7 @@
     mode: '0600'
 
 - name: Create proxy network
+  become: yes
   shell:
     cmd: "docker network create proxy"
   ignore_errors: true
@@ -54,6 +55,7 @@
 - include_tasks: update_routes.yml
 
 - name: Run container
+  become: yes
   shell:
     cmd: "docker compose -f /data/services/traefik.yml up -d"
 

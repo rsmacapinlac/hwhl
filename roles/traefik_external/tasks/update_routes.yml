@@ -8,5 +8,7 @@
     group: docker
 
 - name: Restart traefik
+  become: true
   shell:
     cmd: "docker compose -f /data/services/traefik.yml restart traefik"
+  ignore_errors: true
