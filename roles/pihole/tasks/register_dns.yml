@@ -1,0 +1,13 @@
+- name: Create homelab folder
+  file:
+    path: "{{ playbook_dir }}/files/pihole"
+    state: directory
+  delegate_to: 127.0.0.1
+
+- name: Insert IP address and hostname into custom.list format
+  lineinfile:
+    path: "{{ playbook_dir }}/files/pihole/custom.list"
+    regexp: ".* {{ ansible_hostname }}.local.{{ homelab_domain }}"
+    line: "{{ ansible_default_ipv4.address }} {{ ansible_hostname }}.int.{{ homelab_domain }}"
+    create: true
+  delegate_to: 127.0.0.1

@@ -21,7 +21,7 @@
 - hosts: "arrs"
   remote_user: ansible
   vars_files:
-    - group_vars/docker.yml
+    - group_vars/watchtower.yml
     - group_vars/arrs.yml
   roles:
     - role: portainer
@@ -30,13 +30,44 @@
     - role: duplicati
     - role: arrs
 
+# Plan to deprecate this
 - hosts: "docker"
   remote_user: ansible
   vars_files:
-    - group_vars/docker.yml
+    - group_vars/watchtower.yml
   roles:
     - role: portainer
     - role: watchtower
+ ####
+
+- hosts: "containers"
+  remote_user: ansible
+  vars_files:
+    - group_vars/watchtower.yml
+    - group_vars/traefik.yml
+  roles:
+    - role: portainer
+    - role: watchtower
+    - role: traefik_internal
+
+- hosts: "portainer"
+  remote_user: ansible
+  roles:
+    - role: portainer
+
+- hosts: "watchtower"
+  remote_user: ansible
+  vars_files:
+    - group_vars/watchtower.yml
+  roles:
+    - role: watchtower
+
+- hosts: "traefik_internal"
+  remote_user: ansible
+  vars_files:
+    - group_vars/traefik.yml
+  roles:
+    - role: traefik_internal
 
 - hosts: "backups"
   remote_user: ansible

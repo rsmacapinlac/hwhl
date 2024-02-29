@@ -1,23 +1,30 @@
 ---
-- name: Update DNS A record and CNAME entries
+- name: Build custom.list
+  remote_user: ansible
+  hosts: "proxmox_all_lxc"
+  tasks:
+    - name: Register DNS entries
+      include_tasks: roles/pihole/tasks/register_dns.yml
+
+- name: Update DNS custom.list
   remote_user: ansible
   hosts: "dns"
   tasks:
     - name: Update PiHole
       include_tasks: roles/pihole/tasks/update.yml
 
-- name: Update Proxy routes
-  remote_user: ansible
-  hosts: "proxy_external"
-  tasks:
-    - name: Update Traefik
-      include_tasks: roles/traefik_external/tasks/update_routes.yml
+#- name: Update Proxy routes
+#  remote_user: ansible
+#  hosts: "proxy_external"
+#  tasks:
+#    - name: Update Traefik
+#      include_tasks: roles/traefik_external/tasks/update_routes.yml
 
-- name: Update Authelia configuration
-  remote_user: ansible
-  hosts: "proxy_external"
-  vars_files:
-    - group_vars/proxy.yml
-  tasks:
-    - name: Update authelia configuration
-      include_tasks: roles/authelia/tasks/update_configuration.yml
+#- name: Update Authelia configuration
+#  remote_user: ansible
+#  hosts: "proxy_external"
+#  vars_files:
+#    - group_vars/proxy.yml
+#  tasks:
+#    - name: Update authelia configuration
+#      include_tasks: roles/authelia/tasks/update_configuration.yml

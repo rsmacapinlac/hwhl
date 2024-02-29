@@ -24,3 +24,11 @@ services:
       - NET_ADMIN
     #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
     restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+networks:
+  proxy:
+    external: true

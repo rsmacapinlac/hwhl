@@ -26,7 +26,7 @@
         unprivileged: false
         tags:
           - dns
-          - docker
+          - containers
       loop: '{{ lxcs_dns }}'
 
     - name: Create External Proxy containers

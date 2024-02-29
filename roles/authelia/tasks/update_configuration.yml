@@ -17,3 +17,4 @@
 - name: Restart authelia
   shell:
     cmd: "docker compose -f /data/services/authelia.yml restart authelia"
+  ignore_errors: true

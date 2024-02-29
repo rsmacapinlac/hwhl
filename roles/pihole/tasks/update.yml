@@ -2,22 +2,54 @@
 - name: Copy DNS Records
   become: true
   copy:
-    src: ../files/a-records
+    src: "{{ playbook_dir }}/files/pihole/custom.list"
     dest: /data/containers/pihole/etc-pihole/custom.list
     owner: ansible
     group: docker
 
-- name: Copy CNAME Records
+#- name: Copy CNAME Records
+#  become: true
+#  copy:
+#    src: ../files/c-names
+#    dest: /data/containers/pihole/etc-dnsmasq.d/05-pihole-custom-cname.conf
+#    owner: ansible
+#    group: docker
+
+- name: Check which service's CNAME record exists
+  ansible.builtin.stat:
+    path: "{{ item.src }}"
+  register: file_status
+  loop:
+    - { src: "{{ playbook_dir }}/files/dns/05-pihole.conf", dest: "05-pihole.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/05-portainer.conf", dest: "05-portainer.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/05-duplicati.conf", dest: "05-duplicati.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/05-traefik.conf", dest: "05-traefik.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/05-traefik-external.conf", dest: "05-traefik-external.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/05-wg-easy.conf", dest: "05-wg-easy.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/05-paperless-ng.conf", dest: "05-paperless-ng.conf" }
+
+#- name: Debug file_status.results
+#  debug:
+#    var: file_status.results
+
+- name: Copy files if they exist
   become: true
-  copy:
-    src: ../files/c-names
-    dest: /data/containers/pihole/etc-dnsmasq.d/05-pihole-custom-cname.conf
-    owner: ansible
-    group: docker
+  ansible.builtin.copy:
+    src: "{{ item.item.src }}"
+    dest: "/data/containers/pihole/etc-dnsmasq.d/{{ item.item.dest }}"
+  loop: "{{ file_status.results }}"
+#  when: item.stat.exists
+
+#- name: Copy CNAME records for defined services
+#  become: true
+#  ansible.builtin.copy:
+#    src: "{{ item.src }}"
+#    dest: "/data/containers/pihole/etc-dnsmasq.d/{{ item.dest }}"
+#  loop:
+#    - { src: "{{ playbook_dir }}/files/dns/05-portainer.conf", dest: "05-portainer.conf" }
+#    - { src: "{{ playbook_dir }}/files/dns/05-traefik.conf", dest: "05-traefik.conf" }
 
 - name: Restart PiHole
-  become: true
-  shell:
-    # cmd: "docker exec -it pihole pihole restartdns"
+  command:
     cmd: "docker compose -f /data/services/pihole.yml restart"
   ignore_errors: true

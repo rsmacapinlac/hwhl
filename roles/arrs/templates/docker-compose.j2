@@ -105,7 +105,6 @@ services:
     restart: unless-stopped
 
   transmission-openvpn:
-    priviledged: true
     cap_add:
       - NET_ADMIN
     volumes:

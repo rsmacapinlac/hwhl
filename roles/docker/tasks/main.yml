@@ -89,6 +89,10 @@
     groups: "docker"
     append: yes
 
+- name: Reset ssh connection to allow ansible user to be reset
+  ansible.builtin.meta:
+    reset_connection
+
 - name: Service folder where all docker-compose files will be put
   become: yes
   ansible.builtin.file:
@@ -97,6 +101,16 @@
     owner: ansible
     group: docker
 
+
+#- name: Create proxy network
+#  become: yes
+#  shell:
+#    cmd: "docker network create proxy"
+#  ignore_errors: true
+
+- name: Create the 'proxy' network
+  community.docker.docker_network:
+    name: proxy
 
 #- name: Ensure Docker starts
 #  service:

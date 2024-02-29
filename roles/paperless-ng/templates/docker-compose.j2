@@ -6,7 +6,7 @@ services:
     environment:
       - PUID=1001
       - PGID=1001
-      - TZ=America/Vancouver
+      - TZ={{ timezone }}
       # - REDIS_URL= #optional
       - PAPERLESS_ENABLE_HTTP_REMOTE_USER=true
       - PAPERLESS_LOGOUT_REDIRECT_URL=https://auth.macapinlac.network/logout
@@ -21,3 +21,22 @@ services:
     ports:
       - 8000:8000
     restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.paperless-ng.entrypoints=http"
+      - "traefik.http.routers.paperless-ng.rule=Host(`paperless-ng.local.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.paperless-ng-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.paperless-ng.middlewares=portainer-https-redirect"
+      - "traefik.http.routers.paperless-ng-secure.entrypoints=https"
+      - "traefik.http.routers.paperless-ng-secure.rule=Host(`paperless-ng.local.{{ homelab_domain }}`)"
+      - "traefik.http.routers.paperless-ng-secure.tls=true"
+      - "traefik.http.routers.paperless-ng-secure.service=paperless-ng"
+      - "traefik.http.services.paperless-ng.loadbalancer.server.port=8000"
+      - "traefik.docker.network=proxy"
+
+networks:
+  proxy:
+    external: true

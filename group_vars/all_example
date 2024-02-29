@@ -1,5 +1,6 @@
 # Add your timezone (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 timezone:
+homelab_domain:
 
 proxmox_api:
   api_user:
@@ -28,3 +29,13 @@ lxcs_dns:
     pubkey:
     vmid:
     proxmox_node:
+
+lxcs_external_proxy:
+  - name: 'proxy-ext'
+    ip_addr: 192.168.0.5
+    gateway: 192.168.0.1 
+    nameserver: '192.168.0.3,192.168.0.2'
+    root_password: ""
+    pubkey: 
+    vmid: 
+    proxmox_node: 
