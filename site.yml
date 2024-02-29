@@ -21,13 +21,9 @@
 - hosts: "arrs"
   remote_user: ansible
   vars_files:
-    - group_vars/watchtower.yml
     - group_vars/arrs.yml
   roles:
-    - role: portainer
-    - role: watchtower
     - role: shares
-    - role: duplicati
     - role: arrs
 
 # Plan to deprecate this
