@@ -228,7 +228,7 @@ services:
       - "traefik.http.routers.transmission-secure.rule=Host(`transmission.local.{{ homelab_domain }}`)"
       - "traefik.http.routers.transmission-secure.tls=true"
       - "traefik.http.routers.transmission-secure.service=transmission"
-      - "traefik.http.services.transmission.loadbalancer.server.port=9000"
+      - "traefik.http.services.transmission.loadbalancer.server.port=9091"
       - "traefik.docker.network=proxy"
 
   samba:
