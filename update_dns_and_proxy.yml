@@ -13,12 +13,12 @@
     - name: Update PiHole
       include_tasks: roles/pihole/tasks/update.yml
 
-#- name: Update Proxy routes
-#  remote_user: ansible
-#  hosts: "proxy_external"
-#  tasks:
-#    - name: Update Traefik
-#      include_tasks: roles/traefik_external/tasks/update_routes.yml
+- name: Update Proxy routes
+  remote_user: ansible
+  hosts: "proxy_external"
+  tasks:
+    - name: Update Traefik
+      include_tasks: roles/traefik_external/tasks/update_routes.yml
 
 #- name: Update Authelia configuration
 #  remote_user: ansible
