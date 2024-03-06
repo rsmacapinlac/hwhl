@@ -26,6 +26,11 @@
     - role: shares
     - role: arrs
 
+- hosts: "overseer"
+  remote_user: ansible
+  roles:
+    - role: overseer
+
 # Plan to deprecate this
 - hosts: "docker"
   remote_user: ansible

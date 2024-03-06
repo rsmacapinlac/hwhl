@@ -1,0 +1,31 @@
+version: '3'
+services:  
+  overseerr:
+    image: lscr.io/linuxserver/overseerr
+    container_name: overseerr
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ timezone }}
+    volumes:
+      - /data/containers/overseerr:/config
+    ports:
+      - 5055:5055
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.overseer.entrypoints=http"
+      - "traefik.http.routers.overseer.rule=Host(`overseer.local.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.overseer-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.overseer.middlewares=overseer-https-redirect"
+      - "traefik.http.routers.overseer-secure.entrypoints=https"
+      - "traefik.http.routers.overseer-secure.rule=Host(`overseer.local.{{ homelab_domain }}`)"
+      - "traefik.http.routers.overseer-secure.tls=true"
+      - "traefik.http.routers.overseer-secure.service=overseer"
+      - "traefik.http.services.overseer.loadbalancer.server.port=5055"
+      - "traefik.docker.network=proxy"
+
+networks:
+  proxy:
+    external: true

@@ -330,7 +330,7 @@ http:
     overseerr:
       loadBalancer:
         servers:
-          - url: "http://doubashi.int.macapinlac.network:5055"
+          - url: "http://shinkai.int.macapinlac.network:5055"
         passHostHeader: true
     homeassistant:
       loadBalancer:
