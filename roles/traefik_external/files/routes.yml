@@ -126,7 +126,7 @@ http:
         - "https"
       rule: "Host(`rss.macapinlac.network`)"
       middlewares:
-        - authelia
+        # - authelia
         - default-headers
         - https-redirectscheme
       tls: {}
@@ -350,7 +350,7 @@ http:
     fresh-rss:
       loadBalancer:
         servers:
-          - url: "http://mizuta.int.macapinlac.network:8081"
+          - url: "http://kazuho.int.macapinlac.network:8082"
         passHostHeader: true
     homepage:
       loadBalancer:

@@ -8,7 +8,7 @@
         href: https://plx-request.{{ homelab_domain }}
         widget:
           type: overseerr
-          url: https://overseerr.van.{{ homelab_domain }}
+          url: https://overseer.local.{{ homelab_domain }}
           key: {{ overseerr_api_key }}
     - Plex:
         icon: plex
@@ -31,6 +31,14 @@
     - LinkDing:
         icon: linkding
         href: https://bookmarks.{{ homelab_domain }}
+    - FreshRSS:
+        icon: freshrss
+        href: https://rss.{{ homelab_domain }}
+        widget:
+          type: freshrss
+          url: https://freshrss.local.{{ homelab_domain }}
+          username: {{ freshrss_username }}
+          password: {{ freshrss_password }}
 
 - PVR:
     - Sonarr:
@@ -79,7 +87,7 @@
         href: https://dns0.local.{{ homelab_domain }}
         widget:
           type: pihole
-          url: https://dns0.local.{{ homelab_domain }}
+          url: https://dns0.int.{{ homelab_domain }}
           fields: ["queries", "blocked_percent"]
           key: {{ pihole_api_key }}
     - DNS1:

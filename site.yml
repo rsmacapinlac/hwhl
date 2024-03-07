@@ -31,6 +31,11 @@
   roles:
     - role: overseer
 
+- hosts: "freshrss"
+  remote_user: ansible
+  roles:
+    - role: freshrss
+
 # Plan to deprecate this
 - hosts: "docker"
   remote_user: ansible

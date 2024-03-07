@@ -28,6 +28,7 @@
     - { src: "{{ playbook_dir }}/files/dns/05-wg-easy.conf", dest: "05-wg-easy.conf" }
     - { src: "{{ playbook_dir }}/files/dns/05-paperless-ng.conf", dest: "05-paperless-ng.conf" }
     - { src: "{{ playbook_dir }}/files/dns/05-arrs.conf", dest: "05-arrs.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/05-freshrss.conf", dest: "05-freshrss.conf" }
 
 #- name: Debug file_status.results
 #  debug:
