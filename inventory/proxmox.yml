@@ -12,6 +12,7 @@ groups:
   arrs: "'arrs' in (proxmox_tags_parsed|list)"
   overseer: "'overseer' in (proxmox_tags_parsed|list)"
   freshrss: "'freshrss' in (proxmox_tags_parsed|list)"
+  linkding: "'linkding' in (proxmox_tags_parsed|list)"
   backups: "'backups' in (proxmox_tags_parsed|list)"
   documents: "'documents' in (proxmox_tags_parsed|list)"
   dns: "'dns' in (proxmox_tags_parsed|list)"

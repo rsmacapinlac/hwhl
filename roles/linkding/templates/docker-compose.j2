@@ -1,0 +1,35 @@
+version: '3.5'
+services:
+  linkding:
+    container_name: linkding
+    image: sissbruecker/linkding:latest
+    restart: unless-stopped
+    environment:
+      #- LD_ENABLE_AUTH_PROXY=True
+      #- LD_AUTH_PROXY_USERNAME_HEADER=HTTP_REMOTE_USER
+      #- LD_AUTH_PROXY_LOGOUT_URL=https://auth.macapinlac.network/logout
+      - LD_DISABLE_URL_VALIDATION=True
+    ports:
+      - '9090:9090'
+    volumes:
+      - /data/containers/linkding:/etc/linkding/data
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.linkding.entrypoints=http"
+      - "traefik.http.routers.linkding.rule=Host(`linkding.local.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.linkding-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.linkding.middlewares=linkding-https-redirect"
+      - "traefik.http.routers.linkding-secure.entrypoints=https"
+      - "traefik.http.routers.linkding-secure.rule=Host(`linkding.local.{{ homelab_domain }}`)"
+      - "traefik.http.routers.linkding-secure.tls=true"
+      - "traefik.http.routers.linkding-secure.service=linkding"
+      - "traefik.http.services.linkding.loadbalancer.server.port=9090"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true

@@ -285,7 +285,7 @@ http:
     linkding:
       loadbalancer:
         servers:
-          - url: "http://mizuta.int.macapinlac.network:9090"
+          - url: "http://kazuho.int.macapinlac.network:9090"
         passhostheader: true
     sabnzbd:
       loadBalancer:
