@@ -61,7 +61,7 @@ http:
         - "https"
       rule: "Host(`bookmarks.macapinlac.network`)"
       middlewares:
-        - authelia
+        # - authelia
         - default-headers
         - https-redirectscheme
       tls: {}
