@@ -25,6 +25,8 @@ services:
       - "traefik.http.routers.overseer-secure.service=overseer"
       - "traefik.http.services.overseer.loadbalancer.server.port=5055"
       - "traefik.docker.network=proxy"
+    networks:
+      - proxy
 
 networks:
   proxy:
