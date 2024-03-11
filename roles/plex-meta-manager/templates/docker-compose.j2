@@ -1,0 +1,17 @@
+version: '3.5'
+services:
+  plex-meta-manager:
+    image: lscr.io/linuxserver/plex-meta-manager:latest
+    container_name: plex-meta-manager
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ timezone }}
+      #- PMM_CONFIG=/config/config.yml #optional
+      # - PMM_TIME=03:00,09:00,15:00,19:00 #optional
+      - PMM_RUN=False #optional
+      - PMM_TEST=False #optional
+      #- PMM_NO_MISSING=False #optional
+    volumes:
+      - /data/containers/plex-meta-manager:/config
+    restart: unless-stopped

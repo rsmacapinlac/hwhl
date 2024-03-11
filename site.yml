@@ -41,6 +41,35 @@
   roles:
     - role: linkding
 
+
+- hosts: "plex_stack"
+  vars_files:
+    - group_vars/plex_stack.yml
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: plex
+    - role: tautulli
+    - role: plex-meta-manager
+
+- hosts: "plex"
+  vars_files:
+    - group_vars/plex_stack.yml
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: plex
+
+- hosts: "tautulli"
+  remote_user: ansible
+  roles:
+    - role: tautulli
+
+- hosts: "pmm"
+  remote_user: ansible
+  roles:
+    - role: plex-meta-manager
+
 # Plan to deprecate this
 - hosts: "docker"
   remote_user: ansible
@@ -81,6 +110,14 @@
     - role: traefik_internal
 
 - hosts: "backups"
+  remote_user: ansible
+  vars_files:
+    - group_vars/backup.yml
+  roles:
+    - role: shares
+    - role: duplicati
+
+- hosts: "duplicati"
   remote_user: ansible
   vars_files:
     - group_vars/backup.yml

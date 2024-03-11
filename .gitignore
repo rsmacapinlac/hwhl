@@ -13,6 +13,7 @@ group_vars/documents.yml
 group_vars/homepage.yml
 group_vars/nextcloud.yml
 group_vars/photos.yml
+group_vars/plex_stack.yml
 group_vars/proxy.yml
 group_vars/traefik.yml
 group_vars/watchtower.yml
