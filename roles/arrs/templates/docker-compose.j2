@@ -245,27 +245,6 @@ services:
     networks:
       - proxy
 
-  samba:
-    container_name: samba
-    image: dperson/samba
-    environment:
-      TZ: '{{ timezone }}'
-      USERID: 1001
-      GROUPID: 1001
-    networks:
-      - default
-    ports:
-      - "137:137/udp"
-      - "138:138/udp"
-      - "139:139/tcp"
-      - "445:445/tcp"
-    tmpfs:
-      - /tmp
-    restart: unless-stopped
-    volumes:
-      - /data/arrs/Downloads:/arrs/Downloads
-    command: '-s "Arrs Download share;/arrs/Downloads;yes;no;yes"'
-
 networks:
   proxy:
     external: true
