@@ -17,6 +17,7 @@
     - { name: 'radarr' }
     - { name: 'sonarr' }
     - { name: 'bazarr' }
+    - { name: 'readarr' }
     - { name: 'mylar' }
     - { name: 'sabnzbd' }
     - { name: 'transmission' }
