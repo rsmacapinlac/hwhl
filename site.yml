@@ -41,7 +41,6 @@
   roles:
     - role: linkding
 
-
 - hosts: "plex_stack"
   vars_files:
     - group_vars/plex_stack.yml
@@ -69,6 +68,11 @@
   remote_user: ansible
   roles:
     - role: plex-meta-manager
+
+- hosts: "tubearchivist"
+  remote_user: ansible
+  roles:
+    - role: tubearchivist
 
 # Plan to deprecate this
 - hosts: "docker"

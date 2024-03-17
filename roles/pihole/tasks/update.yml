@@ -1,11 +1,10 @@
 
 - name: Copy DNS Records
-  become: true
   copy:
     src: "{{ playbook_dir }}/files/pihole/custom.list"
     dest: /data/containers/pihole/etc-pihole/custom.list
-    owner: ansible
-    group: docker
+    # owner: ansible
+    # group: docker
 
 #- name: Copy CNAME Records
 #  become: true
@@ -32,6 +31,7 @@
     - { src: "{{ playbook_dir }}/files/dns/05-linkding.conf", dest: "05-linkding.conf" }
     - { src: "{{ playbook_dir }}/files/dns/05-plex.conf", dest: "05-plex.conf" }
     - { src: "{{ playbook_dir }}/files/dns/05-tautulli.conf", dest: "05-tautulli.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/05-tubearchivist.conf", dest: "05-tubearchivist.conf" }
 
 #- name: Debug file_status.results
 #  debug:

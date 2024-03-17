@@ -18,6 +18,7 @@ groups:
   tautulli: "'tautulli' in (proxmox_tags_parsed|list)"
   # plex-meta-manager
   pmm: "'pmm' in (proxmox_tags_parsed|list)"
+  tubearchivist: "'tubearchivist' in (proxmox_tags_parsed|list)"
   backups: "'backups' in (proxmox_tags_parsed|list)"
   duplicati: "'duplicati' in (proxmox_tags_parsed|list)"
   documents: "'documents' in (proxmox_tags_parsed|list)"

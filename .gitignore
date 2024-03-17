@@ -4,6 +4,9 @@
 .envrc
 .env
 
+# exclude all host_vars
+host_vars/*
+
 # exclude group_vars with sensitive information
 group_vars/all
 group_vars/arrs.yml
@@ -16,6 +19,7 @@ group_vars/photos.yml
 group_vars/plex_stack.yml
 group_vars/proxy.yml
 group_vars/traefik.yml
+group_vars/tubearchivist.yml
 group_vars/watchtower.yml
 
 # exclude files folder

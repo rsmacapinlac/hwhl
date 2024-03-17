@@ -146,7 +146,7 @@ http:
         - "https"
       rule: "Host(`ta.macapinlac.network`)"
       middlewares:
-        - authelia
+        #- authelia
         - default-headers
         - https-redirectscheme
       tls: {}
@@ -250,7 +250,7 @@ http:
     tubearchivist:
       loadbalancer:
         servers:
-          - url: "http://doubashi.int.macapinlac.network:8000"
+          - url: "http://ritchie.int.macapinlac.network:8000"
         passhostheader: true
     audiobookshelf:
       loadbalancer:
