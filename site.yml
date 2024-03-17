@@ -74,6 +74,11 @@
   roles:
     - role: tubearchivist
 
+- hosts: "obsidian"
+  remote_user: ansible
+  roles:
+    - role: obsidian
+
 # Plan to deprecate this
 - hosts: "docker"
   remote_user: ansible

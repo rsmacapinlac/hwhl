@@ -2,6 +2,16 @@ http:
 #region routers
   routers:
     # external routes
+    obsidian:
+      entryPoints:
+        - "https"
+      rule: "Host(`pkm.macapinlac.network`)"
+      middlewares:
+        - authelia
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: obsidian
     bienn8n:
       entryPoints:
         - "https"
@@ -38,7 +48,7 @@ http:
         - https-redirectscheme
       tls: {}
       service: baserow
-    audiobookshelf-external:
+    audiobookshelf:
       entryPoints:
         - "https"
       rule: "Host(`abs.macapinlac.network`)"
@@ -47,7 +57,7 @@ http:
         - https-redirectscheme
       tls: {}
       service: audiobookshelf
-    ubooquity-external:
+    ubooquity:
       entryPoints:
         - "https"
       rule: "Host(`reading.macapinlac.network`)"
@@ -152,91 +162,15 @@ http:
       tls: {}
       service: tubearchivist
 
-    radarr:
-      entryPoints:
-        - "https"
-      rule: "Host(`radarr.van.macapinlac.network`)"
-      middlewares:
-        - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: radarr
-    bazarr:
-      entryPoints:
-        - "https"
-      rule: "Host(`bazarr.van.macapinlac.network`)"
-      middlewares:
-        - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: bazarr
-    sonarr:
-      entryPoints:
-        - "https"
-      rule: "Host(`sonarr.van.macapinlac.network`)"
-      middlewares:
-        - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: sonarr
-    prowlarr:
-      entryPoints:
-        - "https"
-      rule: "Host(`prowlarr.van.macapinlac.network`)"
-      middlewares:
-        - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: prowlarr
-    sabnzbd:
-      entryPoints:
-        - "https"
-      rule: "Host(`sabnzbd.van.macapinlac.network`)"
-      middlewares:
-        - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: sabnzbd
-    transmission:
-      entryPoints:
-        - "https"
-      rule: "Host(`transmission.van.macapinlac.network`)"
-      middlewares:
-        - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: transmission
-    snippetbox:
-      entryPoints:
-        - "https"
-      rule: "Host(`snippetbox.van.macapinlac.network`)"
-      middlewares:
-        - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: snippetbox
-    tautulli:
-      entryPoints:
-        - "https"
-      rule: "Host(`tautulli.van.macapinlac.network`)"
-      middlewares:
-        - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: tautulli
-    homepage-int:
-      entryPoints:
-        - "https"
-      rule: "Host(`homepage.van.macapinlac.network`)"
-      middlewares:
-        - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: homepage
 #endregion
 
 #region services
   services:
+    obsidian:
+      loadbalancer:
+        servers:
+          - url: "http://ritchie.int.macapinlac.network:8080"
+        passhostheader: true
     bienn8n:
       loadbalancer:
         servers:
@@ -262,46 +196,11 @@ http:
         servers:
           - url: "http://manami.int.macapinlac.network:2202"
         passhostheader: true
-    radarr:
-      loadbalancer:
-        servers:
-          - url: "http://shinkai.int.macapinlac.network:7878"
-        passhostheader: true
-    bazarr:
-      loadbalancer:
-        servers:
-          - url: "http://shinkai.int.macapinlac.network:6767"
-        passhostheader: true
-    sonarr:
-      loadbalancer:
-        servers:
-          - url: "http://shinkai.int.macapinlac.network:8989"
-        passhostheader: true
-    prowlarr:
-      loadbalancer:
-        servers:
-          - url: "http://shinkai.int.macapinlac.network:9696"
-        passhostheader: true
     linkding:
       loadbalancer:
         servers:
           - url: "http://kazuho.int.macapinlac.network:9090"
         passhostheader: true
-    sabnzbd:
-      loadBalancer:
-        servers:
-          - url: "http://shinkai.int.macapinlac.network:8080"
-        passHostHeader: true
-    transmission:
-      loadBalancer:
-        servers:
-          - url: "http://shinkai.int.macapinlac.network:9091"
-        passHostHeader: true
-    snippetbox:
-      loadBalancer:
-        servers:
-          - url: "http://mizuta.int.macapinlac.network:5000"
-        passHostHeader: true
     photoprism:
       loadBalancer:
         servers:
