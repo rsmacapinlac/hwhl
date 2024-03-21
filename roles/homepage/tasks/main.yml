@@ -13,18 +13,19 @@
     group: docker
 
 - name: Setup setttings for homepage
-  template:
-    src: settings.yaml.j2
+  copy:
+    src: "{{ playbook_dir }}/files/homepage/settings.yaml"
     dest: /data/containers/homepage/settings.yaml
-    owner: ansible
-    group: docker
 
 - name: Setup services for homepage
-  template:
-    src: services.yaml.j2
+  copy:
+    src: "{{ playbook_dir }}/files/homepage/services.yaml"
     dest: /data/containers/homepage/services.yaml
-    owner: ansible
-    group: docker
+
+- name: Setup bookmarks for homepage
+  copy:
+    src: "{{ playbook_dir }}/files/homepage/bookmarks.yaml"
+    dest: /data/containers/homepage/bookmarks.yaml
 
 - name: Run container
   shell:
