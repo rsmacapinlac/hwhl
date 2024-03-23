@@ -1,0 +1,45 @@
+version: '3.7'
+services:
+  traggo:
+    image: traggo/server:latest
+    container_name: traggo
+    ports:
+      - 3030:3030
+    environment:
+      TRAGGO_DEFAULT_USER_NAME: "{{ traggo_default_user_name }}"
+      TRAGGO_DEFAULT_USER_PASS: "{{ traggo_default_user_pass }}"
+    volumes:
+      - /data/containers/traggo:/opt/traggo/data
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.traggo-by-hostname.entrypoints=http"
+      - "traefik.http.routers.traggo-by-hostname.rule=Host(`traggo.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+
+      - "traefik.http.middlewares.traggo-by-hostname--https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.traggo-by-hostname.middlewares=traggo-by-hostname-https-redirect"
+
+      - "traefik.http.routers.traggo-by-hostname-secure.entrypoints=https"
+      - "traefik.http.routers.traggo-by-hostname-secure.rule=Host(`traggo.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.traggo-by-hostname-secure.tls=true"
+      - "traefik.http.routers.traggo-by-hostname-secure.service=traggo"
+
+      - "traefik.http.routers.traggo.entrypoints=http"
+      - "traefik.http.routers.traggo.rule=Host(`traggo.local.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.traggo-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.traggo.middlewares=traggo-https-redirect"
+      - "traefik.http.routers.traggo-secure.entrypoints=https"
+      - "traefik.http.routers.traggo-secure.rule=Host(`traggo.local.{{ homelab_domain }}`)"
+      - "traefik.http.routers.traggo-secure.tls=true"
+      - "traefik.http.routers.traggo-secure.service=traggo"
+
+      - "traefik.http.services.traggo.loadbalancer.server.port=3030"
+      - "traefik.docker.network=proxy"
+    restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true

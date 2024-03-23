@@ -2,6 +2,15 @@ http:
 #region routers
   routers:
     # external routes
+    traggo:
+      entryPoints:
+        - "https"
+      rule: "Host(`time.macapinlac.network`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls: {}
+      service: traggo
     obsidian:
       entryPoints:
         - "https"
@@ -166,6 +175,11 @@ http:
 
 #region services
   services:
+    traggo:
+      loadbalancer:
+        servers:
+          - url: "http://ritchie.int.macapinlac.network:3030"
+        passhostheader: true
     obsidian:
       loadbalancer:
         servers:

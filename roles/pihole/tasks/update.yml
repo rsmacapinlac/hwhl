@@ -33,6 +33,7 @@
     - { src: "{{ playbook_dir }}/files/dns/05-tautulli.conf", dest: "05-tautulli.conf" }
     - { src: "{{ playbook_dir }}/files/dns/05-tubearchivist.conf", dest: "05-tubearchivist.conf" }
     - { src: "{{ playbook_dir }}/files/dns/05-obsidian.conf", dest: "05-obsidian.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/05-traggo.conf", dest: "05-traggo.conf" }
 
 #- name: Debug file_status.results
 #  debug:

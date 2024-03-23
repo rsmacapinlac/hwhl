@@ -79,6 +79,11 @@
   roles:
     - role: obsidian
 
+- hosts: "traggo"
+  remote_user: ansible
+  roles:
+    - role: traggo
+
 # Plan to deprecate this
 - hosts: "docker"
   remote_user: ansible

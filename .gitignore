@@ -19,6 +19,7 @@ group_vars/photos.yml
 group_vars/plex_stack.yml
 group_vars/proxy.yml
 group_vars/traefik.yml
+group_vars/traggo.yml
 group_vars/tubearchivist.yml
 group_vars/watchtower.yml
 

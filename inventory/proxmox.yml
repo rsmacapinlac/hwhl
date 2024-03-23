@@ -20,6 +20,7 @@ groups:
   pmm: "'pmm' in (proxmox_tags_parsed|list)"
   tubearchivist: "'tubearchivist' in (proxmox_tags_parsed|list)"
   obsidian: "'obsidian' in (proxmox_tags_parsed|list)"
+  traggo: "'traggo' in (proxmox_tags_parsed|list)"
   backups: "'backups' in (proxmox_tags_parsed|list)"
   duplicati: "'duplicati' in (proxmox_tags_parsed|list)"
   documents: "'documents' in (proxmox_tags_parsed|list)"
