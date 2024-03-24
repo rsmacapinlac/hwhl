@@ -6,3 +6,11 @@
     autoclean: yes
     autoremove: yes
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Update all packages to the latest version
+  become: yes
+  apt:
+    update_cache: yes
+    upgrade: full
+    force_apt_get: yes
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

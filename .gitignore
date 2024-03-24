@@ -4,6 +4,9 @@
 .envrc
 .env
 
+# inventory files
+inventory/proxmox-nodes.yml
+
 # exclude all host_vars
 host_vars/*
 

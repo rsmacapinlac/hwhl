@@ -1,4 +1,5 @@
 ---
+# playbook for setting up proxmox
 - hosts: "proxmox_nodes_by_ip"
   remote_user: root
   roles:
