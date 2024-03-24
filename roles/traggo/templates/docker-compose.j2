@@ -16,7 +16,7 @@ services:
       - "traefik.http.routers.traggo-by-hostname.entrypoints=http"
       - "traefik.http.routers.traggo-by-hostname.rule=Host(`traggo.{{ ansible_hostname }}.{{ homelab_domain }}`)"
 
-      - "traefik.http.middlewares.traggo-by-hostname--https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.traggo-by-hostname-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.traggo-by-hostname.middlewares=traggo-by-hostname-https-redirect"
 
       - "traefik.http.routers.traggo-by-hostname-secure.entrypoints=https"

@@ -28,6 +28,27 @@ services:
       - proxy
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+
+      # routers
+      - "traefik.http.routers.pihole-by-hostname.entrypoints=http"
+      - "traefik.http.routers.pihole-by-hostname.rule=Host(`pihole.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.pihole-by-hostname.middlewares=pihole-by-hostname-https-redirect"
+      - "traefik.http.routers.pihole-by-hostname-secure.entrypoints=https"
+      - "traefik.http.routers.pihole-by-hostname-secure.rule=Host(`pihole.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.pihole-by-hostname-secure.tls=true"
+      - "traefik.http.routers.pihole-by-hostname-secure.service=pihole"
+      - "traefik.http.routers.pihole-by-hostname-secure.middlewares=redirectregex-pihole,addprefix-pihole"
+
+      # middlewares
+      - "traefik.http.middlewares.pihole-by-hostname-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.addprefix-pihole.addPrefix.prefix=/admin"
+      - "traefik.http.middlewares.redirectregex-pihole.redirectregex.regex=/admin/(.*)"
+      - "traefik.http.middlewares.redirectregex-pihole.redirectregex.replacement=/"
+
+      # services
+      - "traefik.http.services.pihole.loadbalancer.server.port=80"
 
 networks:
   proxy:

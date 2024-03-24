@@ -1,35 +1,9 @@
 http:
-  #region routers
-  routers:
-    pihole:
-      entryPoints:
-        - "https"
-      rule: "Host(`{{ ansible_hostname }}.local.{{ homelab_domain }}`)"
-      middlewares:
-        - redirectregex-pihole
-        - default-headers
-        - addprefix-pihole
-        - https-redirectscheme
-      tls: {}
-      service: pihole
-  services:
-    pihole:
-      loadBalancer:
-        servers:
-          - url: "http://{{ ansible_default_ipv4.address }}:8080"
-        passHostHeader: true
   middlewares:
     https-redirectscheme:
       redirectScheme:
         scheme: https
         permanent: true
-    addprefix-pihole:
-      addPrefix:
-        prefix: "/admin"
-    redirectregex-pihole:
-      redirectRegex:
-        regex: "/admin/(.*)"
-        replacement: /
 
     default-headers:
       headers:
