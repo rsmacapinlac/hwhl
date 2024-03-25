@@ -1,7 +1,65 @@
-- name: "Provision lxc's"
+- name: "Provision lxcs"
   remote_user: root
   hosts: proxmox_control_node_by_ip
   tasks:
+    - name: Create utility container
+      community.general.proxmox:
+        vmid: "{{ item.vmid }}"
+        hostname: '{{ item.name }}'
+        node: '{{ item.proxmox_node  }}'
+        api_user: '{{ proxmox_api.api_user }}'
+        api_host: '{{ proxmox_api.api_host }}'
+        api_token_id: '{{ proxmox_api.api_token_id }}'
+        api_token_secret: '{{ proxmox_api.api_token_secret }}'
+        memory: 4096
+        swap: 8192
+        disk: 'local-lvm:64'
+        password: '{{ item.root_password }}'
+        pubkey: '{{ item.pubkey }}'
+        timezone: '{{ timezone }}'
+        cores: 2
+        ostemplate: local:vztmpl/debian-12-standard_12.2-1_amd64.tar.zst
+        netif: '{"net0":"name=eth0,gw={{ item.gateway }},ip={{ item.ip_addr }},bridge=vmbr0"}'
+        nameserver: '{{ item.nameserver }}'
+        unprivileged: false
+        tags:
+          - containers
+          - semaphore
+      ignore_errors: true
+      loop: '{{ lxcs_utility }}'
+      when: lxcs_utility is defined
+
+    - name: Ensure nesting and cifs,nfs are enabled
+      ansible.builtin.lineinfile:
+        path: /etc/pve/lxc/{{ item.vmid }}.conf
+        line: "features: mount=nfs;cifs,nesting=1"
+        regexp: '^features: .*'
+        state: present
+      loop: '{{ lxcs_utility }}'
+      when: lxcs_utility is defined
+
+    - name: Ensure utility lxcs start on boot enabled
+      ansible.builtin.lineinfile:
+        path: /etc/pve/lxc/{{ item.vmid }}.conf
+        line: "onboot: 1"
+        regexp: '^onboot: .*'
+        state: present
+      loop: '{{ lxcs_utility }}'
+      when: lxcs_utility is defined
+
+    - name: Start utility containers
+      community.general.proxmox:
+        vmid: "{{ item.vmid }}"
+        hostname: '{{ item.name }}'
+        node: '{{ item.proxmox_node  }}'
+        api_user: '{{ proxmox_api.api_user }}'
+        api_host: '{{ proxmox_api.api_host }}'
+        api_token_id: '{{ proxmox_api.api_token_id }}'
+        api_token_secret: '{{ proxmox_api.api_token_secret }}'
+        state: started
+      loop: '{{ lxcs_utility }}'
+      when: lxcs_utility is defined
+
     - name: Create DNS containers
       community.general.proxmox:
         vmid: "{{ item.vmid }}"
@@ -13,21 +71,51 @@
         api_token_secret: '{{ proxmox_api.api_token_secret }}'
         memory: 2048
         swap: 4096
-        # https://github.com/ansible-collections/community.general/commit/d7b89cde46b921adcc2334e3d9fc09c50701b46b
-        # storage: 'local-lvm'
         disk: 'local-lvm:64'
         password: '{{ item.root_password }}'
         pubkey: '{{ item.pubkey }}'
         timezone: '{{ timezone }}'
         cores: 1
         ostemplate: local:vztmpl/debian-12-standard_12.2-1_amd64.tar.zst
-        netif: '{"net0":"name=eth0,gw={{ item.gateway }},ip={{ item.ip_addr }}/24,bridge=vmbr0"}'
+        netif: '{"net0":"name=eth0,gw={{ item.gateway }},ip={{ item.ip_addr }},bridge=vmbr0"}'
         nameserver: '{{ item.nameserver }}'
         unprivileged: false
         tags:
           - dns
           - containers
       loop: '{{ lxcs_dns }}'
+      when: lxcs_dns is defined
+
+    - name: Ensure nesting enabled for DNS lxcs
+      ansible.builtin.lineinfile:
+        path: /etc/pve/lxc/{{ item.vmid }}.conf
+        line: "features: nesting=1"
+        regexp: '^features: .*'
+        state: present
+      loop: '{{ lxcs_dns }}'
+      when: lxcs_dns is defined
+
+    - name: Ensure DNS lxcs start on boot enabled
+      ansible.builtin.lineinfile:
+        path: /etc/pve/lxc/{{ item.vmid }}.conf
+        line: "onboot: 1"
+        regexp: '^onboot: .*'
+        state: present
+      loop: '{{ lxcs_dns }}'
+      when: lxcs_dns is defined
+
+    - name: Start DNS containers
+      community.general.proxmox:
+        vmid: "{{ item.vmid }}"
+        hostname: '{{ item.name }}'
+        node: '{{ item.proxmox_node  }}'
+        api_user: '{{ proxmox_api.api_user }}'
+        api_host: '{{ proxmox_api.api_host }}'
+        api_token_id: '{{ proxmox_api.api_token_id }}'
+        api_token_secret: '{{ proxmox_api.api_token_secret }}'
+        state: started
+      loop: '{{ lxcs_dns }}'
+      when: lxcs_dns is defined
 
     - name: Create External Proxy containers
       community.general.proxmox:
@@ -54,18 +142,16 @@
         tags:
           - proxy_external
       loop: '{{ lxcs_external_proxy }}'
+      when: lxcs_external_proxy is defined
 
-    - name: Start DNS containers
-      community.general.proxmox:
-        vmid: "{{ item.vmid }}"
-        hostname: '{{ item.name }}'
-        node: '{{ item.proxmox_node  }}'
-        api_user: '{{ proxmox_api.api_user }}'
-        api_host: '{{ proxmox_api.api_host }}'
-        api_token_id: '{{ proxmox_api.api_token_id }}'
-        api_token_secret: '{{ proxmox_api.api_token_secret }}'
-        state: started
-      loop: '{{ lxcs_dns }}'
+    - name: Ensure utility lxcs start on boot enabled
+      ansible.builtin.lineinfile:
+        path: /etc/pve/lxc/{{ item.vmid }}.conf
+        line: "onboot: 1"
+        regexp: '^onboot: .*'
+        state: present
+      loop: '{{ lxcs_external_proxy }}'
+      when: lxcs_external_proxy is defined
 
     - name: Start External Proxy containers
       community.general.proxmox:
@@ -78,5 +164,6 @@
         api_token_secret: '{{ proxmox_api.api_token_secret }}'
         state: started
       loop: '{{ lxcs_external_proxy }}'
+      when: lxcs_external_proxy is defined
 
 

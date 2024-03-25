@@ -6,6 +6,7 @@
 
 # inventory files
 inventory/proxmox-nodes.yml
+inventory/proxmox-node-*.yml
 
 # exclude all host_vars
 host_vars/*
