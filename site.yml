@@ -85,6 +85,10 @@
   roles:
     - role: traggo
 
+- hosts: "semaphore"
+  remote_user: ansible
+  roles:
+    - role: semaphore
 # Plan to deprecate this
 - hosts: "docker"
   remote_user: ansible

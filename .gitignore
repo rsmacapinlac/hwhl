@@ -22,6 +22,7 @@ group_vars/nextcloud.yml
 group_vars/photos.yml
 group_vars/plex_stack.yml
 group_vars/proxy.yml
+group_vars/semaphore.yml
 group_vars/traefik.yml
 group_vars/traggo.yml
 group_vars/tubearchivist.yml
