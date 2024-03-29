@@ -1,0 +1,42 @@
+- name: 'Create LXC container'
+  community.general.proxmox:
+    vmid: "{{ item.vmid }}"
+    hostname: '{{ item.name }}'
+    node: '{{ item.proxmox_node  }}'
+    api_user: '{{ proxmox_api.api_user }}'
+    api_host: '{{ proxmox_api.api_host }}'
+    api_token_id: '{{ proxmox_api.api_token_id }}'
+    api_token_secret: '{{ proxmox_api.api_token_secret }}'
+    memory: "{{ item.memory }}"
+    swap: '{{ item.swap }}'
+    disk: 'local-lvm:64'
+    password: '{{ item.root_password }}'
+    pubkey: '{{ item.pubkey }}'
+    timezone: '{{ timezone }}'
+    cores: '{{ item.cores }}'
+    ostemplate: local:vztmpl/debian-12-standard_12.2-1_amd64.tar.zst
+    netif: '{"net0":"name=eth0,gw={{ item.gateway }},ip={{ item.ip_addr }},bridge=vmbr0"}'
+    nameserver: '{{ item.nameserver }}'
+    unprivileged: false
+    tags:
+      - containers
+  loop: '{{ lxcs_containers }}'
+  when: lxcs_containers is defined
+
+- name: Ensure nesting and cifs,nfs are enabled
+  ansible.builtin.lineinfile:
+    path: /etc/pve/lxc/{{ item.vmid }}.conf
+    line: "features: mount=nfs;cifs,nesting=1"
+    regexp: '^features: .*'
+    state: present
+  loop: '{{ lxcs_containers }}'
+  when: lxcs_containers is defined
+
+- name: Ensure utility lxcs start on boot enabled
+  ansible.builtin.lineinfile:
+    path: /etc/pve/lxc/{{ item.vmid }}.conf
+    line: "onboot: 1"
+    regexp: '^onboot: .*'
+    state: present
+  loop: '{{ lxcs_containers }}'
+  when: lxcs_containers is defined
