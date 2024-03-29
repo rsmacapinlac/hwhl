@@ -89,11 +89,10 @@
   remote_user: ansible
   roles:
     - role: semaphore
+
 # Plan to deprecate this
 - hosts: "docker"
   remote_user: ansible
-  vars_files:
-    - group_vars/watchtower.yml
   roles:
     - role: portainer
     - role: watchtower
