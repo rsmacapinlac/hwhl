@@ -101,9 +101,6 @@
 
 - hosts: "containers"
   remote_user: ansible
-  vars_files:
-    - group_vars/watchtower.yml
-    - group_vars/traefik.yml
   roles:
     - role: portainer
     - role: watchtower
