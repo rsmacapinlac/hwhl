@@ -9,7 +9,7 @@
     api_token_secret: '{{ proxmox_api.api_token_secret }}'
     memory: "{{ item.memory }}"
     swap: '{{ item.swap }}'
-    disk: 'local-lvm:64'
+    disk: 'local-lvm:{{ item.disksize }}'
     password: '{{ item.root_password }}'
     pubkey: '{{ item.pubkey }}'
     timezone: '{{ timezone }}'
