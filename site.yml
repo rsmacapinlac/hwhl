@@ -21,8 +21,6 @@
 
 - hosts: "arrs"
   remote_user: ansible
-  vars_files:
-    - group_vars/arrs.yml
   roles:
     - role: shares
     - role: arrs
