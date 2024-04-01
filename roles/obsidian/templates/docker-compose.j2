@@ -14,14 +14,26 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
+      - "traefik.http.routers.obsidian-by-hostname.entrypoints=http"
+      - "traefik.http.routers.obsidian-by-hostname.rule=Host(`obsidian.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+
+      - "traefik.http.middlewares.obsidian-by-hostname-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.obsidian-by-hostname.middlewares=obsidian-by-hostname-https-redirect"
+
+      - "traefik.http.routers.obsidian-by-hostname-secure.entrypoints=https"
+      - "traefik.http.routers.obsidian-by-hostname-secure.rule=Host(`obsidian.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.obsidian-by-hostname-secure.tls=true"
+      - "traefik.http.routers.obsidian-by-hostname-secure.service=obsidian"
+
       - "traefik.http.routers.obsidian.entrypoints=http"
-      - "traefik.http.routers.obsidian.rule=Host(`obsidian.{{ ansible_hostname }}.{{ homelab_domain  }}`)"
+      - "traefik.http.routers.obsidian.rule=Host(`obsidian.local.{{ homelab_domain }}`)"
       - "traefik.http.middlewares.obsidian-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.obsidian.middlewares=obsidian-https-redirect"
       - "traefik.http.routers.obsidian-secure.entrypoints=https"
-      - "traefik.http.routers.obsidian-secure.rule=Host(`obsidian.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.obsidian-secure.rule=Host(`obsidian.local.{{ homelab_domain }}`)"
       - "traefik.http.routers.obsidian-secure.tls=true"
       - "traefik.http.routers.obsidian-secure.service=obsidian"
+
       - "traefik.http.services.obsidian.loadbalancer.server.port=8080"
       - "traefik.docker.network=proxy"
     restart: unless-stopped

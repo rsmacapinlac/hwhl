@@ -1,0 +1,21 @@
+# managed vm's and lxc
+managed_hosts:
+  children:
+    raspberrypi:
+    dns:
+    external-proxy:
+    containers:
+    duplicati:
+    plex_stack:
+    overseer:
+    arrs:
+    homepage:
+    paperless-ng:
+    photoprism:
+    tubearchivist:
+    nextcloud:
+    traggo:
+    freshrss:
+    linkding:
+    semaphore:
+    homeassistant:

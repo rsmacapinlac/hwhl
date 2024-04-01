@@ -1,14 +1,10 @@
 
 - name: Traefik routes
-  become: true
   copy:
-    src: ../files/routes.yml
-    dest: /data/containers/traefik/config.yml
-    owner: ansible
-    group: docker
+    src: "{{ playbook_dir }}/files/traefik/config.yml"
+    dest: "/data/containers/traefik/config.yml"
 
 - name: Restart traefik
   become: true
   shell:
     cmd: "docker compose -f /data/services/traefik.yml restart traefik"
-  ignore_errors: true

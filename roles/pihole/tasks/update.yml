@@ -1,44 +1,39 @@
+- name: Check if host records exists
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/files/dns/custom.list"
+  register: cname_record_status
 
-- name: Copy DNS Records
+- name: Copy host DNS Records
   copy:
-    src: "{{ playbook_dir }}/files/pihole/custom.list"
+    src: "{{ playbook_dir }}/files/dns/custom.list"
     dest: /data/containers/pihole/etc-pihole/custom.list
-    # owner: ansible
-    # group: docker
-
-#- name: Copy CNAME Records
-#  become: true
-#  copy:
-#    src: ../files/c-names
-#    dest: /data/containers/pihole/etc-dnsmasq.d/05-pihole-custom-cname.conf
-#    owner: ansible
-#    group: docker
+  when: cname_record_status.stat.exists
 
 - name: Check which service's CNAME record exists
+  delegate_to: localhost
   ansible.builtin.stat:
     path: "{{ item.src }}"
   register: file_status
   loop:
-    - { src: "{{ playbook_dir }}/files/dns/05-pihole.conf", dest: "05-pihole.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-portainer.conf", dest: "05-portainer.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-duplicati.conf", dest: "05-duplicati.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-traefik.conf", dest: "05-traefik.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-traefik-external.conf", dest: "05-traefik-external.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-wg-easy.conf", dest: "05-wg-easy.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-paperless-ng.conf", dest: "05-paperless-ng.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-arrs.conf", dest: "05-arrs.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-freshrss.conf", dest: "05-freshrss.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-linkding.conf", dest: "05-linkding.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-plex.conf", dest: "05-plex.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-tautulli.conf", dest: "05-tautulli.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-tubearchivist.conf", dest: "05-tubearchivist.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-obsidian.conf", dest: "05-obsidian.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-traggo.conf", dest: "05-traggo.conf" }
-    - { src: "{{ playbook_dir }}/files/dns/05-semaphore.conf", dest: "05-semaphore.conf" }
-
-#- name: Debug file_status.results
-#  debug:
-#    var: file_status.results
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-pihole.conf", dest: "05-pihole.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-traefik.conf", dest: "05-traefik.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-portainer.conf", dest: "05-portainer.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-wg-easy.conf", dest: "05-wg-easy.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-duplicati.conf", dest: "05-duplicati.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-plex.conf", dest: "05-plex.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-tautulli.conf", dest: "05-tautulli.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-arrs.conf", dest: "05-arrs.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-overseer.conf", dest: "05-overseer.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-paperless-ng.conf", dest: "05-paperless-ng.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-homepage.conf", dest: "05-homepage.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-tubearchivist.conf", dest: "05-tubearchivist.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-traggo.conf", dest: "05-traggo.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-obsidian.conf", dest: "05-obsidian.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-freshrss.conf", dest: "05-freshrss.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-linkding.conf", dest: "05-linkding.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-semaphore.conf", dest: "05-semaphore.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-homeassistant.conf", dest: "05-homeassistant.conf" }
 
 - name: Copy files if they exist
   become: true
@@ -46,16 +41,7 @@
     src: "{{ item.item.src }}"
     dest: "/data/containers/pihole/etc-dnsmasq.d/{{ item.item.dest }}"
   loop: "{{ file_status.results }}"
-#  when: item.stat.exists
-
-#- name: Copy CNAME records for defined services
-#  become: true
-#  ansible.builtin.copy:
-#    src: "{{ item.src }}"
-#    dest: "/data/containers/pihole/etc-dnsmasq.d/{{ item.dest }}"
-#  loop:
-#    - { src: "{{ playbook_dir }}/files/dns/05-portainer.conf", dest: "05-portainer.conf" }
-#    - { src: "{{ playbook_dir }}/files/dns/05-traefik.conf", dest: "05-traefik.conf" }
+  when: item.stat.exists
 
 - name: Restart PiHole
   command:

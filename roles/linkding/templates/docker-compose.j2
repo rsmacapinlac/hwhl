@@ -16,6 +16,17 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
+      - "traefik.http.routers.linkding-by-hostname.entrypoints=http"
+      - "traefik.http.routers.linkding-by-hostname.rule=Host(`linkding.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+
+      - "traefik.http.middlewares.linkding-by-hostname-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.linkding-by-hostname.middlewares=linkding-by-hostname-https-redirect"
+
+      - "traefik.http.routers.linkding-by-hostname-secure.entrypoints=https"
+      - "traefik.http.routers.linkding-by-hostname-secure.rule=Host(`linkding.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.linkding-by-hostname-secure.tls=true"
+      - "traefik.http.routers.linkding-by-hostname-secure.service=linkding"
+
       - "traefik.http.routers.linkding.entrypoints=http"
       - "traefik.http.routers.linkding.rule=Host(`linkding.local.{{ homelab_domain }}`)"
       - "traefik.http.middlewares.linkding-https-redirect.redirectscheme.scheme=https"
@@ -24,6 +35,7 @@ services:
       - "traefik.http.routers.linkding-secure.rule=Host(`linkding.local.{{ homelab_domain }}`)"
       - "traefik.http.routers.linkding-secure.tls=true"
       - "traefik.http.routers.linkding-secure.service=linkding"
+
       - "traefik.http.services.linkding.loadbalancer.server.port=9090"
       - "traefik.docker.network=proxy"
     networks:

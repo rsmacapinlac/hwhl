@@ -1,14 +1,24 @@
 - name: Create services folder
   ansible.builtin.file:
-    path: /data/services/
+    path: /data/services/homepage
     state: directory
     owner: ansible
     group: docker
 
+- name: Add host into the 05-homepage.conf for pihole
+  lineinfile:
+    path: "{{ playbook_dir }}/files/dns/cname/05-homepage.conf"
+    line: "{{ item }}"
+    create: true
+  loop:
+    - "cname=homepage.{{ ansible_hostname }}.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
+    - "cname=homepage.local.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
+  delegate_to: 127.0.0.1
+
 - name: Setup docker compose file for homepage
   template:
     src: docker-compose.j2
-    dest: /data/services/homepage.yml
+    dest: /data/services/homepage/docker-compose.yml
     owner: ansible
     group: docker
 
@@ -29,4 +39,4 @@
 
 - name: Run container
   shell:
-    cmd: "docker compose -f /data/services/homepage.yml up -d"
+    cmd: "docker compose -f /data/services/homepage/docker-compose.yml up -d"

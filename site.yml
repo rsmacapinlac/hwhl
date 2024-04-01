@@ -1,11 +1,11 @@
 ---
 # playbook for setting up proxmox
-- hosts: "proxmox_nodes_by_ip"
+- hosts: "proxmox_control_node_by_ip"
   remote_user: root
   roles:
     - role: proxmox
 
-- hosts: "proxmox_all_lxc"
+- hosts: "managed_hosts"
   remote_user: root
   tasks:
     - name: Apt update
@@ -36,6 +36,11 @@
   remote_user: ansible
   roles:
     - role: freshrss
+
+- hosts: "homeassistant"
+  remote_user: ansible
+  roles:
+    - role: homeassistant
 
 - hosts: "linkding"
   remote_user: ansible
@@ -103,7 +108,7 @@
   roles:
     - role: portainer
     - role: watchtower
-    - role: traefik_internal
+    - role: traefik
 
 - hosts: "portainer"
   remote_user: ansible
@@ -112,30 +117,11 @@
 
 - hosts: "watchtower"
   remote_user: ansible
-  vars_files:
-    - group_vars/watchtower.yml
   roles:
     - role: watchtower
 
-- hosts: "traefik_internal"
-  remote_user: ansible
-  vars_files:
-    - group_vars/traefik.yml
-  roles:
-    - role: traefik_internal
-
-- hosts: "backups"
-  remote_user: ansible
-  vars_files:
-    - group_vars/backup.yml
-  roles:
-    - role: shares
-    - role: duplicati
-
 - hosts: "duplicati"
   remote_user: ansible
-  vars_files:
-    - group_vars/backup.yml
   roles:
     - role: shares
     - role: duplicati
@@ -145,23 +131,24 @@
   roles:
     - role: pihole
 
-- hosts: "proxy_external"
+- hosts: "external-proxy"
   remote_user: ansible
-  vars_files:
-    - group_vars/proxy.yml
   roles:
-    - role: traefik_external
+    - role: traefik
     - role: authelia
     - role: cloudflare-ddns
     - role: wg-easy
+  tasks:
+    - name: "Update external routes"
+      include_tasks: roles/traefik/tasks/update_routes_external.yml
 
-- hosts: "photos"
+- hosts: "photoprism"
   remote_user: ansible
   roles:
     - role: shares
     - role: photoprism
 
-- hosts: "documents"
+- hosts: "paperless-ng"
   remote_user: ansible
   roles:
     - role: shares
@@ -169,8 +156,6 @@
 
 - hosts: "homepage"
   remote_user: ansible
-  vars_files:
-    - group_vars/photos.yml
   roles:
     - role: homepage
 
