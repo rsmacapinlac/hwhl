@@ -22,7 +22,7 @@
     owner: ansible
     group: docker
 
-- name: Create services folder
+- name: Create containers folder
   ansible.builtin.file:
     path: /data/containers/homepage
     state: directory
