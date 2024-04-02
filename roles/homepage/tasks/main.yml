@@ -22,6 +22,13 @@
     owner: ansible
     group: docker
 
+- name: Create services folder
+  ansible.builtin.file:
+    path: /data/containers/homepage
+    state: directory
+    owner: ansible
+    group: docker
+
 - name: Setup setttings for homepage
   copy:
     src: "{{ playbook_dir }}/files/homepage/settings.yaml"
