@@ -1,15 +1,3 @@
-- name: Check if host records exists
-  delegate_to: localhost
-  ansible.builtin.stat:
-    path: "{{ playbook_dir }}/files/dns/custom.list"
-  register: cname_record_status
-
-- name: Copy host DNS Records
-  copy:
-    src: "{{ playbook_dir }}/files/dns/custom.list"
-    dest: /data/containers/pihole/etc-pihole/custom.list
-  when: cname_record_status.stat.exists
-
 - name: Check which service's CNAME record exists
   delegate_to: localhost
   ansible.builtin.stat:

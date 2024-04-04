@@ -28,8 +28,5 @@
   shell:
     cmd: "docker compose -f /data/services/pihole.yml up -d"
 
-# register dns
-- include_tasks: register_host.yml
-
 # Update the DNS records as well
-- include_tasks: update.yml
+- include_tasks: update_dns.yml
