@@ -1,6 +1,0 @@
----
-tubearchivist:
-  - name: YouTube
-    host_folder: /data/tubearchivist/
-    container: /youtube
-

@@ -1,6 +1,0 @@
----
-# Create a copy of this file: documents.yml
-# Keep the mount_point, it is hard coded in the docker-compose file
-mount_point: /mnt/Documents
-server: 
-share_name: 

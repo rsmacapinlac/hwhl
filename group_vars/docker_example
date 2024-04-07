@@ -1,5 +1,0 @@
----
-# rename this file docker.yml
-# watchtower notifications
-discord_token: 
-discord_webhook_id: 

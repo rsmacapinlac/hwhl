@@ -13,6 +13,12 @@
     - name: 'Add users'
       include_tasks: roles/common/tasks/users.yml
 
+- hosts: "workstations"
+  tasks:
+    - name: 'Apt update'
+      include_tasks: roles/common/tasks/apt-update.yml
+    - name: 'Add users'
+      include_tasks: roles/common/tasks/users.yml
 
 - hosts: "raspberrypi"
   remote_user: pi
@@ -47,8 +53,6 @@
     - role: linkding
 
 - hosts: "plex_stack"
-  vars_files:
-    - group_vars/plex_stack.yml
   remote_user: ansible
   roles:
     - role: shares
@@ -57,8 +61,6 @@
     - role: plex-meta-manager
 
 - hosts: "plex"
-  vars_files:
-    - group_vars/plex_stack.yml
   remote_user: ansible
   roles:
     - role: shares

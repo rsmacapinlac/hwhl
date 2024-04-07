@@ -1,7 +1,0 @@
----
-shares:
-  - name: DuplicatiBackup
-    type: 
-    source: ""
-    destination: ""
-    options: ""
