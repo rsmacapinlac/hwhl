@@ -1,5 +1,5 @@
 ---
-- hosts: 'proxmox_contro_node_by_ip:managed_hosts'
+- hosts: 'proxmox_control_node_by_ip:managed_hosts'
   remote_user: root
   tasks:
     - name: apt update
