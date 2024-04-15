@@ -29,7 +29,6 @@
 - hosts: "arrs"
   remote_user: ansible
   roles:
-    - role: shares
     - role: arrs
 
 - hosts: "overseer"
@@ -124,7 +123,6 @@
 - hosts: "duplicati"
   remote_user: ansible
   roles:
-    - role: shares
     - role: duplicati
 
 - hosts: "dns"
@@ -163,7 +161,6 @@
 - hosts: "nextcloud"
   remote_user: ansible
   roles:
-    - role: shares
     - role: nextcloud
 
 - hosts: "ritchieplex"

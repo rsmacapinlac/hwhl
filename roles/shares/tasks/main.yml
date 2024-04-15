@@ -1,15 +1,5 @@
-- name: Install mounting dependencies
-  become: yes
-  apt:
-    name: "{{item}}"
-    state: present
-    update_cache: yes
-  loop:
-    - cifs-utils
-    - nfs-common
-    - nfs4-acl-tools
-    - avahi-daemon
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- name: "Dependencies"
+  include_tasks: dependencies.yml
 
 - name: Check mountpoint exist
   become: yes

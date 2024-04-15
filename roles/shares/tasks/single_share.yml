@@ -1,0 +1,22 @@
+- name: "Dependencies"
+  include_tasks: roles/shares/tasks/dependencies.yml
+
+- name: Check mountpoint exist
+  become: yes
+  ansible.builtin.file:
+    path: "{{ destination }}"
+    state: directory
+    mode: '0755'
+  ignore_errors: true
+
+#- name: Workaround ensure share is unmounted
+#  command: "umount /media/ContainerData"
+
+- name: Mount nfs or smb shares
+  become: yes
+  ansible.posix.mount:
+    fstype: "{{ type }}"
+    src: "{{ source }}"
+    path: "{{ destination }}"
+    opts: "{{ options }}"
+    state: mounted

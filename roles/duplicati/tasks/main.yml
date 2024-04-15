@@ -1,3 +1,11 @@
+- name: "Mount Duplicati share"
+  include_tasks: roles/shares/tasks/single_share.yml
+  vars:
+    type: "{{ named_shares['duplicati']['type'] }}"
+    destination: "{{ named_shares['duplicati']['destination'] }}"
+    source: "{{ named_shares['duplicati']['source'] }}"
+    options: "{{ named_shares['duplicati']['options'] }}"
+
 - name: Create a backup folder for the host
   become: yes
   ansible.builtin.file:

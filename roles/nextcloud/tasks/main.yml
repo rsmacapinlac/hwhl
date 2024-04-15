@@ -1,3 +1,11 @@
+- name: "Mount NextCloud share"
+  include_tasks: roles/shares/tasks/single_share.yml
+  vars:
+    type: "{{ named_shares['nextcloud']['type'] }}"
+    destination: "{{ named_shares['nextcloud']['destination'] }}"
+    source: "{{ named_shares['nextcloud']['source'] }}"
+    options: "{{ named_shares['nextcloud']['options'] }}"
+
 - name: Create services folder
   ansible.builtin.file:
     path: /data/services/

@@ -11,7 +11,7 @@ services:
     volumes:
       - /data/containers/duplicati_{{ ansible_hostname}}:/config
       - /data/containers:/data-containers
-      - {{ shares[0].destination }}/{{ ansible_hostname  }}:/backups
+      - {{ named_shares['duplicati']['destination'] }}/{{ ansible_hostname  }}:/backups
     ports:
       - 8200:8200
     restart: unless-stopped
