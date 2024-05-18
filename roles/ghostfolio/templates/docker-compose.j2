@@ -1,0 +1,76 @@
+services:
+  ghostfolio:
+    image: ghostfolio/ghostfolio:latest
+    init: true
+    env_file:
+      - ./.env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?connect_timeout=300&sslmode=prefer
+      NODE_ENV: production
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - 3333:3333
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:3333/api/v1/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.ghostfolio-by-hostname.entrypoints=http"
+      - "traefik.http.routers.ghostfolio-by-hostname.rule=Host(`ghostfolio.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+
+      - "traefik.http.middlewares.ghostfolio-by-hostname-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.ghostfolio-by-hostname.middlewares=ghostfolio-by-hostname-https-redirect"
+
+      - "traefik.http.routers.ghostfolio-by-hostname-secure.entrypoints=https"
+      - "traefik.http.routers.ghostfolio-by-hostname-secure.rule=Host(`ghostfolio.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.ghostfolio-by-hostname-secure.tls=true"
+      - "traefik.http.routers.ghostfolio-by-hostname-secure.service=ghostfolio"
+
+      - "traefik.http.services.ghostfolio.loadbalancer.server.port=3333"
+      - "traefik.docker.network=proxy"
+    restart: unless-stopped
+    networks:
+      - proxy
+
+  postgres:
+    image: postgres:15
+    env_file:
+      - ./.env
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - /data/containers/ghostfolio:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - proxy
+
+  redis:
+    image: redis:alpine
+    env_file:
+      - ./.env
+    command: ['redis-server', '--requirepass', $REDIS_PASSWORD]
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli --pass $REDIS_PASSWORD ping | grep PONG']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true

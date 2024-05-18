@@ -21,6 +21,7 @@
     - { src: "{{ playbook_dir }}/files/dns/cname/05-freshrss.conf", dest: "05-freshrss.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-linkding.conf", dest: "05-linkding.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-semaphore.conf", dest: "05-semaphore.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-ghostfolio.conf", dest: "05-ghostfolio.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-homeassistant.conf", dest: "05-homeassistant.conf" }
 
 - name: Copy files if they exist

@@ -95,6 +95,11 @@
   roles:
     - role: semaphore
 
+- hosts: "ghostfolio"
+  remote_user: ansible
+  roles:
+    - role: ghostfolio
+
 # Plan to deprecate this
 - hosts: "docker"
   remote_user: ansible
