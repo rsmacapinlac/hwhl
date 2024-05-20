@@ -100,6 +100,12 @@
   roles:
     - role: ghostfolio
 
+- hosts: "bookstack"
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: kavita
+
 # Plan to deprecate this
 - hosts: "docker"
   remote_user: ansible

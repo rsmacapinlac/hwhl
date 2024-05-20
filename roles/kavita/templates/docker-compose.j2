@@ -1,0 +1,39 @@
+---
+services:
+  kavita:
+    image: lscr.io/linuxserver/kavita:latest
+    container_name: kavita
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ timezone }}
+    volumes:
+      - /data/containers/kavita/:/config
+      - /mnt/Yukari/Books/ebooks:/ebooks
+      - /mnt/Yukari/Comics:/comics
+{% for item in kavita_volumes %}
+      - {{ item.host_folder }}:{{ item.container }}
+{% endfor %}
+    ports:
+      - 5000:5000
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.kavita.entrypoints=http"
+      - "traefik.http.routers.kavita.rule=Host(`kavita.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.kavita-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.kavita.middlewares=kavita-https-redirect"
+      - "traefik.http.routers.kavita-secure.entrypoints=https"
+      - "traefik.http.routers.kavita-secure.rule=Host(`kavita.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.kavita-secure.tls=true"
+      - "traefik.http.routers.kavita-secure.service=kavita"
+      - "traefik.http.services.kavita.loadbalancer.server.port=5000"
+      - "traefik.docker.network=proxy"
+    restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true

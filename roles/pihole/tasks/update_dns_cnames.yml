@@ -23,6 +23,7 @@
     - { src: "{{ playbook_dir }}/files/dns/cname/05-semaphore.conf", dest: "05-semaphore.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-ghostfolio.conf", dest: "05-ghostfolio.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-homeassistant.conf", dest: "05-homeassistant.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-kavita.conf", dest: "05-kavita.conf" }
 
 - name: Copy files if they exist
   become: true
