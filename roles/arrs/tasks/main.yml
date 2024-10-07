@@ -3,7 +3,7 @@
     path: "{{ playbook_dir }}/files/dns/cname/05-arrs.conf"
     # regexp: ".* {{ ansible_hostname }}.local.{{ homelab_domain }}"
     # line: "{{ ansible_default_ipv4.address }} {{ ansible_hostname }}.int.{{ homelab_domain }}"
-    line: "cname={{ item.name }}.local.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
+    line: "cname={{ item.name }}.{{ ansible_hostname }}.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
     create: true
   loop:
     - { name: 'prowlarr' }

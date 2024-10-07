@@ -29,6 +29,7 @@
 - hosts: "arrs"
   remote_user: ansible
   roles:
+    - role: shares
     - role: arrs
 
 - hosts: "overseer"
@@ -57,7 +58,7 @@
     - role: shares
     - role: plex
     - role: tautulli
-    - role: plex-meta-manager
+    # - role: plex-meta-manager
 
 - hosts: "plex"
   remote_user: ansible
