@@ -60,6 +60,11 @@
     - role: tautulli
     # - role: plex-meta-manager
 
+- hosts: "jellyfin"
+  remote_user: ansible
+  roles:
+    - role: jellyfin
+
 - hosts: "plex"
   remote_user: ansible
   roles:

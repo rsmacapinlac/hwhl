@@ -10,6 +10,7 @@
     - { src: "{{ playbook_dir }}/files/dns/cname/05-wg-easy.conf", dest: "05-wg-easy.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-duplicati.conf", dest: "05-duplicati.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-plex.conf", dest: "05-plex.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-jellyfin.conf", dest: "05-jellyfin.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-tautulli.conf", dest: "05-tautulli.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-arrs.conf", dest: "05-arrs.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-overseer.conf", dest: "05-overseer.conf" }
