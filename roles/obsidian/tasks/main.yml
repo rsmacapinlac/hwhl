@@ -4,14 +4,13 @@
     line: "{{ item }}"
     create: true
   loop:
-    - "cname=obsidian.local.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
     - "cname=obsidian.{{ ansible_hostname  }}.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
   delegate_to: 127.0.0.1
 
 - name: Create services folder
   become: true
   ansible.builtin.file:
-    path: /data/services/obsidian
+    path: /data/services
     state: directory
     owner: ansible
     group: docker
@@ -19,10 +18,10 @@
 - name: Setup docker compose file for Obsidian stack
   template:
     src: docker-compose.j2
-    dest: /data/services/obsidian/docker-compose.yml
+    dest: /data/services/obsidian.yml
     owner: ansible
     group: docker
 
 - name: Run container
   shell:
-    cmd: "docker compose -f /data/services/obsidian/docker-compose.yml up -d"
+    cmd: "docker compose -f /data/services/obsidian.yml up -d"

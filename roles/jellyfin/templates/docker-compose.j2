@@ -8,6 +8,7 @@ services:
       - PUID=1001
       - PGID=1001
       - TZ={{ timezone }}
+      - JELLYFIN_PublishedServerUrl=jellyfin.{{ ansible_hostname }}.{{ homelab_domain }}
     volumes:
       - /data/containers/jellyfin:/config
 {% for item in jellyfin_volumes %}

@@ -63,6 +63,7 @@
 - hosts: "jellyfin"
   remote_user: ansible
   roles:
+    - role: shares
     - role: jellyfin
 
 - hosts: "plex"
