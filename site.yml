@@ -119,6 +119,12 @@
     - role: shares
     - role: kavita
 
+- hosts: "audiobookshelf"
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: audiobookshelf
+
 # Plan to deprecate this
 - hosts: "docker"
   remote_user: ansible
