@@ -25,15 +25,6 @@ services:
       - "traefik.http.routers.homepage-by-hostname-secure.tls=true"
       - "traefik.http.routers.homepage-by-hostname-secure.service=homepage"
 
-      - "traefik.http.routers.homepage.entrypoints=http"
-      - "traefik.http.routers.homepage.rule=Host(`homepage.local.{{ homelab_domain }}`)"
-      - "traefik.http.middlewares.homepage-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.homepage.middlewares=homepage-https-redirect"
-      - "traefik.http.routers.homepage-secure.entrypoints=https"
-      - "traefik.http.routers.homepage-secure.rule=Host(`homepage.local.{{ homelab_domain }}`)"
-      - "traefik.http.routers.homepage-secure.tls=true"
-      - "traefik.http.routers.homepage-secure.service=homepage"
-
       - "traefik.http.services.homepage.loadbalancer.server.port=3000"
       - "traefik.docker.network=proxy"
     networks:

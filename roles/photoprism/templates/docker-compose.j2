@@ -53,9 +53,9 @@ services:
       PHOTOPRISM_SITE_AUTHOR: ""                     # meta site author
     working_dir: "/photoprism" # do not change or remove
     volumes:
-      - "{{ shares[0].destination }}/import:/photoprism/import" # Original media files (DO NOT REMOVE)
-      - "{{ shares[0].destination }}/originals:/photoprism/originals" # Original media files (DO NOT REMOVE)
-      - "{{ shares[0].destination }}/storage:/photoprism/storage"                  # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
+      - "{{ photoprism_host_folder }}/import:/photoprism/import" # Original media files (DO NOT REMOVE)
+      - "{{ photoprism_host_folder }}/originals:/photoprism/originals" # Original media files (DO NOT REMOVE)
+      - "{{ photoprism_host_folder }}/storage:/photoprism/storage"                  # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
   photoprism_mariadb:
     image: lscr.io/linuxserver/mariadb:latest
     container_name: photoprism_mariadb

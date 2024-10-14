@@ -2,7 +2,7 @@ version: '3.5'
 services:
   linkding:
     container_name: linkding
-    image: sissbruecker/linkding:latest
+    image: sissbruecker/linkding:latest-plus
     restart: unless-stopped
     environment:
       #- LD_ENABLE_AUTH_PROXY=True
@@ -26,15 +26,6 @@ services:
       - "traefik.http.routers.linkding-by-hostname-secure.rule=Host(`linkding.{{ ansible_hostname }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.linkding-by-hostname-secure.tls=true"
       - "traefik.http.routers.linkding-by-hostname-secure.service=linkding"
-
-      - "traefik.http.routers.linkding.entrypoints=http"
-      - "traefik.http.routers.linkding.rule=Host(`linkding.local.{{ homelab_domain }}`)"
-      - "traefik.http.middlewares.linkding-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.linkding.middlewares=linkding-https-redirect"
-      - "traefik.http.routers.linkding-secure.entrypoints=https"
-      - "traefik.http.routers.linkding-secure.rule=Host(`linkding.local.{{ homelab_domain }}`)"
-      - "traefik.http.routers.linkding-secure.tls=true"
-      - "traefik.http.routers.linkding-secure.service=linkding"
 
       - "traefik.http.services.linkding.loadbalancer.server.port=9090"
       - "traefik.docker.network=proxy"

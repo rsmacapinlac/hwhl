@@ -72,6 +72,12 @@
     - role: shares
     - role: plex
 
+- hosts: "tdarr"
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: tdarr
+
 - hosts: "tautulli"
   remote_user: ansible
   roles:

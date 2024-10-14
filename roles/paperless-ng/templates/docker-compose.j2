@@ -37,15 +37,6 @@ services:
       - "traefik.http.routers.paperless-ng-by-hostname-secure.tls=true"
       - "traefik.http.routers.paperless-ng-by-hostname-secure.service=paperless-ng"
 
-      - "traefik.http.routers.paperless-ng.entrypoints=http"
-      - "traefik.http.routers.paperless-ng.rule=Host(`paperless-ng.local.{{ homelab_domain }}`)"
-      - "traefik.http.middlewares.paperless-ng-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.paperless-ng.middlewares=paperless-ng-https-redirect"
-      - "traefik.http.routers.paperless-ng-secure.entrypoints=https"
-      - "traefik.http.routers.paperless-ng-secure.rule=Host(`paperless-ng.local.{{ homelab_domain }}`)"
-      - "traefik.http.routers.paperless-ng-secure.tls=true"
-      - "traefik.http.routers.paperless-ng-secure.service=paperless-ng"
-
       - "traefik.http.services.paperless-ng.loadbalancer.server.port=8000"
       - "traefik.docker.network=proxy"
 networks:

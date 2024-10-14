@@ -1,0 +1,59 @@
+services:
+  tdarr:
+    container_name: tdarr
+    image: ghcr.io/haveagitgat/tdarr:latest
+    restart: unless-stopped
+#    network_mode: bridge
+    ports:
+      - 8265:8265 # webUI port
+      - 8266:8266 # server port
+      - 8267:8267 # Internal node port
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ timezone }}
+      - UMASK_SET=002
+      - serverIP=0.0.0.0
+      - serverPort=8266
+      - webUIPort=8265
+      - internalNode=true
+      - nodeID=TDarr Internal Node
+      - nodeIP=0.0.0.0
+      - nodePort=8267
+      # - NVIDIA_DRIVER_CAPABILITIES=all
+      # - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - /data/containers/tdarr/server:/app/server
+      - /data/containers/tdarr/configs:/app/configs
+      - /data/containers/tdarr/logs:/app/logs
+{% for item in tdarr_volumes %}
+      - {{ item.host_folder }}:{{ item.container }}
+{% endfor %}
+      - /tmp/:/temp
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - capabilities:
+#              - gpu
+
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.tdarr.entrypoints=http"
+      - "traefik.http.routers.tdarr.rule=Host(`tdarr.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.tdarr-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.tdarr.middlewares=tdarr-https-redirect"
+      - "traefik.http.routers.tdarr-secure.entrypoints=https"
+      - "traefik.http.routers.tdarr-secure.rule=Host(`tdarr.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.tdarr-secure.tls=true"
+      - "traefik.http.routers.tdarr-secure.service=tdarr"
+      - "traefik.http.services.tdarr.loadbalancer.server.port=8265"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true

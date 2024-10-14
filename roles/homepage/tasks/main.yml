@@ -12,7 +12,6 @@
     create: true
   loop:
     - "cname=homepage.{{ ansible_hostname }}.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
-    - "cname=homepage.local.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
   delegate_to: 127.0.0.1
 
 - name: Setup docker compose file for homepage
@@ -22,7 +21,8 @@
     owner: ansible
     group: docker
 
-- name: Create containers folder
+- name: Create homepage data folder
+  become: true
   ansible.builtin.file:
     path: /data/containers/homepage
     state: directory

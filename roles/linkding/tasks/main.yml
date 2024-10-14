@@ -4,7 +4,6 @@
     line: "{{ item }}"
     create: true
   loop:
-    - "cname=linkding.local.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
     - "cname=linkding.{{ ansible_hostname }}.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
   delegate_to: 127.0.0.1
 

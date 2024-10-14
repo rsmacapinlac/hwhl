@@ -4,8 +4,7 @@
     line: "{{ item }}"
     create: true
   loop:
-    - "cname=freshrss.local.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
-    # - "cname=freshrss.{{ ansible_hostname  }}.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
+    - "cname=freshrss.{{ ansible_hostname }}.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
   delegate_to: 127.0.0.1
 
 - name: Create services folder
