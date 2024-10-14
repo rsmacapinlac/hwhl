@@ -113,7 +113,7 @@
   roles:
     - role: ghostfolio
 
-- hosts: "bookstack"
+- hosts: "kavita"
   remote_user: ansible
   roles:
     - role: shares

@@ -9,8 +9,6 @@ services:
       - TZ={{ timezone }}
     volumes:
       - /data/containers/kavita/:/config
-      - /mnt/Yukari/Books/ebooks:/ebooks
-      - /mnt/Yukari/Comics:/comics
 {% for item in kavita_volumes %}
       - {{ item.host_folder }}:{{ item.container }}
 {% endfor %}
