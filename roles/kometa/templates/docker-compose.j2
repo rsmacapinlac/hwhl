@@ -1,0 +1,17 @@
+---
+services:
+  kometa:
+    image: lscr.io/linuxserver/kometa:latest
+    container_name: kometa
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ timezone }}
+      - KOMETA_CONFIG=/config/config.yml #optional
+      - KOMETA_TIME=03:00 #optional
+      - KOMETA_RUN=False #optional
+      - KOMETA_TEST={{ kometa_test }} #optional
+      - KOMETA_NO_MISSING=False #optional
+    volumes:
+      - /data/containers/kometa:/config
+    restart: unless-stopped

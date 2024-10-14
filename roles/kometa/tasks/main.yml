@@ -1,0 +1,23 @@
+- name: Create services folder
+  become: true
+  ansible.builtin.file:
+    path: /data/services/kometa
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Setup docker compose file for homepage
+  template:
+    src: docker-compose.j2
+    dest: /data/services/kometa/docker-compose.yml
+    owner: ansible
+    group: docker
+
+- name: Copy config file for Kometa setttings
+  copy:
+    src: "{{ playbook_dir }}/files/kometa/config.yml"
+    dest: /data/containers/kometa/config.yml
+
+- name: Run container
+  shell:
+    cmd: "docker compose -f /data/services/kometa/docker-compose.yml up -d"

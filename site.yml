@@ -67,6 +67,11 @@
   roles:
     - role: tautulli
 
+- hosts: kometa
+  remote_user: ansible
+  roles:
+    - role: kometa
+
 - hosts: "jellyfin"
   remote_user: ansible
   roles:
@@ -89,11 +94,6 @@
   remote_user: ansible
   roles:
     - role: tautulli
-
-- hosts: "pmm"
-  remote_user: ansible
-  roles:
-    - role: plex-meta-manager
 
 - hosts: "tubearchivist"
   remote_user: ansible
