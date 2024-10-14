@@ -52,13 +52,20 @@
   roles:
     - role: linkding
 
-- hosts: "plex_stack"
+# Deprecate
+#- hosts: "plex_stack"
+#  remote_user: ansible
+#  roles:
+#    - role: shares
+#    - role: plex
+#    - role: tautulli
+#     - role: plex-meta-manager
+#
+
+- hosts: tautulli
   remote_user: ansible
   roles:
-    - role: shares
-    - role: plex
     - role: tautulli
-    # - role: plex-meta-manager
 
 - hosts: "jellyfin"
   remote_user: ansible

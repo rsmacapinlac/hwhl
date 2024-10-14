@@ -25,15 +25,6 @@ services:
       - "traefik.http.routers.tautulli-by-hostname-secure.tls=true"
       - "traefik.http.routers.tautulli-by-hostname-secure.service=tautulli"
 
-      - "traefik.http.routers.tautulli.entrypoints=http"
-      - "traefik.http.routers.tautulli.rule=Host(`tautulli.local.{{ homelab_domain }}`)"
-      - "traefik.http.middlewares.tautulli-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.tautulli.middlewares=tautulli-https-redirect"
-      - "traefik.http.routers.tautulli-secure.entrypoints=https"
-      - "traefik.http.routers.tautulli-secure.rule=Host(`tautulli.local.{{ homelab_domain }}`)"
-      - "traefik.http.routers.tautulli-secure.tls=true"
-      - "traefik.http.routers.tautulli-secure.service=tautulli"
-
       - "traefik.http.services.tautulli.loadbalancer.server.port=8181"
       - "traefik.docker.network=proxy"
     networks:

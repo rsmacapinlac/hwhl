@@ -10,7 +10,7 @@
 - name: Create services folder
   become: true
   ansible.builtin.file:
-    path: /data/services/
+    path: /data/services/tautulli
     state: directory
     owner: ansible
     group: docker
@@ -18,10 +18,10 @@
 - name: Setup docker compose file for Tautulli stack
   template:
     src: docker-compose.j2
-    dest: /data/services/tautulli.yml
+    dest: /data/services/tautulli/docker-compose.yml
     owner: ansible
     group: docker
 
 - name: Run container
   shell:
-    cmd: "docker compose -f /data/services/tautulli.yml up -d"
+    cmd: "docker compose -f /data/services/tautulli/docker-compose.yml up -d"
