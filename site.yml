@@ -186,22 +186,3 @@
   remote_user: ansible
   roles:
     - role: nextcloud
-
-- hosts: "ritchieplex"
-  remote_user: ansible
-  roles:
-    - role: shares
-      vars:
-        - mount_point: /mnt/Yukari
-        - server: yukari.local
-        - share_name: /volume1/SavedMedia
-    - role: shares
-      vars:
-        - mount_point: /mnt/Daikichi
-        - server: daikichi.local
-        - share_name: /nfs/Media
-    - role: shares
-      vars:
-        - mount_point: /mnt/Daikichi_MyBook
-        - server: daikichi.local
-        - share_name: /nfs/My_Book_1230-1

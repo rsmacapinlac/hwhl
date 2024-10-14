@@ -9,7 +9,9 @@ services:
       - PGID=1001
       - TZ={{ timezone }}
       - VERSION=docker
+      {% if plex_claim is defined %}
       - PLEX_CLAIM={{ plex_claim }}
+      {% endif %}
       #- NVIDIA_VISIBLE_DEVICES=all
       #- NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
       #- CUDA_DRIVER_CAPABILITIES=compute,video,utility
