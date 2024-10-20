@@ -27,6 +27,7 @@
     - { src: "{{ playbook_dir }}/files/dns/cname/05-kavita.conf", dest: "05-kavita.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-audiobookshelf.conf", dest: "05-audiobookshelf.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-tdarr.conf", dest: "05-tdarr.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-baserow.conf", dest: "05-baserow.conf" }
 
 - name: Copy files if they exist
   become: true

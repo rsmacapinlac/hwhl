@@ -212,3 +212,8 @@
   remote_user: ansible
   roles:
     - role: nextcloud
+
+- hosts: "baserow"
+  remote_user: ansible
+  roles:
+    - role: baserow
