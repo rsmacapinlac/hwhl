@@ -16,7 +16,7 @@
 
 - name: Update Externally facing proxy routes
   remote_user: ansible
-  hosts: "externalproxy"
+  hosts: "externalproxy:edge"
   tasks:
     - name: Update Traefik
       include_tasks: roles/traefik/tasks/update_routes_external.yml

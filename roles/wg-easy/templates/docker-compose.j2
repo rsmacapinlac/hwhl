@@ -1,9 +1,9 @@
 services:
   wg-easy:
     environment:
-      - WG_HOST={{ wireguard_host }}
-      - PASSWORD={{ wireguard_webpassword }}
-      - WG_DEFAULT_DNS={{ wireguard_dns }}
+      - WG_HOST={{ wireguard.host }}
+      - PASSWORD_HASH={{ wireguard.password_hash }}
+      - WG_DEFAULT_DNS={{ wireguard.dns }}
     # image: weejewel/wg-easy
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy
@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
-      - SYS_MODULE
+      # - SYS_MODULE
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
@@ -35,15 +35,6 @@ services:
       - "traefik.http.routers.wg-easy-by-hostname-secure.rule=Host(`wg-easy.{{ ansible_hostname }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.wg-easy-by-hostname-secure.tls=true"
       - "traefik.http.routers.wg-easy-by-hostname-secure.service=wg-easy"
-
-      - "traefik.http.routers.wg-easy.entrypoints=http"
-      - "traefik.http.routers.wg-easy.rule=Host(`wg-easy.local.{{ homelab_domain }}`)"
-      - "traefik.http.middlewares.wg-easy-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.wg-easy.middlewares=wg-easy-https-redirect"
-      - "traefik.http.routers.wg-easy-secure.entrypoints=https"
-      - "traefik.http.routers.wg-easy-secure.rule=Host(`wg-easy.local.{{ homelab_domain }}`)"
-      - "traefik.http.routers.wg-easy-secure.tls=true"
-      - "traefik.http.routers.wg-easy-secure.service=wg-easy"
 
       - "traefik.http.services.wg-easy.loadbalancer.server.port=51821"
       - "traefik.docker.network=proxy"

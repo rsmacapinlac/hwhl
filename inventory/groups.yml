@@ -3,7 +3,8 @@ managed_hosts:
   children:
     raspberrypi:
     dns:
-    external-proxy:
+    edge:
+    # external-proxy:
     containers:
     duplicati:
     plex_stack:

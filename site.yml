@@ -167,7 +167,20 @@
   roles:
     - role: pihole
 
+# Plan to depricate this group for 'edge'
 - hosts: "external-proxy"
+  remote_user: ansible
+  roles:
+    - role: traefik
+    - role: authelia
+    - role: cloudflare-ddns
+    - role: wg-easy
+  tasks:
+    - name: "Update external routes"
+      include_tasks: roles/traefik/tasks/update_routes_external.yml
+#####
+
+- hosts: "edge"
   remote_user: ansible
   roles:
     - role: traefik
