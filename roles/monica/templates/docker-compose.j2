@@ -72,7 +72,7 @@ services:
     labels:
       ofelia.enabled: "true"
       ofelia.job-exec.mariadb_maintenance.schedule: "0 30 1 * * 0"
-      ofelia.job-exec.mariadb_maintenance.command: "mariadb-check -u root -pwsm49LvZfKwRGU --auto-repair --optimize --all-databases"
+      ofelia.job-exec.mariadb_maintenance.command: "mariadb-check -u root -p{{ monica.mysql.root_password }} --auto-repair --optimize --all-databases"
 
     networks:
       - proxy
