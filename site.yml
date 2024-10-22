@@ -227,3 +227,8 @@
   remote_user: ansible
   roles:
     - role: monica
+
+- hosts: "ofelia"
+  remote_user: ansible
+  roles:
+    - role: ofelia

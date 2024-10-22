@@ -1,13 +1,4 @@
 services:
-  ofelia:
-    container_name: monica_ofelia
-    image: mcuadros/ofelia:latest
-    command: daemon --docker
-    depends_on:
-      - monica_mariadb
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-
   monicacrm:
     image: monica
     container_name: monica
@@ -71,8 +62,8 @@ services:
     restart: unless-stopped
     labels:
       ofelia.enabled: "true"
-      ofelia.job-exec.mariadb_maintenance.schedule: "0 30 1 * * 0"
-      ofelia.job-exec.mariadb_maintenance.command: "mariadb-check -u root -p{{ monica.mysql.root_password }} --auto-repair --optimize --all-databases"
+      ofelia.job-exec.monica_mariadb_maintenance.schedule: "0 30 1 * * 0"
+      ofelia.job-exec.monica_mariadb_maintenance.command: "mariadb-check -u root -p{{ monica.mysql.root_password }} --auto-repair --optimize --all-databases"
 
     networks:
       - proxy

@@ -1,12 +1,4 @@
 services:
-  ofelia:
-    container_name: photoprism_ofelia
-    image: mcuadros/ofelia:latest
-    command: daemon --docker
-    depends_on:
-      - photoprism_mariadb
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
   photoprism:
     container_name: photoprism
     ## Use photoprism/photoprism:preview for testing preview builds:
@@ -73,5 +65,5 @@ services:
     restart: unless-stopped
     labels:
       ofelia.enabled: "true"
-      ofelia.job-exec.mariadb_maintenance.schedule: "0 30 1 * * 0"
-      ofelia.job-exec.mariadb_maintenance.command: "mariadb-check -u root -p{{ mysql_root_password }} --auto-repair --optimize --all-databases"
+      ofelia.job-exec.photoprism_mariadb_maintenance.schedule: "0 30 2 * * 0"
+      ofelia.job-exec.photoprism_mariadb_maintenance.command: "mariadb-check -u root -p{{ mysql_root_password }} --auto-repair --optimize --all-databases"
