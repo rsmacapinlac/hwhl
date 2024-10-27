@@ -13,6 +13,7 @@
     - { src: "{{ playbook_dir }}/files/dns/cname/05-jellyfin.conf", dest: "05-jellyfin.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-tautulli.conf", dest: "05-tautulli.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-arrs.conf", dest: "05-arrs.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-whisparr.conf", dest: "05-whisparr.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-overseer.conf", dest: "05-overseer.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-paperless-ng.conf", dest: "05-paperless-ng.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-homepage.conf", dest: "05-homepage.conf" }
