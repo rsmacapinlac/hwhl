@@ -3,13 +3,13 @@ services:
     image: monica
     container_name: monica
     depends_on:
-      - monica_mariadb
+      - monica_db
     ports:
       - "8084:80"
     environment:
       - APP_KEY={{ monica.app_key }}
-      - APP_ENV=local
-      - DB_HOST=monica_mariadb
+      - APP_ENV=production
+      - DB_HOST=monica_db:3306
       - DB_USERNAME={{ monica.mysql.username }}
       - DB_PASSWORD={{ monica.mysql.password }}
       - DEBUG=false
@@ -46,20 +46,19 @@ services:
     networks:
       - proxy
 
-  monica_mariadb:
-    image: lscr.io/linuxserver/mariadb:latest
-    container_name: monica_mariadb
+  monica_db:
+    image: mariadb:11
+    container_name: monica_db
     environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MYSQL_DATABASE=monica
+      - MYSQL_USER={{ monica.mysql.username }}
+      - MYSQL_PASSWORD={{ monica.mysql.password }}
       - PUID=1001
       - PGID=1001
-      - MYSQL_ROOT_PASSWORD={{ monica.mysql.root_password }}
-      - TZ={{ timezone }}
-      - MYSQL_DATABASE=monica #optional
-      - MYSQL_USER={{ monica.mysql.username }} #optional
-      - MYSQL_PASSWORD={{ monica.mysql.password }} #optional
     volumes:
-      - /data/containers/monica/db:/config
-    restart: unless-stopped
+      - /data/containers/monica/db:/var/lib/mysql
+    restart: always
     labels:
       ofelia.enabled: "true"
       ofelia.job-exec.monica_mariadb_maintenance.schedule: "0 30 1 * * 0"
