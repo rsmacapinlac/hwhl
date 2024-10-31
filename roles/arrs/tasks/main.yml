@@ -9,6 +9,7 @@
     - { name: 'prowlarr' }
     - { name: 'flaresolverr' }
     - { name: 'radarr' }
+    - { name: 'lidarr' }
     - { name: 'sonarr' }
     - { name: 'bazarr' }
     - { name: 'readarr' }

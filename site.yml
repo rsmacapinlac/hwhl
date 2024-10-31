@@ -238,3 +238,8 @@
   remote_user: ansible
   roles:
     - role: ofelia
+
+- hosts: "syncthing"
+  remote_user: ansible
+  roles:
+    - role: syncthing
