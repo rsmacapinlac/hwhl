@@ -296,7 +296,8 @@ services:
       - TRANSMISSION_WATCH_DIR=/watch
       - TRANSMISSION_RATIO_LIMIT=0
       - TRANSMISSION_RATIO_LIMIT_ENABLED=true
-      - DEBUG=true
+    devices:
+      - /dev/net/tun
     logging:
       driver: json-file
       options:
