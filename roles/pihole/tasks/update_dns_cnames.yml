@@ -32,6 +32,7 @@
     - { src: "{{ playbook_dir }}/files/dns/cname/05-n8n.conf", dest: "05-n8n.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-monica.conf", dest: "05-monica.conf" }
     - { src: "{{ playbook_dir }}/files/dns/cname/05-syncthing.conf", dest: "05-syncthing.conf" }
+    - { src: "{{ playbook_dir }}/files/dns/cname/05-navidrome.conf", dest: "05-navidrome.conf" }
 
 - name: Copy files if they exist
   become: true

@@ -78,6 +78,11 @@
   roles:
     - role: kometa
 
+- hosts: "navidrome"
+  remote_user: ansible
+  roles:
+    - role: navidrome
+
 - hosts: "jellyfin"
   remote_user: ansible
   roles:
