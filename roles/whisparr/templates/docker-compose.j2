@@ -14,6 +14,8 @@ services:
 {% for item in whisparr_volumes %}
       - {{ item.host_folder }}:{{ item.container }}
 {% endfor %}
+      - /data/arrs/Downloads/sabnzbd/complete:/sabnzbd
+      - /data/arrs/Downloads/transmission/completed:/transmission
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"

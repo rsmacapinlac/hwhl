@@ -5,7 +5,6 @@
     create: true
   loop:
     - "cname=homeassistant.{{ ansible_hostname }}.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
-    - "cname=homeassistant.local.{{ homelab_domain }},{{ ansible_hostname }}.int.{{ homelab_domain }}"
   delegate_to: 127.0.0.1
 
 - name: Create services folder
