@@ -31,6 +31,7 @@ services:
       - "traefik.http.routers.baserow-secure.service=baserow"
       - "traefik.http.services.baserow.loadbalancer.server.port=80"
       - "traefik.docker.network=proxy"
+    restart: unless-stopped
     networks:
       - proxy
 
