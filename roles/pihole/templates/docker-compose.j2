@@ -1,56 +1,24 @@
-version: "3.5"
-
-# More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
 services:
   pihole:
     container_name: pihole
-    #image: pihole/pihole:latest
-    image: pihole/pihole:2024.07.0
+    image: pihole/pihole:latest
+    #image: pihole/pihole:2024.07.0
     ports:
       - "53:53/tcp"
       - "53:53/udp"
-      - "8080:80/tcp"
+      - "80:80/tcp"
+      - "443:443/tcp"
+    env_file: .env
     environment:
-      - TZ={{ timezone }}
-      - WEBPASSWORD={{ pihole_password  }}
-      - PIHOLE_DNS_={{ pihole_dns }}
-      - PIHOLE_UID=1001
-      - PIHOLE_GID=1001
+      TZ: '{{ timezone }}'
+      PIHOLE_UID: 1001
+      PIHOLE_GID: 1001
     # Volumes store your data between container upgrades
     volumes:
-      - /data/containers/pihole/etc-pihole:/etc/pihole/
-      - /data/containers/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
+      - /data/containers/pihole/etc-pihole:/etc/pihole
+    #  - /data/containers/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d
     # Recommended but not required (DHCP needs NET_ADMIN)
-    cap_add:
-      - NET_ADMIN
+    #cap_add:
+    #  - NET_ADMIN
     #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
     restart: unless-stopped
-    networks:
-      - proxy
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-
-      # routers
-      - "traefik.http.routers.pihole-by-hostname.entrypoints=http"
-      - "traefik.http.routers.pihole-by-hostname.rule=Host(`pihole.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-      - "traefik.http.routers.pihole-by-hostname.middlewares=pihole-by-hostname-https-redirect"
-      - "traefik.http.routers.pihole-by-hostname-secure.entrypoints=https"
-      - "traefik.http.routers.pihole-by-hostname-secure.rule=Host(`pihole.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-      - "traefik.http.routers.pihole-by-hostname-secure.tls=true"
-      - "traefik.http.routers.pihole-by-hostname-secure.service=pihole"
-      - "traefik.http.routers.pihole-by-hostname-secure.middlewares=redirectregex-pihole,addprefix-pihole"
-
-      # middlewares
-      - "traefik.http.middlewares.pihole-by-hostname-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.addprefix-pihole.addPrefix.prefix=/admin"
-      - "traefik.http.middlewares.redirectregex-pihole.redirectregex.regex=/admin/(.*)"
-      - "traefik.http.middlewares.redirectregex-pihole.redirectregex.replacement=/"
-
-      # services
-      - "traefik.http.services.pihole.loadbalancer.server.port=80"
-
-networks:
-  proxy:
-    external: true

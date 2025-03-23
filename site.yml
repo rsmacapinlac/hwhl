@@ -1,19 +1,6 @@
 ---
-# playbook for setting up proxmox
-- hosts: "proxmox_control_node_by_ip"
-  remote_user: root
-  roles:
-    - role: proxmox
-
 - hosts: "managed_hosts"
   remote_user: root
-  tasks:
-    - name: 'Apt update'
-      include_tasks: roles/common/tasks/apt-update.yml
-    - name: 'Add users'
-      include_tasks: roles/common/tasks/users.yml
-
-- hosts: "workstations"
   tasks:
     - name: 'Apt update'
       include_tasks: roles/common/tasks/apt-update.yml
@@ -57,16 +44,6 @@
   remote_user: ansible
   roles:
     - role: linkding
-
-# Deprecate
-#- hosts: "plex_stack"
-#  remote_user: ansible
-#  roles:
-#    - role: shares
-#    - role: plex
-#    - role: tautulli
-#     - role: plex-meta-manager
-#
 
 - hosts: tautulli
   remote_user: ansible
@@ -178,18 +155,10 @@
   roles:
     - role: pihole
 
-# Plan to depricate this group for 'edge'
-- hosts: "external-proxy"
+- hosts: "nebula-sync"
   remote_user: ansible
   roles:
-    - role: traefik
-    - role: authelia
-    - role: cloudflare-ddns
-    - role: wg-easy
-  tasks:
-    - name: "Update external routes"
-      include_tasks: roles/traefik/tasks/update_routes_external.yml
-#####
+    - role: nebula-sync
 
 - hosts: "edge"
   remote_user: ansible
