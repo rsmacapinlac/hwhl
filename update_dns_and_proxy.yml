@@ -1,18 +1,18 @@
 ---
-- name: "Build custom.list"
-  gather_facts: true
-  remote_user: ansible
-  hosts: "managed_hosts:workstations"
-  tasks:
-    - name: "Update host entries for DNS"
-      include_tasks: roles/pihole/tasks/register_host.yml
+#- name: "Build custom.list"
+#  gather_facts: true
+#  remote_user: ansible
+#  hosts: "managed_hosts:workstations"
+#  tasks:
+#    - name: "Update host entries for DNS"
+#      include_tasks: roles/pihole/tasks/register_host.yml
 
-- name: Update DNS custom.list
-  remote_user: ansible
-  hosts: "dns"
-  tasks:
-    - name: Update PiHole
-      include_tasks: roles/pihole/tasks/update_dns.yml
+#- name: Update DNS custom.list
+#  remote_user: ansible
+#  hosts: "dns"
+#  tasks:
+#    - name: Update PiHole
+#      include_tasks: roles/pihole/tasks/update_dns.yml
 
 - name: Update Externally facing proxy routes
   remote_user: ansible

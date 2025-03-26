@@ -13,10 +13,10 @@ services:
       - /data/containers/tubearchivist/cache:/cache
     environment:
       - ES_URL=http://archivist-es:9200     # needs protocol e.g. http and port
-      - REDIS_HOST=archivist-redis          # don't add protocol
+      - REDIS_CON=redis://archivist-redis:6379          # don't add protocol
       - HOST_UID=1001
       - HOST_GID=1001
-      - TA_HOST=tubearchivist.{{ ansible_hostname }}.{{ homelab_domain }} {{ ansible_hostname }}.int.{{ homelab_domain }} {{ extra_ta_hosts }}
+      - TA_HOST=https://tubearchivist.{{ ansible_hostname }}.{{ homelab_domain }} {{ ansible_hostname }}.int.{{ homelab_domain }} {{ extra_ta_hosts }}
       - TA_USERNAME={{ ta_username }}                   # your initial TA credentials
       - TA_PASSWORD={{ ta_password }}            # your initial TA credentials
       - ELASTIC_PASSWORD={{ elastic_password }}     # set password for Elasticsearch
@@ -47,7 +47,7 @@ services:
       - proxy
 
   archivist-redis:
-    image: redis/redis-stack-server
+    image: redis
     container_name: archivist-redis
     restart: unless-stopped
     expose:

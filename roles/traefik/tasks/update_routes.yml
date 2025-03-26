@@ -10,5 +10,5 @@
 - name: Restart traefik
   become: true
   shell:
-    cmd: "docker compose -f /data/services/traefik.yml restart traefik"
+    cmd: "docker compose -f /data/services/traefik/compose.yml restart traefik"
   ignore_errors: true

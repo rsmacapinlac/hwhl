@@ -43,6 +43,3 @@
 - name: Run container
   shell:
     cmd: "docker compose -f /data/services/traefik.yml up -d"
-
-# Update the DNS records as well
-- include_tasks: build_custom_dns.yml
