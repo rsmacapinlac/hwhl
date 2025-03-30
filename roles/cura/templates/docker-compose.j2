@@ -1,0 +1,36 @@
+services:
+  cura:
+    image: lscr.io/linuxserver/cura:latest
+    container_name: cura
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ={{ timezone }}
+    volumes:
+      - /data/containers/cura:/config
+    ports:
+      - 3000:3000
+      - 3001:3001
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.cura.entrypoints=http"
+      - "traefik.http.routers.cura.rule=Host(`cura.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.cura-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.cura.middlewares=cura-https-redirect"
+      - "traefik.http.routers.cura-secure.entrypoints=https"
+      - "traefik.http.routers.cura-secure.rule=Host(`cura.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.cura-secure.tls=true"
+      - "traefik.http.routers.cura-secure.service=cura"
+      - "traefik.http.services.cura.loadbalancer.server.port=3000"
+      - "traefik.docker.network=proxy"
+    restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true

@@ -93,6 +93,11 @@
   roles:
     - role: obsidian
 
+- hosts: "cura"
+  remote_user: ansible
+  roles:
+    - role: cura
+
 - hosts: "traggo"
   remote_user: ansible
   roles:
