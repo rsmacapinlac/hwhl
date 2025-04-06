@@ -1,0 +1,25 @@
+- name: Create services folder (JellySeerr)
+  become: true
+  ansible.builtin.file:
+    path: /data/services/jellyseerr
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Setup docker compose file (JellySeerr)
+  template:
+    src: docker-compose.j2
+    dest: /data/services/jellyseerr/compose.yml
+    owner: ansible
+    group: docker
+
+- name: Setup docker compose file (JellySeerr)
+  template:
+    src: docker-compose.j2
+    dest: /data/services/jellyseerr/compose.yml
+    owner: ansible
+    group: docker
+
+- name: Run container (JellySeerr)
+  shell:
+    cmd: "docker compose -f /data/services/jellyseerr/compose.yml up -d"

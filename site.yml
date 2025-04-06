@@ -25,6 +25,11 @@
     - role: shares
     - role: whisparr
 
+- hosts: "jellyseerr"
+  remote_user: ansible
+  roles:
+    - role: jellyseerr
+
 - hosts: "overseer"
   remote_user: ansible
   roles:
