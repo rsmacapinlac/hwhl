@@ -45,6 +45,11 @@
   roles:
     - role: homeassistant
 
+- hosts: "teslamate"
+  remote_user: ansible
+  roles:
+    - role: teslamate
+
 - hosts: "linkding"
   remote_user: ansible
   roles:

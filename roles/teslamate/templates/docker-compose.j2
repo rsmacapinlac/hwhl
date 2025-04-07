@@ -1,0 +1,57 @@
+services:
+  teslamate:
+    container_name: teslamate
+    image: teslamate/teslamate:latest
+    restart: always
+    env_file: .env
+    environment:
+      - DATABASE_USER=teslamate
+      - DATABASE_PASS=${DATABASE_PASSWORD}
+      - DATABASE_NAME=teslamate
+      - DATABASE_HOST=teslamate_database
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - MQTT_HOST=mosquitto
+    ports:
+      - 4000:4000
+    volumes:
+      - /data/containers/teslamate/import:/opt/app/import
+    cap_drop:
+      - all
+    networks:
+      - proxy
+
+  teslamate_database:
+    container_name: teslamate_database
+    image: postgres:17
+    restart: always
+    env_file: .env
+    environment:
+      - POSTGRES_USER=teslamate
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=teslamate
+    volumes:
+      - /data/containers/teslamate/db:/var/lib/postgresql/data
+    networks:
+      - proxy
+
+  teslamate_grafana:
+    container_name: teslamate_grafana
+    image: teslamate/grafana:latest
+    restart: always
+    env_file: .env
+    environment:
+      - DATABASE_USER=teslamate
+      - DATABASE_PASS=${DATABASE_PASSWORD}
+      - DATABASE_NAME=teslamate
+      - DATABASE_HOST=teslamate_database
+    ports:
+      - 3000:3000
+    volumes:
+      - /data/containers/teslamate/grafana:/var/lib/grafana
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true

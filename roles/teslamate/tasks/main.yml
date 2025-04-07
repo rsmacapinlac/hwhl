@@ -1,0 +1,25 @@
+- name: Create services folder (teslamate)
+  become: true
+  ansible.builtin.file:
+    path: /data/services/teslamate
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Setup docker compose file (teslamate)
+  template:
+    src: docker-compose.j2
+    dest: /data/services/teslamate/compose.yml
+    owner: ansible
+    group: docker
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/teslamate/environment"
+    dest: /data/services/teslamate/.env
+    owner: ansible
+    group: docker
+
+- name: Run container
+  shell:
+    cmd: "docker compose -f /data/services/teslamate/compose.yml up -d"
