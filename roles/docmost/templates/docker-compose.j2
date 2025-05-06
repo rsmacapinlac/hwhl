@@ -1,0 +1,62 @@
+services:
+  docmost:
+    image: docmost/docmost:latest
+    container_name: docmost
+    depends_on:
+      - db
+      - redis
+    env_file: .env
+    environment:
+      APP_URL: "${EXTERNAL_APP_URL}"
+      APP_SECRET: "${APP_SECRET}"
+      DATABASE_URL: "postgresql://docmost:${DATABASE_PASSWORD}@db:5432/docmost?schema=public"
+      REDIS_URL: "redis://redis:6379"
+      PORT: ${PORT}
+    ports:
+      - "${PORT}:${PORT}"
+    restart: unless-stopped
+    volumes:
+      - /data/containers/docmost/storage:/app/data/storage
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.docmost.entrypoints=http"
+      - "traefik.http.routers.docmost.rule=Host(`docmost.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.docmost-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.docmost.middlewares=docmost-https-redirect"
+      - "traefik.http.routers.docmost-secure.entrypoints=https"
+      - "traefik.http.routers.docmost-secure.rule=Host(`docmost.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.docmost-secure.tls=true"
+      - "traefik.http.routers.docmost-secure.service=docmost"
+      - "traefik.http.services.docmost.loadbalancer.server.port=${PORT}"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+  db:
+    container_name: docmost_db
+    image: postgres:16-alpine
+    env_file: .env
+    environment:
+      POSTGRES_DB: docmost
+      POSTGRES_USER: docmost
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - /data/containers/docmost/postgres:/var/lib/postgresql/data
+    networks:
+      - proxy
+
+  redis:
+    container_name: docmost_redis
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - /data/containers/docmost/redis:/data
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true

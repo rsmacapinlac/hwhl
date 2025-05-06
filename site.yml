@@ -218,6 +218,11 @@
   roles:
     - role: n8n
 
+- hosts: "docmost"
+  remote_user: ansible
+  roles:
+    - role: docmost
+
 - hosts: "monica"
   remote_user: ansible
   roles:
