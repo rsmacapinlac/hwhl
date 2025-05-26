@@ -1,3 +1,7 @@
+- name: Check if Docker is already installed
+  stat:
+    path: /usr/bin/docker
+  register: docker_installed
 
 - name: Install dependencies
   become: yes
@@ -9,61 +13,30 @@
     - ca-certificates
     - curl
     - gnupg
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-#- name: Download Docker gpg key (ubuntu)
-#  become: yes
-#  get_url:
-#    url: https://download.docker.com/linux/ubuntu/gpg
-#    dest: /usr/share/keyrings/docker-archive-keyring.gpg_armored
-#  when: ansible_distribution == 'Ubuntu'
-
-#- name: Download Docker gpg key (debian)
-#  become: yes
-#  get_url:
-#    url: https://download.docker.com/linux/debian/gpg
-#    dest: /usr/share/keyrings/docker-archive-keyring.gpg_armored
-#  when: ansible_distribution == 'Debian'
-
-#- name: De-Armor Docker GPG key
-#  become: yes
-#  shell:  'gpg --dearmor <  /usr/share/keyrings/docker-archive-keyring.gpg_armored > /usr/share/keyrings/docker.gpg'
-#  args:
-#    creates: /usr/share/keyrings/docker.gpg
-#  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-#- name: "Add Docker's repository to APT sources list (ubuntu)"
-#  become: yes
-#  ansible.builtin.apt_repository:
-#    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable"
-#    # repo: 'deb [arch="$(dpkg --print-architecture)" signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable"'
-#    state: present
-#  when: ansible_distribution == 'Ubuntu'
-
-
-#- name: "Add Docker's repository to APT sources list (debian)"
-#  become: yes
-#  ansible.builtin.apt_repository:
-#    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable"
-#    # repo: 'deb [arch="$(dpkg --print-architecture)" signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable"'
-#    state: present
-#  when: ansible_distribution == 'Debian'
+  when: not docker_installed.stat.exists
 
 - name: Remove python-configparser package
+  become: yes
   apt:
     name: python-configparser
     state: absent
-- name: get docker convenience script
-  shell: curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
-  args:
-    creates: /tmp/get-docker.sh
+  when: not docker_installed.stat.exists
 
-- name: install docker
+- name: Get docker convenience script
+  get_url:
+    url: https://get.docker.com
+    dest: /tmp/get-docker.sh
+    mode: '0755'
+  when: not docker_installed.stat.exists
+
+- name: Install Docker using convenience script
   shell: sh /tmp/get-docker.sh
   args:
     creates: /usr/bin/docker
+  when: not docker_installed.stat.exists
+  notify: restart docker
 
-- name: Install Docker
+- name: Install Docker packages
   become: yes
   apt:
     name: "{{item}}"
@@ -75,12 +48,15 @@
     - containerd.io
     - docker-buildx-plugin
     - docker-compose-plugin
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  when: not docker_installed.stat.exists
+  notify: restart docker
 
 - name: Create "docker" group
+  become: yes
   group:
     name: "docker"
     state: present
+  when: not docker_installed.stat.exists
 
 - name: Add "ansible" user to "docker" group
   become: yes
@@ -88,33 +64,25 @@
     name: "ansible"
     groups: "docker"
     append: yes
+  when: not docker_installed.stat.exists
+  notify: reset connection
 
 - name: Reset ssh connection to allow ansible user to be reset
   ansible.builtin.meta:
     reset_connection
 
-- name: Service folder where all docker-compose files will be put
+- name: Create services directory
   become: yes
-  ansible.builtin.file:
+  file:
     path: /data/services
     state: directory
     owner: ansible
     group: docker
-
-
-#- name: Create proxy network
-#  become: yes
-#  shell:
-#    cmd: "docker network create proxy"
-#  ignore_errors: true
+    mode: '0755'
+  when: not docker_installed.stat.exists
 
 - name: Create the 'proxy' network
   community.docker.docker_network:
     name: proxy
-
-#- name: Ensure Docker starts
-#  service:
-#    name: docker
-#    state: started
-#    enabled: yes
+  when: not docker_installed.stat.exists
 

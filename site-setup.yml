@@ -1,0 +1,7 @@
+---
+- hosts: pihole
+  remote_user: ansible
+  become: true
+  tasks:
+    - include_tasks: roles/pihole/tasks/setup.yml
+      run_once: true

@@ -165,15 +165,27 @@
   roles:
     - role: duplicati
 
-- hosts: "dns"
+- hosts: "pihole"
   remote_user: ansible
   roles:
     - role: pihole
 
-- hosts: "nebula-sync"
+# Core Infrastructure
+- name: "Deploy PiHole DNS"
+  hosts: pihole
+  remote_user: ansible
+  roles:
+    - role: pihole
+      tags:
+        - pihole
+
+- name: "Depoy Nebula Sync"
+  hosts: "nebula-sync"
   remote_user: ansible
   roles:
     - role: nebula-sync
+      tags:
+        - nebula-sync
 
 - hosts: "edge"
   remote_user: ansible
@@ -185,6 +197,16 @@
   tasks:
     - name: "Update external routes"
       include_tasks: roles/traefik/tasks/update_routes_external.yml
+
+- hosts: "prometheus"
+  remote_user: ansible
+  roles:
+    - role: prometheus
+
+- hosts: "pihole-exporter"
+  remote_user: ansible
+  roles:
+    - role: pihole-exporter
 
 - hosts: "photoprism"
   remote_user: ansible

@@ -11,6 +11,7 @@ services:
       APP_SECRET: "${APP_SECRET}"
       DATABASE_URL: "postgresql://docmost:${DATABASE_PASSWORD}@db:5432/docmost?schema=public"
       REDIS_URL: "redis://redis:6379"
+      FILE_UPLOAD_SIZE_LIMIT: 100mb
       PORT: ${PORT}
     ports:
       - "${PORT}:${PORT}"

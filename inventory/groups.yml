@@ -1,6 +1,7 @@
 managed_hosts:
   children:
     raspberrypi:
+    pihole:
     dns:
     edge:
     containers:
@@ -16,5 +17,8 @@ managed_hosts:
     traggo:
     freshrss:
     linkding:
-    semaphore:
     homeassistant:
+    # monitoring
+    prometheus:
+    pihole-exporter:
+    docmost:
