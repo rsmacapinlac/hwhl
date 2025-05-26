@@ -1,0 +1,8 @@
+---
+- name: restart nebula-sync
+  community.docker.docker_compose_v2:
+    project_src: /data/services/nebula-sync
+    files:
+      - compose.yml
+    state: present
+    recreate: always 

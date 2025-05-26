@@ -1,10 +1,42 @@
-- name: Create services folder (nebula-sync)
+---
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/nebula-sync/environment"
+  register: env_file
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/nebula-sync/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+- name: Check if Nebula Sync container exists
+  community.docker.docker_container_info:
+    name: nebula-sync
+  register: nebula_sync_container
+  ignore_errors: true
+
+- name: Create services folder
   become: true
-  ansible.builtin.file:
+  file:
     path: /data/services/nebula-sync
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
+  when: not nebula_sync_container.container.Status.Running | default(false)
+
+- name: Setup docker compose file for Nebula Sync
+  template:
+    src: docker-compose.j2
+    dest: /data/services/nebula-sync/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  when: not nebula_sync_container.container.Status.Running | default(false)
+  notify: restart nebula-sync
 
 - name: Copy environment configuration
   copy:
@@ -12,15 +44,15 @@
     dest: /data/services/nebula-sync/.env
     owner: ansible
     group: docker
+    mode: '0640'
+  when: not nebula_sync_container.container.Status.Running | default(false)
+  notify: restart nebula-sync
 
-- name: Setup docker compose file (nebula-sync)
-  template:
-    src: docker-compose.j2
-    dest: /data/services/nebula-sync/compose.yml
-    owner: ansible
-    group: docker
-
-- name: Run container
-  become: true
-  shell:
-    cmd: "docker compose -f /data/services/nebula-sync/compose.yml up -d"
+- name: Run Nebula Sync container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/nebula-sync
+    files:
+      - compose.yml
+    state: present
+  when: not nebula_sync_container.container.Status.Running | default(false)
+  notify: restart nebula-sync

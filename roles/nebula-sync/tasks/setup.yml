@@ -1,0 +1,21 @@
+---
+- name: Create configuration directory
+  local_action:
+    module: file
+    path: "{{ playbook_dir }}/files/config/nebula-sync"
+    state: directory
+    mode: '0755'
+
+- name: Generate environment file from template
+  local_action:
+    module: template
+    src: environment.j2
+    dest: "{{ playbook_dir }}/files/config/nebula-sync/environment"
+    mode: '0640'
+  when: not env_file.stat.exists | default(true)
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Nebula Sync environment file has been created at {{ playbook_dir }}/files/config/nebula-sync/environment
+      Please review and modify the configuration as needed before running the main playbook. 

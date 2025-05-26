@@ -1,0 +1,55 @@
+# Primary PiHole instance to sync from
+# Format: https://IP|PASSWORD
+# Example: https://10.1.0.2|your_password_here
+PRIMARY=""  # Be sure to add quotes if you have special characters
+
+# Secondary PiHole instances to sync to
+# Format: https://IP|PASSWORD,https://IP|PASSWORD
+# Example: https://10.1.0.3|your_password_here,https://10.1.0.4|your_password_here
+REPLICAS="" # Be sure to add quotes if you have special characters
+
+# Perform a full sync on startup
+# Options: true, false
+FULL_SYNC=false
+
+# Run gravity sync on startup
+# Options: true, false
+RUN_GRAVITY=false
+
+# Cron schedule for sync
+# Format: */15 * * * * (every 15 minutes)
+# Examples:
+# */5 * * * *  (every 5 minutes)
+# 0 * * * *    (every hour)
+# 0 0 * * *    (once a day at midnight)
+CRON=*/15 * * * *
+
+# Skip TLS verification for HTTPS connections
+# Options: true, false
+CLIENT_SKIP_TLS_VERIFICATION=true
+
+# Timezone for the container
+# Example: America/Vancouver, UTC, Europe/London
+TZ=America/Vancouver
+
+# Configuration sync settings
+# Options: true, false
+SYNC_CONFIG_DNS=true        # Sync DNS settings
+SYNC_CONFIG_DHCP=false      # Sync DHCP settings
+SYNC_CONFIG_NTP=false       # Sync NTP settings
+SYNC_CONFIG_RESOLVER=false  # Sync resolver settings
+SYNC_CONFIG_DATABASE=false  # Sync database settings
+SYNC_CONFIG_MISC=false      # Sync miscellaneous settings
+SYNC_CONFIG_DEBUG=false     # Sync debug settings
+
+# Gravity sync settings
+# Options: true, false
+SYNC_GRAVITY_DHCP_LEASES=false          # Sync DHCP leases
+SYNC_GRAVITY_GROUP=false                # Sync group settings
+SYNC_GRAVITY_AD_LIST=true               # Sync ad lists
+SYNC_GRAVITY_AD_LIST_BY_GROUP=true      # Sync ad lists by group
+SYNC_GRAVITY_DOMAIN_LIST=true           # Sync domain lists
+SYNC_GRAVITY_DOMAIN_LIST_BY_GROUP=true  # Sync domain lists by group
+SYNC_GRAVITY_CLIENT=false               # Sync client settings
+SYNC_GRAVITY_CLIENT_BY_GROUP=false      # Sync client settings by group
+

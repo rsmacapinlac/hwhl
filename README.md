@@ -2,80 +2,157 @@
 
 This is my ansible setup for my homelab.
 
-## Pre-reqs
+## Project Overview
 
-What do you need?
-- Your own domain that is configured with Cloudflare.
-- A Proxmox server
+This Ansible project automates the setup and management of a comprehensive homelab environment. It includes:
+
+### Core Infrastructure
+- DNS management with [PiHole](docs/pihole-setup.md)
+- Reverse proxy with Traefik
+- Authentication with Authelia
+- Container management with Portainer
+- Automated updates with Watchtower
+
+### Media Services
+- Jellyfin/Plex for media streaming
+- Tautulli for media statistics
+- Tdarr for media transcoding
+- Tubearchivist for YouTube archiving
+- Navidrome for music streaming
+- Audiobookshelf for audiobook management
+- Kavita for e-book management
+
+### Productivity & Organization
+- Nextcloud for file sharing and collaboration
+- Paperless-ng for document management
+- Photoprism for photo management
+- Baserow for database management
+- Docmost for documentation
+- Monica for personal relationship management
+- Homepage for dashboard
+
+### Monitoring & Automation
+- Prometheus for metrics collection
+- Traggo for time tracking
+- N8n for workflow automation
+- Ofelia for task scheduling
+- Syncthing for file synchronization
+
+## Directory Structure
+
+```
+.
+├── ansible.cfg          # Ansible configuration
+├── site.yml            # Main playbook
+├── inventory/          # Host inventory files
+├── roles/             # Ansible roles
+├── files/             # Configuration files
+├── group_vars/        # Group variables
+└── collections/       # Ansible collections
+```
+
+## Getting Started
+
+### Prerequisites
+- A running Proxmox node
+- Your own domain that is configured with Cloudflare
 - A working knowledge of your router's DHCP configuration
 - Your public key (scripts assume that it can be found in $HOME/.ssh/id_rsa.pub)
 
-1. Clone the repository
+### Initial Setup
 
+1. Clone the repository:
 ```bash
 git clone git@github.com:rsmacapinlac/hwhl.git
-```
-
-2. Create a 'files' folder
-
-```bash
 cd hwhl
-mkdir files
 ```
 
-3. Start your inventory file
-
+2. Initialize your environment:
+```bash
+./bin/ansible-init.sh
 ```
+
+3. Configure your Proxmox inventory:
+```bash
+# Create and edit your inventory file
 touch inventory/proxmox.yml
 ```
 
-Contents of the file:
-
-```bash
+Add the following content to `inventory/proxmox.yml`:
+```yaml
 proxmox_control_node_by_ip:
   hosts:
-    # this is the IP of your proxmox server
+    # Replace with your Proxmox server IP
     10.1.0.141:
 ```
 
-## Build the base of the homelab
-
-### DNS (PiHole) (x3)
-
-You can build more (x4) but 3 will do.
-
-1. Create an LXC in Proxmox
-
-```
-storage: 32GB
-ip addr: 10.1.0.2 # this assumes that you're on a 10.1.x.x network (where your Router is 10.1.0.1)
-Unpriviledged container: No
-Features: Nesting=1
-# Cloudflare's public DNS
-DNS: 1.1.1.1; 1.0.0.1
+4. Run the Proxmox setup playbook:
+```bash
+ansible-playbook proxmox-setup.yml
 ```
 
-2. Modify the inventory file
+## Usage
 
-Add this content to the end.
+### Common Commands
 
+```bash
+# Run the entire playbook
+ansible-playbook site.yml
+
+# Run specific services by host group
+ansible-playbook site.yml --limit dns          # Run only DNS (PiHole) setup
+ansible-playbook site.yml --limit edge         # Run edge services (Traefik, Authelia, etc.)
+ansible-playbook site.yml --limit containers   # Run container management services
+ansible-playbook site.yml --limit jellyfin     # Run Jellyfin setup
+ansible-playbook site.yml --limit plex         # Run Plex setup
+
+# Check syntax
+ansible-playbook site.yml --syntax-check
+
+# Dry run
+ansible-playbook site.yml --check
 ```
-dns:
-  hosts:
-    dns0.int.macapinlac.network:
-      ansible_host: 10.1.0.2
 
-```
+### Available Host Groups
 
-3. Create an environment file for PiHole
+The playbook is organized into the following host groups:
 
-```
-mkdir files/config/pihole
-touch files/config/pihole/environment
+- `dns`: PiHole DNS servers
+- `edge`: Edge services (Traefik, Authelia, Cloudflare DDNS, WireGuard)
+- `containers`: Container management (Portainer, Watchtower, Traefik)
+- `arrs`: *Arr suite (Sonarr, Radarr, etc.)
+- `jellyfin`: Jellyfin media server
+- `plex`: Plex media server
+- `nextcloud`: Nextcloud file sharing
+- And many more services as defined in site.yml
 
-# contents:
+### Maintenance
 
-FTLCONF_webserver_api_password: 'my super secret password' #obviously change this
-FTLCONF_dns_listeningMode: 'all'
-FTLCONF_dns_upstreams: '1.1.1.1;1.0.0.1'
-```
+- Use `maintenance.yml` for routine maintenance tasks
+- Use `provision.yml` for initial provisioning
+- Use `de-provision.yml` for cleanup
+
+## Security Notes
+
+- All sensitive credentials should be stored in `files/config/`
+- Use environment variables or Ansible vault for secrets
+- Keep your Ansible control node secure
+- Regularly update your systems using the maintenance playbook
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+This project is licensed under the terms of the included LICENSE file.
+
+## Documentation
+
+- [Services Documentation](docs/services.md) - Overview and setup guides for all services
+- [Pi-hole Setup](docs/pihole-setup.md) - Detailed guide for Pi-hole deployment
+- [Nebula Sync Setup](docs/nebula-sync-setup.md) - Guide for Pi-hole synchronization

@@ -5,3 +5,10 @@
   tasks:
     - include_tasks: roles/pihole/tasks/setup.yml
       run_once: true
+
+- hosts: nebula-sync
+  remote_user: ansible
+  become: true
+  tasks:
+    - include_tasks: roles/nebula-sync/tasks/setup.yml
+      run_once: true
