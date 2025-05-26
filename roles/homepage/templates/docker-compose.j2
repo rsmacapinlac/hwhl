@@ -11,6 +11,7 @@ services:
     environment:
       PUID: 1001
       PGID: 1001
+      HOMEPAGE_ALLOWED_HOSTS: "*"
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
