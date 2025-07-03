@@ -18,6 +18,8 @@ services:
     #  start_period: 10s
     #  timeout: 10s
     #  retries: 3
+    networks:
+      - proxy
 
   kimai:
     container_name: kimai
@@ -36,3 +38,26 @@ services:
     depends_on:
       - sqldb
     #    condition: service_healthy
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.kimai-by-hostname.entrypoints=http"
+      - "traefik.http.routers.kimai-by-hostname.rule=Host(`kimai.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+
+      - "traefik.http.middlewares.kimai-by-hostname-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.kimai-by-hostname.middlewares=kimai-by-hostname-https-redirect"
+
+      - "traefik.http.routers.kimai-by-hostname-secure.entrypoints=https"
+      - "traefik.http.routers.kimai-by-hostname-secure.rule=Host(`kimai.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.kimai-by-hostname-secure.tls=true"
+      - "traefik.http.routers.kimai-by-hostname-secure.service=kimai"
+
+      - "traefik.http.services.kimai.loadbalancer.server.port=8001"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true
