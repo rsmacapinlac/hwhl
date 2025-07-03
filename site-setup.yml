@@ -12,3 +12,9 @@
   tasks:
     - include_tasks: roles/nebula-sync/tasks/setup.yml
       run_once: true
+
+- hosts: localhost
+  connection: local
+  tasks:
+    - include_tasks: roles/kimai/tasks/setup.yml
+      run_once: true

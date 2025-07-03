@@ -198,15 +198,15 @@
     - name: "Update external routes"
       include_tasks: roles/traefik/tasks/update_routes_external.yml
 
-- hosts: "prometheus"
-  remote_user: ansible
-  roles:
-    - role: prometheus
+# - hosts: "prometheus"
+#   remote_user: ansible
+#   roles:
+#     - role: prometheus
 
-- hosts: "pihole-exporter"
-  remote_user: ansible
-  roles:
-    - role: pihole-exporter
+# - hosts: "pihole-exporter"
+#   remote_user: ansible
+#   roles:
+#     - role: pihole-exporter
 
 - hosts: "photoprism"
   remote_user: ansible
@@ -259,3 +259,8 @@
   remote_user: ansible
   roles:
     - role: syncthing
+
+- hosts: "kimai"
+  remote_user: ansible
+  roles:
+    - role: kimai

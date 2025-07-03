@@ -1,0 +1,76 @@
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/kimai/environment"
+  register: env_file
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/kimai/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+
+
+- name: Check if Kimai container exists
+  community.docker.docker_container_info:
+    name: kimai
+  register: kimai_container
+  ignore_errors: true
+
+- name: Create services folder
+  become: true
+  file:
+    path: /data/services/kimai
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not kimai_container.container.Status.Running | default(false)
+
+- name: Create data directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  loop:
+    - /data/containers/kimai/mysql
+    - /data/containers/kimai/data
+    - /data/containers/kimai/plugins
+  when: not kimai_container.container.Status.Running | default(false)
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/kimai/environment"
+    dest: /data/services/kimai/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+
+- name: Setup docker compose file for Kimai
+  template:
+    src: docker-compose.j2
+    dest: /data/services/kimai/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+
+- name: Verify compose file exists
+  stat:
+    path: /data/services/kimai/compose.yml
+  register: compose_file
+
+- name: Run Kimai container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/kimai
+    files:
+      - compose.yml
+    state: present
+  when: 
+    - not kimai_container.container.Status.Running | default(false)
+    - compose_file.stat.exists
+  notify: restart kimai 
