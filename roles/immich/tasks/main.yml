@@ -1,0 +1,76 @@
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/immich/environment"
+  register: env_file
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/immich/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+
+
+- name: Check if Immich container exists
+  community.docker.docker_container_info:
+    name: immich
+  register: immich_container
+  ignore_errors: true
+
+- name: Create services folder
+  become: true
+  file:
+    path: /data/services/immich
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not immich_container.container.Status.Running | default(false)
+
+- name: Create data directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  loop:
+    - /data/containers/immich/postgres
+#    - /data/immich-upload
+#    - /data/containers/immich/plugins
+  when: not immich_container.container.Status.Running | default(false)
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/immich/environment"
+    dest: /data/services/immich/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+
+- name: Setup docker compose file for Immich
+  template:
+    src: docker-compose.j2
+    dest: /data/services/immich/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+
+- name: Verify compose file exists
+  stat:
+    path: /data/services/immich/compose.yml
+  register: compose_file
+
+- name: Run Immich container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/immich
+    files:
+      - compose.yml
+    state: present
+  when: 
+    - not immich_container.container.Status.Running | default(false)
+    - compose_file.stat.exists
+  notify: restart immich 

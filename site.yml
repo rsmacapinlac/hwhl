@@ -264,3 +264,8 @@
   remote_user: ansible
   roles:
     - role: kimai
+
+- hosts: "immich"
+  remote_user: ansible
+  roles:
+    - role: immich
