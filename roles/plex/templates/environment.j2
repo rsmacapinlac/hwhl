@@ -1,0 +1,17 @@
+# Plex Environment Configuration
+# Please edit these values before running the role
+
+# Plex Configuration
+PUID=1001
+PGID=1001
+TZ={{ timezone | default('UTC') }}
+VERSION=docker
+
+# Plex Claim Token (optional - remove if not needed)
+# Get your claim token from https://www.plex.tv/claim/
+# PLEX_CLAIM=claim-xxxxxxxxxxxxxxxxxxxx
+
+# NVIDIA GPU Support (uncomment if using NVIDIA GPU)
+# NVIDIA_VISIBLE_DEVICES=all
+# NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
+# CUDA_DRIVER_CAPABILITIES=compute,video,utility 

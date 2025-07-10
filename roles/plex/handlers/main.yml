@@ -1,0 +1,8 @@
+---
+- name: restart plex
+  community.docker.docker_compose_v2:
+    project_src: /data/services/plex
+    files:
+      - compose.yml
+    state: present
+    recreate: always 

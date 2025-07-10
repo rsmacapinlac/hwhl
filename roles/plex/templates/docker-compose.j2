@@ -4,32 +4,25 @@ services:
     container_name: plex
     # network_mode: host
     # runtime: nvidia
-    environment:
-      - PUID=1001
-      - PGID=1001
-      - TZ={{ timezone }}
-      - VERSION=docker
-      {% if plex_claim is defined %}
-      - PLEX_CLAIM={{ plex_claim }}
-      {% endif %}
-      #- NVIDIA_VISIBLE_DEVICES=all
-      #- NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
-      #- CUDA_DRIVER_CAPABILITIES=compute,video,utility
+    env_file:
+      - .env
     volumes:
       - /data/containers/plex:/config
+{% if plex_volumes is defined %}
 {% for item in plex_volumes %}
       - {{ item.host_folder }}:{{ item.container }}
 {% endfor %}
+{% endif %}
     ports:
       - 32400:32400
-      - 1900:1900/udp
+      #- 1900:1900/udp
       # - 5353:5353/udp
-      - 8324:8324
-      - 32410:32410/udp
-      - 32412:32412/udp
-      - 32413:32413/udp
-      - 32414:32414/udp
-      - 32469:32469
+      #- 8324:8324
+      #- 32410:32410/udp
+      #- 32412:32412/udp
+      #- 32413:32413/udp
+      #- 32414:32414/udp
+      #- 32469:32469
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
