@@ -54,3 +54,12 @@
       include_tasks: roles/kasm/tasks/setup.yml
       run_once: true
       when: groups['kasm'] is defined and groups['kasm'] | length > 0
+
+- name: "Setup Prometheus"
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: "Run Prometheus setup if group exists"
+      include_tasks: roles/prometheus/tasks/setup.yml
+      run_once: true
+      when: groups['prometheus'] is defined and groups['prometheus'] | length > 0

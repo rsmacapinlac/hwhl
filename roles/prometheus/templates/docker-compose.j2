@@ -1,0 +1,32 @@
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "{{ prometheus_port }}:{{ prometheus_port }}"
+    volumes:
+      - /data/containers/prometheus/config:/etc/prometheus
+      - /data/containers/prometheus/data:/prometheus
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.entrypoints=http"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.prometheus-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.prometheus.middlewares=prometheus-https-redirect"
+      - "traefik.http.routers.prometheus-secure.entrypoints=https"
+      - "traefik.http.routers.prometheus-secure.rule=Host(`prometheus.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.prometheus-secure.tls=true"
+      - "traefik.http.routers.prometheus-secure.service=prometheus"
+      - "traefik.http.services.prometheus.loadbalancer.server.port={{ prometheus_port }}"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true 

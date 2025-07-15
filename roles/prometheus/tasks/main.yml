@@ -1,0 +1,46 @@
+---
+- name: Check if Prometheus container exists
+  community.docker.docker_container_info:
+    name: prometheus
+  register: prometheus_container
+  ignore_errors: true
+
+- name: Ensure Prometheus config and data directories exist
+  become: true
+  file:
+    path: "/data/containers/prometheus/{{ item }}"
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  loop:
+    - config
+    - data
+  when: not prometheus_container.container.Status.Running | default(false)
+
+- name: Deploy default Prometheus config if not present
+  become: true
+  template:
+    src: prometheus.yml.j2
+    dest: /data/containers/prometheus/config/prometheus.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  when: not lookup('file', '/data/containers/prometheus/config/prometheus.yml', errors='ignore')
+
+- name: Deploy Prometheus docker-compose file
+  become: true
+  template:
+    src: docker-compose.j2
+    dest: /data/containers/prometheus/docker-compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+
+- name: Start Prometheus container with docker-compose v2
+  community.docker.docker_compose_v2:
+    project_src: /data/containers/prometheus
+    state: present
+    pull: always
+    recreate: auto
+    remove_orphans: true 
