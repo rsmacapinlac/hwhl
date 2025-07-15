@@ -1,0 +1,8 @@
+---
+- name: restart kasm
+  community.docker.docker_compose_v2:
+    project_src: /data/services/kasm
+    files:
+      - compose.yml
+    state: present
+    recreate: always 

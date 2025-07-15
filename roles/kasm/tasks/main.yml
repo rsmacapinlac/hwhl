@@ -1,0 +1,75 @@
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/kasm/environment"
+  register: env_file
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/kasm/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+
+
+- name: Check if kasm container exists
+  community.docker.docker_container_info:
+    name: kasm
+  register: kasm_container
+  ignore_errors: true
+
+- name: Create services folder
+  become: true
+  file:
+    path: /data/services/kasm
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not kasm_container.container.Status.Running | default(false)
+
+- name: Create data directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  loop:
+    - /data/containers/kasm/data
+    - /data/containers/kasm/profiles
+  when: not kasm_container.container.Status.Running | default(false)
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/kasm/environment"
+    dest: /data/services/kasm/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+
+- name: Setup docker compose file for kasm
+  template:
+    src: docker-compose.j2
+    dest: /data/services/kasm/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+
+- name: Verify compose file exists
+  stat:
+    path: /data/services/kasm/compose.yml
+  register: compose_file
+
+- name: Run kasm container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/kasm
+    files:
+      - compose.yml
+    state: present
+  when: 
+    - not kasm_container.container.Status.Running | default(false)
+    - compose_file.stat.exists
+  notify: restart kasm 

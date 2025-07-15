@@ -45,3 +45,12 @@
       include_tasks: roles/plex/tasks/setup.yml
       run_once: true
       when: groups['plex'] is defined and groups['plex'] | length > 0
+
+- name: "Setup kasm"
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: "Run kasm setup if group exists"
+      include_tasks: roles/kasm/tasks/setup.yml
+      run_once: true
+      when: groups['kasm'] is defined and groups['kasm'] | length > 0
