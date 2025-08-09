@@ -79,13 +79,13 @@ storage:
     path: /config/db.sqlite3
 
 notifier:
-  smtp:
-    username: {{ authelia_smtp_username }}
-    # This secret can also be set using the env variables AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE
-    password: {{ authelia_smtp_password }}
-    host: {{ authelia_smtp_host }}
-    port: {{ authelia_smtp_port }}
-    sender: {{ authelia_smtp_sender }}
-  #filesystem:
-  #  filename: /config/notification.txt
+  #smtp:
+  #  username: {{ authelia_smtp_username }}
+  #  # This secret can also be set using the env variables AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE
+  #  password: {{ authelia_smtp_password }}
+  #  host: {{ authelia_smtp_host }}
+  #  port: {{ authelia_smtp_port }}
+  #  sender: {{ authelia_smtp_sender }}
+  filesystem:
+    filename: /config/notification.txt
 ...

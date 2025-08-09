@@ -19,7 +19,6 @@ managed_hosts:
     linkding:
     homeassistant:
     # monitoring
-    # prometheus:
-    # pihole-exporter:
+    prometheus:
+    pihole-exporter:
     docmost:
-    kimai:

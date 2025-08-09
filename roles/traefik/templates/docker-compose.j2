@@ -11,8 +11,8 @@ services:
       - 80:80
       - 443:443
     environment:
-      - CF_API_EMAIL={{ cloudflare_api_email }}
-      - CF_DNS_API_TOKEN={{ cloudflare_api_key }}
+      - CF_API_EMAIL={{ cloudflare.api_email }}
+      - CF_DNS_API_TOKEN={{ cloudflare.api_key }}
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
