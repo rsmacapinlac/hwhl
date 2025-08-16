@@ -1,3 +1,4 @@
+---
 services:
   semaphore_postgres:
     container_name: semaphore_postgres
@@ -6,40 +7,18 @@ services:
     hostname: postgres
     volumes:
       - /data/containers/semaphore_postgres:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: semaphore
-      POSTGRES_PASSWORD: '{{ postgres_password }}'
-      POSTGRES_DB: semaphore
+    env_file:
+      - .env
     networks:
       - proxy
 
   semaphore:
     container_name: semaphore
     ports:
-      - 3000:3000
+      - {{ semaphore_port }}:3000
     image: semaphoreui/semaphore:latest
-    environment:
-      ANSIBLE_HOST_KEY_CHECKING: "False"
-      SEMAPHORE_DB_USER: semaphore
-      SEMAPHORE_DB_PASS: '{{ postgres_password }}'
-      SEMAPHORE_DB_HOST: semaphore_postgres
-      SEMAPHORE_DB_PORT: 5432
-      SEMAPHORE_DB_DIALECT: postgres
-      SEMAPHORE_DB: semaphore
-      SEMAPHORE_PLAYBOOK_PATH: /tmp/semaphore/
-      SEMAPHORE_ADMIN_PASSWORD: '{{ semaphore_admin_password }}'
-      SEMAPHORE_ADMIN_NAME: admin
-      SEMAPHORE_ADMIN_EMAIL: admin@localhost
-      SEMAPHORE_ADMIN: admin
-      SEMAPHORE_ACCESS_KEY_ENCRYPTION: {{ semaphore_access_key_encryption }}
-      SEMAPHORE_LDAP_ACTIVATED: 'no' # if you wish to use ldap, set to: 'yes'
-      SEMAPHORE_LDAP_HOST: dc01.local.example.com
-      SEMAPHORE_LDAP_PORT: '636'
-      SEMAPHORE_LDAP_NEEDTLS: 'yes'
-      SEMAPHORE_LDAP_DN_BIND: 'uid=bind_user,cn=users,cn=accounts,dc=local,dc=shiftsystems,dc=net'
-      SEMAPHORE_LDAP_PASSWORD: 'ldap_bind_account_password'
-      SEMAPHORE_LDAP_DN_SEARCH: 'dc=local,dc=example,dc=com'
-      SEMAPHORE_LDAP_SEARCH_FILTER: "(\u0026(uid=%s)(memberOf=cn=ipausers,cn=groups,cn=accounts,dc=local,dc=example,dc=com))"
+    env_file:
+      - .env
     depends_on:
       - semaphore_postgres
     labels:
