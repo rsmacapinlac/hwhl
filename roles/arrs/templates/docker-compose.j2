@@ -174,39 +174,6 @@ services:
     networks:
       - proxy
 
-  readarr:
-    image: lscr.io/linuxserver/readarr:develop
-    container_name: readarr
-    environment:
-      - PUID=1001
-      - PGID=1001
-      - TZ={{ timezone }}
-    volumes:
-      - /data/containers/readarr:/config
-{% for item in readarr %}
-      - {{ item.host_folder }}:{{ item.container }}
-{% endfor %}
-      - /data/arrs/Downloads/sabnzbd/complete:/sabnzbd
-      - /data/arrs/Downloads/transmission/completed:/transmission
-    ports:
-      - 8787:8787
-    restart: unless-stopped
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-      - "traefik.enable=true"
-      - "traefik.http.routers.readarr.entrypoints=http"
-      - "traefik.http.routers.readarr.rule=Host(`readarr.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-      - "traefik.http.middlewares.readarr-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.readarr.middlewares=readarr-https-redirect"
-      - "traefik.http.routers.readarr-secure.entrypoints=https"
-      - "traefik.http.routers.readarr-secure.rule=Host(`readarr.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-      - "traefik.http.routers.readarr-secure.tls=true"
-      - "traefik.http.routers.readarr-secure.service=readarr"
-      - "traefik.http.services.readarr.loadbalancer.server.port=8787"
-      - "traefik.docker.network=proxy"
-    networks:
-      - proxy
-
   mylar3:
     image: lscr.io/linuxserver/mylar3:latest
     container_name: mylar3

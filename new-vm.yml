@@ -1,0 +1,14 @@
+
+- hosts: "managed_hosts"
+  remote_user: root
+  tasks:
+    - name: 'Apt update'
+      include_tasks: roles/common/tasks/apt-update.yml
+    - name: 'Add users'
+      include_tasks: roles/common/tasks/users.yml
+
+- hosts: "raspberrypi"
+  remote_user: pi
+  tasks:
+    - name: Add users
+      include_tasks: roles/common/tasks/users.yml

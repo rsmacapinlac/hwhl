@@ -1,17 +1,13 @@
 ---
+- hosts: all
+  gather_facts: true  # Explicitly gather facts for this play
+
 - hosts: "managed_hosts"
-  remote_user: root
+  remote_user: ansible
+  become: true
   tasks:
     - name: 'Apt update'
       include_tasks: roles/common/tasks/apt-update.yml
-    - name: 'Add users'
-      include_tasks: roles/common/tasks/users.yml
-
-- hosts: "raspberrypi"
-  remote_user: pi
-  tasks:
-    - name: Add users
-      include_tasks: roles/common/tasks/users.yml
 
 - hosts: "arrs"
   remote_user: ansible

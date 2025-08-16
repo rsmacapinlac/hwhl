@@ -20,7 +20,7 @@
       when: groups['nebula-sync'] is defined and groups['nebula-sync'] | length > 0
 
 - name: "Setup Kimai"
-  hosts: localhost
+  hosts: kimai
   connection: local
   tasks:
     - name: "Run Kimai setup if group exists"
@@ -29,7 +29,7 @@
       when: groups['kimai'] is defined and groups['kimai'] | length > 0
 
 - name: "Setup Immich"
-  hosts: localhost
+  hosts: immich
   connection: local
   tasks:
     - name: "Run Immich setup if group exists"
@@ -47,7 +47,7 @@
       when: groups['plex'] is defined and groups['plex'] | length > 0
 
 - name: "Setup kasm"
-  hosts: localhost
+  hosts: kasm
   connection: local
   tasks:
     - name: "Run kasm setup if group exists"
@@ -56,7 +56,7 @@
       when: groups['kasm'] is defined and groups['kasm'] | length > 0
 
 - name: "Setup Prometheus"
-  hosts: localhost
+  hosts: prometheus
   connection: local
   tasks:
     - name: "Run Prometheus setup if group exists"
