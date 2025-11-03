@@ -1,0 +1,95 @@
+---
+- name: "Mount ContainerBackups share for BorgBackup"
+  include_tasks: roles/shares/tasks/single_share.yml
+  vars:
+    type: "{{ borgbackup_share_type }}"
+    destination: "{{ borgbackup_share_destination }}"
+    source: "{{ borgbackup_share_source }}"
+    options: "{{ borgbackup_share_options }}"
+  when: borgbackup_mount_share | default(true)
+
+- name: Create Borg repository base directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ borgbackup_share_destination }}/{{ ansible_hostname }}"
+    state: directory
+
+- name: Create BorgBackup config directory
+  become: true
+  ansible.builtin.file:
+    path: /data/containers/borgbackup
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+- name: Create BorgBackup crontab directory
+  become: true
+  ansible.builtin.file:
+    path: /data/containers/borgbackup/cron
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+- name: Deploy Borgmatic configuration
+  become: true
+  template:
+    src: borgmatic-config.yml.j2
+    dest: /data/containers/borgbackup/config.yaml
+    owner: ansible
+    group: docker
+    mode: '0600'
+
+- name: Deploy crontab for Borgmatic
+  become: true
+  template:
+    src: crontab.txt.j2
+    dest: /data/containers/borgbackup/cron/crontab.txt
+    owner: ansible
+    group: docker
+    mode: '0644'
+
+- name: Setup docker compose file for BorgBackup
+  become: true
+  template:
+    src: docker-compose.j2
+    dest: /data/services/borgbackup.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+
+- name: Check if Borg repository is already initialized
+  stat:
+    path: "{{ borgbackup_share_destination }}/{{ ansible_hostname }}/config"
+  register: borg_repo_config
+
+- name: Check if repository directory exists
+  stat:
+    path: "{{ borgbackup_share_destination }}/{{ ansible_hostname }}"
+  register: borg_repo_dir
+
+- name: Clean up invalid repository directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ borgbackup_share_destination }}/{{ ansible_hostname }}"
+    state: absent
+  when: borg_repo_dir.stat.exists and not borg_repo_config.stat.exists
+
+- name: Recreate repository directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ borgbackup_share_destination }}/{{ ansible_hostname }}"
+    state: directory
+  when: not borg_repo_config.stat.exists
+
+- name: Initialize Borg repository
+  shell:
+    cmd: "docker compose -f /data/services/borgbackup.yml run --rm borgmatic borgmatic init --encryption repokey-blake2"
+  environment:
+    BORG_PASSPHRASE: "{{ borgbackup_encryption_passphrase }}"
+  when: not borg_repo_config.stat.exists
+
+- name: Run BorgBackup container
+  shell:
+    cmd: "docker compose -f /data/services/borgbackup.yml up -d"

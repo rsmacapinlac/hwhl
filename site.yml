@@ -9,6 +9,16 @@
     - name: 'Apt update'
       include_tasks: roles/common/tasks/apt-update.yml
 
+- name: "Deploy BorgBackup (Foundational Backup Service)"
+  hosts: "managed_hosts"
+  remote_user: ansible
+  become: true
+  roles:
+    - role: borgbackup
+      tags:
+        - borgbackup
+        - backup
+
 - hosts: "arrs"
   remote_user: ansible
   roles:

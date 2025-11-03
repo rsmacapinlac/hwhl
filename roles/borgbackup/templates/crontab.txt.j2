@@ -1,0 +1,6 @@
+# Borgmatic backup schedule for {{ ansible_hostname }}
+# Backup: {{ borgbackup_schedule_backup }}
+# Prune: {{ borgbackup_schedule_prune }}
+
+{{ borgbackup_schedule_backup }} PATH=$PATH:/usr/local/bin /usr/local/bin/borgmatic --stats --verbosity 1 --syslog-verbosity 1
+{{ borgbackup_schedule_prune }} PATH=$PATH:/usr/local/bin /usr/local/bin/borgmatic prune --stats --verbosity 1 --syslog-verbosity 1

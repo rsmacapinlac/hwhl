@@ -1,0 +1,29 @@
+---
+# BorgBackup role defaults
+
+# NFS share configuration (references global variables in group_vars/all.yml)
+borgbackup_mount_share: true
+borgbackup_share_type: "{{ container_backups_share_type }}"
+borgbackup_share_source: "{{ container_backups_share_source }}"
+borgbackup_share_destination: "{{ container_backups_share_destination }}"
+borgbackup_share_options: "{{ container_backups_share_options }}"
+
+# Encryption - set in group_vars/all.yml
+# borgbackup_encryption_passphrase
+
+# Backup schedule (cron format)
+borgbackup_schedule_backup: "0 2 * * *"  # 2 AM daily
+borgbackup_schedule_prune: "0 3 * * 0"   # 3 AM Sunday
+
+# Retention policy
+borgbackup_keep_hourly: 0
+borgbackup_keep_daily: 7
+borgbackup_keep_weekly: 4
+borgbackup_keep_monthly: 6
+borgbackup_keep_yearly: 1
+
+# Compression algorithm (lz4, zstd, zlib, lzma, auto, none)
+borgbackup_compression: "lz4"
+
+# Repository check frequency
+borgbackup_check_frequency: "2 weeks"

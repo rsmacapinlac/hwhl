@@ -22,3 +22,28 @@ managed_hosts:
     prometheus:
     pihole-exporter:
     docmost:
+    # additional services
+    nebula-sync:
+    portainer:
+    watchtower:
+    teslamate:
+    musicassistant:
+    syncthing:
+    kimai:
+    navidrome:
+    jellyfin:
+    kavita:
+    audiobookshelf:
+    whisparr:
+    jellyseerr:
+    tdarr:
+    immich:
+    kasm:
+    baserow:
+    n8n:
+    monica:
+    ofelia:
+    semaphore:
+    ghostfolio:
+    obsidian:
+    cura:

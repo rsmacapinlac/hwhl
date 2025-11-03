@@ -15,3 +15,33 @@
   tasks:
     - name: "Update containers"
       include_tasks: roles/watchtower/tasks/update.yml
+
+- name: "BorgBackup Status"
+  hosts: managed_hosts
+  remote_user: ansible
+  tags:
+    - borgbackup
+    - backup-status
+  tasks:
+    - name: "Check if borgbackup container exists"
+      shell: docker ps --filter "name=borgbackup" -q
+      register: borgbackup_exists
+      ignore_errors: true
+      changed_when: false
+
+    - name: "Display BorgBackup repository info"
+      shell: docker exec borgbackup borgmatic info
+      register: borgbackup_info
+      when: borgbackup_exists.stdout | length > 0
+      ignore_errors: true
+      changed_when: false
+
+    - name: "Show backup info"
+      debug:
+        msg: "{{ borgbackup_info.stdout_lines }}"
+      when: borgbackup_exists.stdout | length > 0 and borgbackup_info.rc == 0
+
+    - name: "Show borgbackup not running message"
+      debug:
+        msg: "BorgBackup container not found or not running on {{ ansible_hostname }}"
+      when: borgbackup_exists.stdout | length == 0
