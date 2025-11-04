@@ -8,15 +8,28 @@
 - name: Ensure Prometheus config and data directories exist
   become: true
   file:
-    path: "/data/containers/prometheus/{{ item }}"
+    path: "/data/services/prometheus"
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Ensure Prometheus config directory exists
+  become: true
+  file:
+    path: "/data/containers/prometheus/config"
     state: directory
     owner: ansible
     group: docker
     mode: '0755'
-  loop:
-    - config
-    - data
-  when: not prometheus_container.container.Status.Running | default(false)
+
+- name: Ensure Prometheus data directory exists with correct permissions
+  become: true
+  file:
+    path: "/data/containers/prometheus/data"
+    state: directory
+    owner: "65534"
+    group: "65534"
+    mode: '0755'
 
 - name: Deploy default Prometheus config if not present
   become: true
@@ -26,20 +39,19 @@
     owner: ansible
     group: docker
     mode: '0644'
-  when: not lookup('file', '/data/containers/prometheus/config/prometheus.yml', errors='ignore')
 
 - name: Deploy Prometheus docker-compose file
   become: true
   template:
     src: docker-compose.j2
-    dest: /data/containers/prometheus/docker-compose.yml
+    dest: /data/services/prometheus/compose.yml
     owner: ansible
     group: docker
     mode: '0644'
 
 - name: Start Prometheus container with docker-compose v2
   community.docker.docker_compose_v2:
-    project_src: /data/containers/prometheus
+    project_src: /data/services/prometheus
     state: present
     pull: always
     recreate: auto

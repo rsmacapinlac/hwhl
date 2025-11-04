@@ -14,6 +14,19 @@
     path: "{{ borgbackup_share_destination }}/{{ ansible_hostname }}"
     state: directory
 
+- name: Create services directory
+  become: true
+  ansible.builtin.file:
+    path: /data/services
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+- name: Create the 'proxy' network
+  community.docker.docker_network:
+    name: proxy
+
 - name: Create BorgBackup config directory
   become: true
   ansible.builtin.file:
@@ -58,37 +71,6 @@
     owner: ansible
     group: docker
     mode: '0644'
-
-- name: Check if Borg repository is already initialized
-  stat:
-    path: "{{ borgbackup_share_destination }}/{{ ansible_hostname }}/config"
-  register: borg_repo_config
-
-- name: Check if repository directory exists
-  stat:
-    path: "{{ borgbackup_share_destination }}/{{ ansible_hostname }}"
-  register: borg_repo_dir
-
-- name: Clean up invalid repository directory
-  become: true
-  ansible.builtin.file:
-    path: "{{ borgbackup_share_destination }}/{{ ansible_hostname }}"
-    state: absent
-  when: borg_repo_dir.stat.exists and not borg_repo_config.stat.exists
-
-- name: Recreate repository directory
-  become: true
-  ansible.builtin.file:
-    path: "{{ borgbackup_share_destination }}/{{ ansible_hostname }}"
-    state: directory
-  when: not borg_repo_config.stat.exists
-
-- name: Initialize Borg repository
-  shell:
-    cmd: "docker compose -f /data/services/borgbackup.yml run --rm borgmatic borgmatic init --encryption repokey-blake2"
-  environment:
-    BORG_PASSPHRASE: "{{ borgbackup_encryption_passphrase }}"
-  when: not borg_repo_config.stat.exists
 
 - name: Run BorgBackup container
   shell:

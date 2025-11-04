@@ -1,0 +1,3 @@
+---
+# Default to empty shares list if not defined
+shares: []
