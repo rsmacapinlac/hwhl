@@ -1,14 +1,14 @@
 ---
-- hosts: 'proxmox_control_node_by_ip:managed_hosts'
+- hosts: 'proxmox_control_node_by_ip'
   remote_user: root
   tasks:
     - name: apt update
       include_tasks: roles/common/tasks/apt-update.yml
 
-- hosts: "workstations"
-  tasks:
-    - name: apt update
-      include_tasks: roles/common/tasks/apt-update.yml
+#- hosts: "workstations"
+#  tasks:
+#    - name: apt update
+#      include_tasks: roles/common/tasks/apt-update.yml
 
 - hosts: 'pihole'
   remote_user: ansible
@@ -16,11 +16,17 @@
     - name: "Update PiHole"
       include_tasks: roles/pihole/tasks/update.yml
 
-- hosts: 'containers:watchtower:dns:edge'
+- hosts: 'managed_hosts'
   remote_user: ansible
   tasks:
-    - name: "Update containers"
-      include_tasks: roles/watchtower/tasks/update.yml
+    - name: "Update BorgBackup"
+      include_tasks: roles/borgbackup/tasks/update.yml
+
+#- hosts: 'containers:watchtower:dns:edge'
+#  remote_user: ansible
+#  tasks:
+#    - name: "Update containers"
+#      include_tasks: roles/watchtower/tasks/update.yml
 
 - name: "BorgBackup Status"
   hosts: managed_hosts

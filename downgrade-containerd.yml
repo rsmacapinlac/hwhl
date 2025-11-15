@@ -1,0 +1,19 @@
+---
+- name: Downgrade containerd.io on managed hosts
+  hosts: managed_hosts
+  become: true
+  tasks:
+    - name: Downgrade Docker packages to specific versions
+      ansible.builtin.apt:
+        name:
+          - docker-ce=5:28.5.2-1~debian.12~bookworm
+          - docker-ce-cli=5:28.5.2-1~debian.12~bookworm
+          - containerd.io=1.7.28-1~debian.12~bookworm
+        state: present
+        allow_downgrade: true
+        update_cache: true
+
+    - name: Reboot the LXC container
+      ansible.builtin.reboot:
+        msg: "Rebooting after containerd.io downgrade"
+        reboot_timeout: 300
