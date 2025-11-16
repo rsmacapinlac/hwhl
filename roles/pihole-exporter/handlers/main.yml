@@ -1,0 +1,7 @@
+---
+- name: restart pihole-exporter
+  community.docker.docker_compose_v2:
+    project_src: /data/services/pihole-exporter
+    files:
+      - compose.yml
+    state: restarted

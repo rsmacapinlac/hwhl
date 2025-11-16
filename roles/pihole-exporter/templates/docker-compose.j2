@@ -1,0 +1,10 @@
+services:
+  pihole-exporter:
+    container_name: pihole-exporter
+    image: ekofr/pihole-exporter:latest
+    ports:
+      - "9617:9617"
+    env_file: .env
+    environment:
+      TZ: '{{ timezone }}'
+    restart: unless-stopped

@@ -1,0 +1,22 @@
+# PiHole Exporter Environment Configuration
+# This exporter monitors multiple PiHole instances
+# For multiple instances, use comma-separated values
+
+# PiHole connection settings
+# Format: hostname1,hostname2,hostname3
+PIHOLE_HOSTNAME={{ pihole_hostnames | default('dns0.int.macapinlac.network,dns1.int.macapinlac.network,dns2.int.macapinlac.network,dns3.int.macapinlac.network') }}
+
+# Protocol (if same for all instances, specify once)
+PIHOLE_PROTOCOL=http
+
+# Port (if same for all instances, specify once)
+PIHOLE_PORT=80
+
+# API tokens/passwords - one per instance, comma-separated
+# Format: token1,token2,token3
+# Note: Use WEBPASSWORD from /etc/pihole/setupVars.conf on each PiHole
+PIHOLE_PASSWORD={{ pihole_api_tokens | default('changeme,changeme,changeme,changeme') }}
+
+# Exporter settings
+EXPORTER_PORT=9617
+INTERVAL=10s

@@ -1,0 +1,56 @@
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/pihole-exporter/environment"
+  register: env_file
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/pihole-exporter/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+- name: Check if PiHole Exporter container exists
+  community.docker.docker_container_info:
+    name: pihole-exporter
+  register: exporter_container
+  ignore_errors: true
+
+- name: Create services folder
+  become: true
+  file:
+    path: /data/services/pihole-exporter
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not exporter_container.container.Status.Running | default(false)
+
+- name: Setup docker compose file for PiHole Exporter
+  template:
+    src: docker-compose.j2
+    dest: /data/services/pihole-exporter/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  when: not exporter_container.container.Status.Running | default(false)
+  notify: restart pihole-exporter
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/pihole-exporter/environment"
+    dest: /data/services/pihole-exporter/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart pihole-exporter
+
+- name: Run PiHole Exporter container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/pihole-exporter
+    files:
+      - compose.yml
+    state: present
+  when: not exporter_container.container.Status.Running | default(false)
+  notify: restart pihole-exporter

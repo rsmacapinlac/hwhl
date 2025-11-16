@@ -9,6 +9,15 @@
       run_once: true
       when: groups['pihole'] is defined and groups['pihole'] | length > 0
 
+- name: "Setup PiHole Exporter"
+  hosts: pihole-exporter
+  connection: local
+  tasks:
+    - name: "Run PiHole Exporter setup if group exists"
+      include_tasks: roles/pihole-exporter/tasks/setup.yml
+      run_once: true
+      when: groups['pihole-exporter'] is defined and groups['pihole-exporter'] | length > 0
+
 - name: "Setup Nebula Sync"
   hosts: nebula-sync
   remote_user: ansible

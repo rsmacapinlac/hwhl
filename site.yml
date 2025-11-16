@@ -185,6 +185,15 @@
       tags:
         - pihole
 
+- name: "Deploy PiHole Exporter"
+  hosts: pihole-exporter
+  remote_user: ansible
+  roles:
+    - role: pihole-exporter
+      tags:
+        - pihole-exporter
+        - monitoring
+
 - name: "Depoy Nebula Sync"
   hosts: "nebula-sync"
   remote_user: ansible
@@ -208,11 +217,6 @@
   remote_user: ansible
   roles:
     - role: prometheus
-
-# - hosts: "pihole-exporter"
-#   remote_user: ansible
-#   roles:
-#     - role: pihole-exporter
 
 - hosts: "photoprism"
   remote_user: ansible

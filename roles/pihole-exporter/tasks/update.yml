@@ -1,0 +1,47 @@
+---
+- name: Pull latest PiHole Exporter image
+  community.docker.docker_image_pull:
+    name: ekofr/pihole-exporter:latest
+  register: image_pull
+
+- name: Update PiHole Exporter container with latest image
+  community.docker.docker_compose_v2:
+    project_src: /data/services/pihole-exporter
+    files:
+      - compose.yml
+    state: present
+    pull: always
+    recreate: always
+  when: image_pull.changed
+
+- name: Display update status
+  debug:
+    msg: "PiHole Exporter has been updated to the latest version"
+  when: image_pull.changed
+
+- name: Get list of all PiHole Exporter images
+  command: docker images ekofr/pihole-exporter --format "{{ '{{' }}.ID{{ '}}' }}|{{ '{{' }}.CreatedAt{{ '}}' }}" --no-trunc
+  register: exporter_images
+  changed_when: false
+
+- name: Identify old PiHole Exporter images to remove (keep 3 most recent)
+  set_fact:
+    images_to_remove: "{{ exporter_images.stdout_lines | map('split', '|') | sort(attribute='1', reverse=true) | map(attribute='0') | list | [3:] }}"
+  when: exporter_images.stdout_lines | length > 3
+
+- name: Remove old PiHole Exporter images
+  community.docker.docker_image:
+    name: "{{ item }}"
+    state: absent
+    force_absent: true
+  loop: "{{ images_to_remove }}"
+  when:
+    - images_to_remove is defined
+    - images_to_remove | length > 0
+
+- name: Display cleanup status
+  debug:
+    msg: "Removed {{ images_to_remove | length }} old PiHole Exporter image(s), kept 3 most recent"
+  when:
+    - images_to_remove is defined
+    - images_to_remove | length > 0
