@@ -1,0 +1,31 @@
+---
+- name: Check if Portainer compose file exists
+  stat:
+    path: /data/services/portainer.yml
+  register: portainer_compose_file
+
+- name: Update Portainer container with latest image
+  community.docker.docker_compose_v2:
+    project_src: /data/services
+    files:
+      - portainer.yml
+    state: present
+    pull: always
+    recreate: always
+    remove_orphans: false
+
+- name: Wait for Portainer container to be running
+  community.docker.docker_container_info:
+    name: portainer
+  register: portainer_status
+  until: portainer_status.container.State.Running | default(false)
+  retries: 5
+  delay: 2
+
+- name: Display update status
+  debug:
+    msg: "Portainer has been updated and is running"
+
+- name: Remove dangling Portainer images
+  command: docker image prune -f
+  changed_when: true

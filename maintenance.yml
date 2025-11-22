@@ -34,6 +34,12 @@
     - name: "Update Watchtower"
       include_tasks: roles/watchtower/tasks/update.yml
 
+- hosts: "containers:portainer"
+  remote_user: ansible
+  tasks:
+    - name: "Update Portainer"
+      include_tasks: roles/portainer/tasks/update.yml
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:
