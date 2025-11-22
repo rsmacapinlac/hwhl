@@ -12,12 +12,10 @@
     state: present
     pull: always
     recreate: always
-  when: image_pull.changed
 
 - name: Display update status
   debug:
-    msg: "PiHole Exporter has been updated to the latest version"
-  when: image_pull.changed
+    msg: "PiHole Exporter container has been recreated"
 
 - name: Get list of all PiHole Exporter images
   command: docker images ekofr/pihole-exporter --format "{{ '{{' }}.ID{{ '}}' }}|{{ '{{' }}.CreatedAt{{ '}}' }}" --no-trunc

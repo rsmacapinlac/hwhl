@@ -12,12 +12,10 @@
     state: present
     pull: always
     recreate: always
-  when: image_pull.changed
 
 - name: Display update status
   debug:
-    msg: "Nebula Sync has been updated to the latest version"
-  when: image_pull.changed
+    msg: "Nebula Sync container has been recreated"
 
 - name: Get list of all Nebula Sync images
   command: docker images ghcr.io/lovelaze/nebula-sync --format "{{ '{{' }}.ID{{ '}}' }}|{{ '{{' }}.CreatedAt{{ '}}' }}" --no-trunc

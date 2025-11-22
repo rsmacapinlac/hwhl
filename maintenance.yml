@@ -28,6 +28,12 @@
     - name: "Update Nebula Sync"
       include_tasks: roles/nebula-sync/tasks/update.yml
 
+- hosts: "containers"
+  remote_user: ansible
+  tasks:
+    - name: "Update Watchtower"
+      include_tasks: roles/watchtower/tasks/update.yml
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

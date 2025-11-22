@@ -1,2 +1,45 @@
-- name: Watchtower (run-once) update all containers
-  command: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtower --run-once --cleanup --remove-volumes --debug --include-restarting"
+---
+- name: Pull latest Watchtower image
+  community.docker.docker_image_pull:
+    name: containrrr/watchtower:latest
+  register: image_pull
+
+- name: Update Watchtower container with latest image
+  community.docker.docker_compose_v2:
+    project_src: /data/services
+    files:
+      - watchtower.yml
+    state: present
+    pull: always
+    recreate: always
+
+- name: Display update status
+  debug:
+    msg: "Watchtower has been updated to the latest version"
+
+- name: Get list of all Watchtower images
+  command: docker images containrrr/watchtower --format "{{ '{{' }}.ID{{ '}}' }}|{{ '{{' }}.CreatedAt{{ '}}' }}" --no-trunc
+  register: watchtower_images
+  changed_when: false
+
+- name: Identify old Watchtower images to remove (keep 3 most recent)
+  set_fact:
+    images_to_remove: "{{ watchtower_images.stdout_lines | map('split', '|') | sort(attribute='1', reverse=true) | map(attribute='0') | list | [3:] }}"
+  when: watchtower_images.stdout_lines | length > 3
+
+- name: Remove old Watchtower images
+  community.docker.docker_image:
+    name: "{{ item }}"
+    state: absent
+    force_absent: true
+  loop: "{{ images_to_remove }}"
+  when:
+    - images_to_remove is defined
+    - images_to_remove | length > 0
+
+- name: Display cleanup status
+  debug:
+    msg: "Removed {{ images_to_remove | length }} old Watchtower image(s), kept 3 most recent"
+  when:
+    - images_to_remove is defined
+    - images_to_remove | length > 0
