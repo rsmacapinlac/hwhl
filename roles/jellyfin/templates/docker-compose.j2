@@ -1,38 +1,36 @@
+---
 services:
   jellyfin:
-    image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
-    # network_mode: host
-    # runtime: nvidia
+    image: lscr.io/linuxserver/jellyfin:latest
+    env_file:
+      - .env
     environment:
-      - PUID=1001
-      - PGID=1001
-      - TZ={{ timezone }}
-      - JELLYFIN_PublishedServerUrl=jellyfin.{{ ansible_hostname }}.{{ homelab_domain }}
+      - JELLYFIN_PublishedServerUrl=jellyfin.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}
     volumes:
       - /data/containers/jellyfin:/config
 {% for item in jellyfin_volumes %}
       - {{ item.host_folder }}:{{ item.container }}
 {% endfor %}
     ports:
-      - 8096:8096
-      - 8920:8920 #optional
-      - 7359:7359/udp #optional
-      - 1900:1900/udp #optional
+      - {{ jellyfin_port }}:8096
+      - {{ jellyfin_https_port }}:8920
+      - {{ jellyfin_discovery_port }}:7359/udp
+      - {{ jellyfin_dlna_port }}:1900/udp
+    restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.jellyfin.entrypoints=http"
-      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
       - "traefik.http.middlewares.jellyfin-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.jellyfin.middlewares=jellyfin-https-redirect"
       - "traefik.http.routers.jellyfin-secure.entrypoints=https"
-      - "traefik.http.routers.jellyfin-secure.rule=Host(`jellyfin.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.jellyfin-secure.rule=Host(`jellyfin.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.jellyfin-secure.tls=true"
       - "traefik.http.routers.jellyfin-secure.service=jellyfin"
       - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
       - "traefik.docker.network=proxy"
-    restart: unless-stopped
     networks:
       - proxy
 

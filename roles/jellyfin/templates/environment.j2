@@ -1,0 +1,8 @@
+# Jellyfin Environment Configuration
+
+# User/Group Configuration
+PUID={{ jellyfin_puid | default('1001') }}
+PGID={{ jellyfin_pgid | default('1001') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}

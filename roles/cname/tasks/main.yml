@@ -1,5 +1,7 @@
-- name: Create DNS folder for cname entries
-  file:
-    path: "{{ playbook_dir }}/files/dns/cname"
-    state: directory
-  delegate_to: 127.0.0.1
+#- name: Create DNS folder for cname entries
+#  file:
+#    path: "{{ playbook_dir }}/files/dns/cname"
+#    state: directory
+#    mode: '0755'
+#  delegate_to: 127.0.0.1
+#  become: false

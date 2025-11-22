@@ -1,0 +1,48 @@
+---
+# Setup tasks for Jellyfin environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create jellyfin config directory locally
+  file:
+    path: "{{ playbook_dir }}/files/config/jellyfin"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/jellyfin/environment"
+  register: jellyfin_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: environment.j2
+    dest: "{{ playbook_dir }}/files/config/jellyfin/environment"
+    mode: '0640'
+  when: not jellyfin_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Jellyfin environment file created at: {{ playbook_dir }}/files/config/jellyfin/environment
+
+      Please review and update the following settings:
+      - PUID/PGID: User and group IDs for container permissions
+      - TZ: Timezone for the service
+      - JELLYFIN_PublishedServerUrl: Public URL for the Jellyfin server
+
+      Media library volumes should be configured in your inventory file using the 'jellyfin_volumes' variable.
+      Example:
+        jellyfin_volumes:
+          - { host_folder: "/mnt/media/movies", container: "/movies" }
+          - { host_folder: "/mnt/media/tv", container: "/tv" }
+
+      After configuration, deploy with: ansible-playbook site.yml --limit jellyfin
+  when: not jellyfin_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

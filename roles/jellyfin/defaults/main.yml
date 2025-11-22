@@ -1,0 +1,12 @@
+---
+# Jellyfin default configuration variables
+
+# Port configuration
+jellyfin_port: 8096
+jellyfin_https_port: 8920
+jellyfin_discovery_port: 7359
+jellyfin_dlna_port: 1900
+
+# User/Group IDs
+jellyfin_puid: 1001
+jellyfin_pgid: 1001

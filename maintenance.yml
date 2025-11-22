@@ -50,6 +50,12 @@
     - name: "Update Portainer"
       include_tasks: roles/portainer/tasks/update.yml
 
+- hosts: "jellyfin"
+  remote_user: ansible
+  tasks:
+    - name: "Update Jellyfin"
+      include_tasks: roles/jellyfin/tasks/update.yml
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:
