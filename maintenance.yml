@@ -31,10 +31,20 @@
 - hosts: "containers"
   remote_user: ansible
   tasks:
+    - name: "Update Traefik"
+      include_tasks: roles/traefik/tasks/update.yml
     - name: "Update Watchtower"
       include_tasks: roles/watchtower/tasks/update.yml
+    - name: "Update Portainer"
+      include_tasks: roles/portainer/tasks/update.yml
 
-- hosts: "containers:portainer"
+- hosts: "edge"
+  remote_user: ansible
+  tasks:
+    - name: "Update Traefik"
+      include_tasks: roles/traefik/tasks/update.yml
+
+- hosts: "portainer"
   remote_user: ansible
   tasks:
     - name: "Update Portainer"

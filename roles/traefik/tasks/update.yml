@@ -1,0 +1,26 @@
+---
+- name: Update Traefik container with latest image
+  community.docker.docker_compose_v2:
+    project_src: /data/services
+    files:
+      - traefik.yml
+    state: present
+    pull: always
+    recreate: always
+    remove_orphans: false
+
+- name: Wait for Traefik container to be running
+  community.docker.docker_container_info:
+    name: traefik
+  register: traefik_status
+  until: traefik_status.container.State.Running | default(false)
+  retries: 5
+  delay: 2
+
+- name: Display update status
+  debug:
+    msg: "Traefik has been updated and is running"
+
+- name: Remove dangling Traefik images
+  command: docker image prune -f
+  changed_when: true
