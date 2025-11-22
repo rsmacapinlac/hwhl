@@ -5,3 +5,4 @@
     files:
       - compose.yml
     state: restarted
+    remove_orphans: false

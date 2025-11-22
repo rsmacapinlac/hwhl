@@ -1,9 +1,4 @@
 ---
-- name: Pull latest PiHole image
-  community.docker.docker_image_pull:
-    name: pihole/pihole:latest
-  register: image_pull
-
 - name: Update PiHole container with latest image
   community.docker.docker_compose_v2:
     project_src: /data/services/pihole
@@ -12,34 +7,20 @@
     state: present
     pull: always
     recreate: always
+    remove_orphans: false
+
+- name: Wait for PiHole container to be running
+  community.docker.docker_container_info:
+    name: pihole
+  register: pihole_status
+  until: pihole_status.container.State.Running | default(false)
+  retries: 5
+  delay: 2
 
 - name: Display update status
   debug:
-    msg: "PiHole container has been recreated"
+    msg: "PiHole has been updated and is running"
 
-- name: Get list of all PiHole images
-  command: docker images pihole/pihole --format "{{ '{{' }}.ID{{ '}}' }}|{{ '{{' }}.CreatedAt{{ '}}' }}" --no-trunc
-  register: pihole_images
-  changed_when: false
-
-- name: Identify old PiHole images to remove (keep 3 most recent)
-  set_fact:
-    images_to_remove: "{{ pihole_images.stdout_lines | map('split', '|') | sort(attribute='1', reverse=true) | map(attribute='0') | list | [3:] }}"
-  when: pihole_images.stdout_lines | length > 3
-
-- name: Remove old PiHole images
-  community.docker.docker_image:
-    name: "{{ item }}"
-    state: absent
-    force_absent: true
-  loop: "{{ images_to_remove }}"
-  when:
-    - images_to_remove is defined
-    - images_to_remove | length > 0
-
-- name: Display cleanup status
-  debug:
-    msg: "Removed {{ images_to_remove | length }} old PiHole image(s), kept 3 most recent"
-  when:
-    - images_to_remove is defined
-    - images_to_remove | length > 0
+- name: Remove dangling PiHole images
+  command: docker image prune -f
+  changed_when: true

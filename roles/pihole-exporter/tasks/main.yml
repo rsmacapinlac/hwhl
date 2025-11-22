@@ -52,5 +52,6 @@
     files:
       - compose.yml
     state: present
+    remove_orphans: false
   when: not exporter_container.container.Status.Running | default(false)
   notify: restart pihole-exporter

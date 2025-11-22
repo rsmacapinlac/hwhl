@@ -70,7 +70,8 @@
     files:
       - compose.yml
     state: present
-  when: 
+    remove_orphans: false
+  when:
     - not kimai_container.container.Status.Running | default(false)
     - compose_file.stat.exists
   notify: restart kimai 

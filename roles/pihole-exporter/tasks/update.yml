@@ -1,9 +1,4 @@
 ---
-- name: Pull latest PiHole Exporter image
-  community.docker.docker_image_pull:
-    name: ekofr/pihole-exporter:latest
-  register: image_pull
-
 - name: Update PiHole Exporter container with latest image
   community.docker.docker_compose_v2:
     project_src: /data/services/pihole-exporter
@@ -12,34 +7,30 @@
     state: present
     pull: always
     recreate: always
+    remove_orphans: false
+  register: compose_update
+  ignore_errors: true
+
+- name: Wait for PiHole Exporter container to be running
+  community.docker.docker_container_info:
+    name: pihole-exporter
+  register: exporter_status
+  until: exporter_status.container.State.Running | default(false)
+  retries: 5
+  delay: 2
+  when: compose_update is succeeded
 
 - name: Display update status
   debug:
-    msg: "PiHole Exporter container has been recreated"
+    msg: "PiHole Exporter has been updated and is running"
+  when: compose_update is succeeded
 
-- name: Get list of all PiHole Exporter images
-  command: docker images ekofr/pihole-exporter --format "{{ '{{' }}.ID{{ '}}' }}|{{ '{{' }}.CreatedAt{{ '}}' }}" --no-trunc
-  register: exporter_images
-  changed_when: false
-
-- name: Identify old PiHole Exporter images to remove (keep 3 most recent)
-  set_fact:
-    images_to_remove: "{{ exporter_images.stdout_lines | map('split', '|') | sort(attribute='1', reverse=true) | map(attribute='0') | list | [3:] }}"
-  when: exporter_images.stdout_lines | length > 3
-
-- name: Remove old PiHole Exporter images
-  community.docker.docker_image:
-    name: "{{ item }}"
-    state: absent
-    force_absent: true
-  loop: "{{ images_to_remove }}"
-  when:
-    - images_to_remove is defined
-    - images_to_remove | length > 0
-
-- name: Display cleanup status
+- name: Display skip message when DNS unavailable
   debug:
-    msg: "Removed {{ images_to_remove | length }} old PiHole Exporter image(s), kept 3 most recent"
-  when:
-    - images_to_remove is defined
-    - images_to_remove | length > 0
+    msg: "Skipped PiHole Exporter update - DNS server unavailable or update failed"
+  when: compose_update is failed
+
+- name: Remove dangling PiHole Exporter images
+  command: docker image prune -f
+  changed_when: true
+  when: compose_update is succeeded

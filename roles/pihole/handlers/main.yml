@@ -6,3 +6,4 @@
       - compose.yml
     state: present
     recreate: always
+    remove_orphans: false

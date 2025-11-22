@@ -1,9 +1,4 @@
 ---
-- name: Pull latest BorgBackup image
-  community.docker.docker_image_pull:
-    name: ghcr.io/borgmatic-collective/borgmatic:latest
-  register: image_pull
-
 - name: Update BorgBackup container with latest image
   community.docker.docker_compose_v2:
     project_src: /data/services
@@ -12,36 +7,21 @@
     state: present
     pull: always
     recreate: always
-  when: image_pull.changed
+    remove_orphans: false
+  register: compose_update
+
+- name: Wait for BorgBackup container to be running
+  community.docker.docker_container_info:
+    name: borgbackup
+  register: borgbackup_status
+  until: borgbackup_status.container.State.Running | default(false)
+  retries: 5
+  delay: 2
 
 - name: Display update status
   debug:
-    msg: "BorgBackup has been updated to the latest version"
-  when: image_pull.changed
+    msg: "BorgBackup has been updated and is running"
 
-- name: Get list of all BorgBackup images
-  command: docker images ghcr.io/borgmatic-collective/borgmatic --format "{{ '{{' }}.ID{{ '}}' }}|{{ '{{' }}.CreatedAt{{ '}}' }}" --no-trunc
-  register: borgbackup_images
-  changed_when: false
-
-- name: Identify old BorgBackup images to remove (keep 3 most recent)
-  set_fact:
-    images_to_remove: "{{ borgbackup_images.stdout_lines | map('split', '|') | sort(attribute='1', reverse=true) | map(attribute='0') | list | [3:] }}"
-  when: borgbackup_images.stdout_lines | length > 3
-
-- name: Remove old BorgBackup images
-  community.docker.docker_image:
-    name: "{{ item }}"
-    state: absent
-    force_absent: true
-  loop: "{{ images_to_remove }}"
-  when:
-    - images_to_remove is defined
-    - images_to_remove | length > 0
-
-- name: Display cleanup status
-  debug:
-    msg: "Removed {{ images_to_remove | length }} old BorgBackup image(s), kept 3 most recent"
-  when:
-    - images_to_remove is defined
-    - images_to_remove | length > 0
+- name: Remove dangling BorgBackup images
+  command: docker image prune -f
+  changed_when: true

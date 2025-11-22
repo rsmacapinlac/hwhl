@@ -5,4 +5,5 @@
     files:
       - compose.yml
     state: present
-    recreate: always 
+    recreate: always
+    remove_orphans: false 
