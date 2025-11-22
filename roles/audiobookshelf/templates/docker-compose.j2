@@ -10,17 +10,19 @@ services:
       - {{ item.host_folder }}:{{ item.container }}
 {% endfor %}
     ports:
-      - '13378:80'
+      - '{{ audiobookshelf_port }}:80'
+    env_file:
+      - .env
     restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.audiobookshelf.entrypoints=http"
-      - "traefik.http.routers.audiobookshelf.rule=Host(`audiobookshelf.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.audiobookshelf.rule=Host(`audiobookshelf.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
       - "traefik.http.middlewares.audiobookshelf-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.audiobookshelf.middlewares=audiobookshelf-https-redirect"
       - "traefik.http.routers.audiobookshelf-secure.entrypoints=https"
-      - "traefik.http.routers.audiobookshelf-secure.rule=Host(`audiobookshelf.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.audiobookshelf-secure.rule=Host(`audiobookshelf.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.audiobookshelf-secure.tls=true"
       - "traefik.http.routers.audiobookshelf-secure.service=audiobookshelf"
       - "traefik.http.services.audiobookshelf.loadbalancer.server.port=80"

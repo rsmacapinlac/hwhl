@@ -90,3 +90,12 @@
       include_tasks: roles/jellyfin/tasks/setup.yml
       run_once: true
       when: groups['jellyfin'] is defined and groups['jellyfin'] | length > 0
+
+- name: "Setup Audiobookshelf"
+  hosts: audiobookshelf
+  connection: local
+  tasks:
+    - name: "Run Audiobookshelf setup if group exists"
+      include_tasks: roles/audiobookshelf/tasks/setup.yml
+      run_once: true
+      when: groups['audiobookshelf'] is defined and groups['audiobookshelf'] | length > 0

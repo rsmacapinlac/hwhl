@@ -140,6 +140,8 @@
   roles:
     - role: shares
     - role: audiobookshelf
+      tags:
+        - audiobookshelf
 
 # Plan to deprecate this
 - hosts: "docker"

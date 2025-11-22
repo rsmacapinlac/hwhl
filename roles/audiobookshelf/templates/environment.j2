@@ -1,0 +1,8 @@
+# Audiobookshelf Environment Configuration
+
+# User/Group Configuration
+PUID={{ audiobookshelf_puid | default('1001') }}
+PGID={{ audiobookshelf_pgid | default('1001') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}

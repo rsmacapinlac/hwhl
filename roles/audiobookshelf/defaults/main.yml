@@ -1,0 +1,9 @@
+---
+# Audiobookshelf default configuration variables
+
+# Port configuration
+audiobookshelf_port: 13378
+
+# User/Group IDs
+audiobookshelf_puid: 1001
+audiobookshelf_pgid: 1001
