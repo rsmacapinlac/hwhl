@@ -93,7 +93,6 @@ roles/{service}/
     owner: ansible
     group: docker
     mode: '0644'
-  when: not {service}_container.container.Status.Running | default(false)
   notify: restart {service}
 
 # Container deployment using docker_compose_v2
@@ -313,10 +312,18 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.{service}.rule=Host(`{service}.{{ domain }}`)"
-      - "traefik.http.routers.{service}.entrypoints=websecure"
-      - "traefik.http.routers.{service}.tls.certresolver=cloudflare"
+      # HTTP router with redirect to HTTPS
+      - "traefik.http.routers.{service}.entrypoints=http"
+      - "traefik.http.routers.{service}.rule=Host(`{service}.{{ ansible_facts[\"hostname\"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.{service}-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.{service}.middlewares={service}-https-redirect"
+      # HTTPS router
+      - "traefik.http.routers.{service}-secure.entrypoints=https"
+      - "traefik.http.routers.{service}-secure.rule=Host(`{service}.{{ ansible_facts[\"hostname\"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.{service}-secure.tls=true"
+      - "traefik.http.routers.{service}-secure.service={service}"
       - "traefik.http.services.{service}.loadbalancer.server.port=3000"
+      - "traefik.docker.network=proxy"
     networks:
       - proxy
 
@@ -328,9 +335,11 @@ networks:
 
 **Characteristics:**
 - Traefik labels for routing and SSL
+- HTTP to HTTPS automatic redirect
 - Connected to external proxy network
 - Watchtower enabled for updates
 - Configurable ports for conflict resolution
+- Uses modern `ansible_facts["hostname"]` syntax
 
 ### Monitoring/Backend Services (No Traefik)
 Services for internal monitoring or metrics export:
@@ -402,6 +411,164 @@ volumes:
     - role: {service}
 ```
 
+## Common Pitfalls and Solutions
+
+### 1. Privilege Escalation with Local Tasks
+
+**Problem:** Tasks delegated to localhost (using `delegate_to: 127.0.0.1` or `local_action`) inherit privilege escalation from the parent play, causing sudo password prompts on your local machine.
+
+**Symptom:**
+```
+[ERROR]: Task failed: Duplicate become password prompt encountered waiting for become success.
+[sudo via ansible, key=...] password:
+```
+
+**Solution:** Explicitly disable privilege escalation for local tasks:
+```yaml
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/{service}/environment"
+  register: env_file
+  become: false  # ← Critical for local tasks
+
+- name: Create config directory locally
+  file:
+    path: "{{ playbook_dir }}/files/config/{service}"
+    state: directory
+  delegate_to: 127.0.0.1
+  become: false  # ← Critical for delegated local tasks
+```
+
+**Why:** Local tasks creating files in your workspace don't need sudo privileges. Always add `become: false` to tasks that run on localhost.
+
+### 2. Overly Aggressive Conditional Deployment
+
+**Problem:** Adding conditionals to the docker-compose template deployment prevents configuration updates when containers are already running.
+
+**Bad Pattern:**
+```yaml
+- name: Setup docker compose file for {service}
+  template:
+    src: docker-compose.j2
+    dest: /data/services/{service}/compose.yml
+  when: not {service}_container.container.State.Running | default(false)  # ❌ Prevents updates!
+  notify: restart {service}
+```
+
+**Symptom:** Running the playbook doesn't update the compose file on the server even though the template has changed.
+
+**Good Pattern:**
+```yaml
+- name: Setup docker compose file for {service}
+  template:
+    src: docker-compose.j2
+    dest: /data/services/{service}/compose.yml
+  notify: restart {service}  # ✅ Always deploys, handler only runs if changed
+```
+
+**Why:** The `template` module is idempotent and only reports `changed` if the file content actually differs. Let Ansible's change detection trigger the handler, not manual conditionals.
+
+**When to use conditionals:**
+- Directory creation (only needed for first deployment)
+- Initial container deployment (to avoid unnecessary recreation)
+
+**When NOT to use conditionals:**
+- Template deployment (let Ansible detect changes)
+- Environment file deployment (should always sync)
+
+### 3. Incorrect Traefik Label Patterns
+
+**Problem:** Using simplified Traefik patterns that don't match the infrastructure's standard configuration.
+
+**Bad Pattern (No HTTP Support):**
+```yaml
+labels:
+  - "traefik.enable=true"
+  - "traefik.http.routers.{service}.entrypoints=websecure"  # ❌ Only HTTPS, HTTP fails
+  - "traefik.http.routers.{service}.rule=Host(`{service}.domain`)"
+  - "traefik.http.routers.{service}.tls.certresolver=cloudflare"
+```
+
+**Symptom:** Service only accessible via HTTPS, HTTP requests fail or timeout.
+
+**Good Pattern (HTTP to HTTPS Redirect):**
+```yaml
+labels:
+  - "traefik.enable=true"
+  # HTTP router with redirect
+  - "traefik.http.routers.{service}.entrypoints=http"
+  - "traefik.http.routers.{service}.rule=Host(`{service}.{{ ansible_facts[\"hostname\"] }}.{{ homelab_domain }}`)"
+  - "traefik.http.middlewares.{service}-https-redirect.redirectscheme.scheme=https"
+  - "traefik.http.routers.{service}.middlewares={service}-https-redirect"
+  # HTTPS router
+  - "traefik.http.routers.{service}-secure.entrypoints=https"
+  - "traefik.http.routers.{service}-secure.rule=Host(`{service}.{{ ansible_facts[\"hostname\"] }}.{{ homelab_domain }}`)"
+  - "traefik.http.routers.{service}-secure.tls=true"
+  - "traefik.http.routers.{service}-secure.service={service}"
+  - "traefik.http.services.{service}.loadbalancer.server.port=8080"
+  - "traefik.docker.network=proxy"  # ✅ Important for multi-network setups
+```
+
+**Why:** This pattern creates two routers:
+1. HTTP router that redirects all traffic to HTTPS
+2. HTTPS router that serves the actual service
+
+**Reference Implementation:** Compare with working roles like `kavita`, `semaphore`, or `jellyfin`.
+
+### 4. Ansible Facts Deprecation
+
+**Problem:** Using old-style fact variables that will be removed in Ansible 2.24+.
+
+**Deprecated Pattern:**
+```yaml
+environment:
+  - PUBLISHED_URL=service.{{ ansible_hostname }}.{{ homelab_domain }}  # ❌ Deprecated
+```
+
+**Deprecation Warning:**
+```
+[DEPRECATION WARNING]: INJECT_FACTS_AS_VARS default to `True` is deprecated,
+top-level facts will not be auto injected after the change.
+```
+
+**Modern Pattern:**
+```yaml
+environment:
+  - PUBLISHED_URL=service.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}  # ✅ Future-proof
+```
+
+**Common Replacements:**
+- `ansible_hostname` → `ansible_facts["hostname"]`
+- `ansible_os_family` → `ansible_facts["os_family"]`
+- `ansible_distribution` → `ansible_facts["distribution"]`
+
+**Why:** Ansible is moving to namespace all facts under `ansible_facts` to avoid variable naming conflicts.
+
+### 5. Environment Variables in Wrong Location
+
+**Problem:** Mixing static and dynamic environment variables incorrectly.
+
+**When to use `env_file: .env`:**
+- Static configuration (API keys, passwords, user IDs)
+- Shared across hosts
+- Managed via `templates/environment.j2`
+
+**When to use inline `environment:`:**
+- Dynamic per-host values (hostnames, URLs)
+- Values that change per deployment
+- Values using Ansible variables
+
+**Good Pattern:**
+```yaml
+services:
+  jellyfin:
+    env_file:
+      - .env  # Static: PUID, PGID, TZ
+    environment:
+      - JELLYFIN_PublishedServerUrl=jellyfin.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}  # Dynamic per host
+```
+
 ## Best Practices
 
 1. **Always validate environment files exist** before deployment
@@ -410,34 +577,66 @@ volumes:
 4. **Use handlers** for service restarts to avoid unnecessary recreation
 5. **Make conflicting settings configurable** (especially ports)
 6. **Follow consistent naming** conventions across roles
-7. **Use conditional deployment** to avoid unnecessary container recreation
+7. **Use conditional deployment sparingly** - only for directory creation and initial container deployment, not for template deployment
 8. **Implement proper error handling** with meaningful error messages
 9. **Include `remove_orphans: false`** in docker_compose_v2 calls to prevent accidental container removal
 10. **Use Jinja2 defaults** in environment templates for better flexibility
 11. **Choose appropriate service patterns** based on service type (user-facing vs monitoring vs database)
 12. **Implement update tasks** for services requiring frequent updates
 13. **Add container health checks** when implementing update workflows
+14. **Always add `become: false`** to tasks using `local_action` or `delegate_to: 127.0.0.1`
+15. **Use modern `ansible_facts["fact_name"]` syntax** instead of deprecated `ansible_fact_name` variables
+16. **Compare Traefik labels** with working roles (kavita, semaphore, jellyfin) before deploying new services
 
-## Examples of Modern Pattern Implementation
+## Reference Implementations
 
-### Full-Featured User-Facing Services
-- **semaphore**: Recently upgraded role demonstrating full modern pattern with Traefik
-- **kasm**: Environment file management and configurable deployment
-- **immich**: Complete modern pattern with setup integration
-- **kimai**: Template-based configuration with validation
+### Fully Compliant Roles (Audited & Migrated)
 
-### Monitoring and Backend Services
-- **pihole-exporter**: Demonstrates update tasks, Jinja2 defaults, multi-value configuration
-  - Update tasks with health checking (`tasks/update.yml`)
-  - Advanced environment templates with defaults
-  - Minimal compose configuration (no Traefik)
-  - Error handling for dependency unavailability
-- **prometheus**: Advanced configuration with custom templates
+- **jellyfin** - Complete modern pattern implementation (migrated Nov 2024)
+  - 100% compliance (35/35 patterns)
+  - User-facing media server with Traefik
+  - Multi-host deployment (ritchie and media)
+  - Reference: See "Migration Case Study" below
 
-### Pattern Highlights by Role
-| Role | Environment Templates | Update Tasks | Traefik Integration | Jinja2 Defaults |
-|------|----------------------|--------------|--------------------|--------------------|
-| semaphore | ✓ | - | ✓ | - |
-| pihole-exporter | ✓ | ✓ | - | ✓ |
-| immich | ✓ | - | ✓ | - |
-| prometheus | ✓ | - | - | ✓ |
+### Other Notable Implementations
+
+These roles implement various modern patterns but have not been formally audited:
+
+- **pihole-exporter** - Monitoring service with update tasks and Jinja2 defaults
+- **semaphore** - User-facing service with Traefik integration
+- **immich** - User-facing service with setup integration
+- **kasm** - Environment file management example
+- **kimai** - Template-based configuration
+- **prometheus** - Advanced configuration with custom templates
+
+> **Note:** To audit a role against these patterns, use `/audit-role {role-name}` slash command.
+
+### Migration Case Study: Jellyfin
+
+**Legacy State (Pre-Migration):**
+- Shell-based deployment (`docker compose -f jellyfin.yml up -d`)
+- No environment file management
+- Flat file structure (`/data/services/jellyfin.yml`)
+- Hardcoded configuration in compose template
+- No setup or update integration
+- Old Ansible facts syntax (`ansible_hostname`)
+- Incomplete Traefik labels (no HTTP redirect)
+
+**Modern State (Post-Migration):**
+- `docker_compose_v2` module-based deployment
+- Environment file template with Jinja2 defaults
+- Service-specific directory (`/data/services/jellyfin/compose.yml`)
+- Configuration separated into environment file and compose template
+- Full site-setup.yml and maintenance.yml integration
+- Modern facts syntax (`ansible_facts["hostname"]`)
+- Complete Traefik HTTP-to-HTTPS redirect pattern
+- Configurable ports via defaults
+
+**Compliance:** 100% (35/35 patterns implemented)
+
+**Key Lessons Learned:**
+1. Don't over-use conditionals - let Ansible's change detection work
+2. Always add `become: false` to local tasks
+3. Match Traefik patterns with existing working roles
+4. Separate static (env_file) from dynamic (environment) configuration
+5. Use modern `ansible_facts` to avoid future deprecation
