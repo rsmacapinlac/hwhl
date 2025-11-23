@@ -1,26 +1,21 @@
-version: '3.5'
+---
 services:
   tubearchivist:
     container_name: tubearchivist
     restart: unless-stopped
     image: bbilly1/tubearchivist
+    env_file:
+      - .env
     ports:
-      - 8000:8000
+      - {{ tubearchivist_port }}:8000
     volumes:
 {% for item in tubearchivist %}
       - {{ item.host_folder }}:{{ item.container }}
 {% endfor %}
       - /data/containers/tubearchivist/cache:/cache
     environment:
-      - ES_URL=http://archivist-es:9200     # needs protocol e.g. http and port
-      - REDIS_CON=redis://archivist-redis:6379          # don't add protocol
-      - HOST_UID=1001
-      - HOST_GID=1001
-      - TA_HOST=https://tubearchivist.{{ ansible_hostname }}.{{ homelab_domain }} {{ ansible_hostname }}.int.{{ homelab_domain }} {{ extra_ta_hosts }}
-      - TA_USERNAME={{ ta_username }}                   # your initial TA credentials
-      - TA_PASSWORD={{ ta_password }}            # your initial TA credentials
-      - ELASTIC_PASSWORD={{ elastic_password }}     # set password for Elasticsearch
-      - TZ={{ timezone }} # set your time zone
+      - HOST_UID={{ tubearchivist_puid | default('1001') }}
+      - HOST_GID={{ tubearchivist_pgid | default('1001') }}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 2m
@@ -34,11 +29,11 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.tubearchivist.entrypoints=http"
-      - "traefik.http.routers.tubearchivist.rule=Host(`tubearchivist.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.tubearchivist.rule=Host(`tubearchivist.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
       - "traefik.http.middlewares.tubearchivist-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.tubearchivist.middlewares=tubearchivist-https-redirect"
       - "traefik.http.routers.tubearchivist-secure.entrypoints=https"
-      - "traefik.http.routers.tubearchivist-secure.rule=Host(`tubearchivist.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.tubearchivist-secure.rule=Host(`tubearchivist.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.tubearchivist-secure.tls=true"
       - "traefik.http.routers.tubearchivist-secure.service=tubearchivist"
       - "traefik.http.services.tubearchivist.loadbalancer.server.port=8000"
@@ -50,6 +45,8 @@ services:
     image: redis
     container_name: archivist-redis
     restart: unless-stopped
+    env_file:
+      - .env
     expose:
       - "6379"
     volumes:
@@ -60,12 +57,12 @@ services:
       - proxy
 
   archivist-es:
-    image: bbilly1/tubearchivist-es         # only for amd64, or use official es 8.11.0
+    image: bbilly1/tubearchivist-es
     container_name: archivist-es
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      - "ELASTIC_PASSWORD={{ elastic_password }}"       # matching Elasticsearch password
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "xpack.security.enabled=true"
       - "discovery.type=single-node"
       - "path.repo=/usr/share/elasticsearch/data/snapshot"
@@ -74,7 +71,7 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - /data/containers/tubearchivist/es:/usr/share/elasticsearch/data    # check for permission error when using bind mount, see readme
+      - /data/containers/tubearchivist/es:/usr/share/elasticsearch/data
     expose:
       - "9200"
     networks:

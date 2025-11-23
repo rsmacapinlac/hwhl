@@ -62,6 +62,12 @@
     - name: "Update Audiobookshelf"
       include_tasks: roles/audiobookshelf/tasks/update.yml
 
+- hosts: "tubearchivist"
+  remote_user: ansible
+  tasks:
+    - name: "Update TubeArchivist"
+      include_tasks: roles/tubearchivist/tasks/update.yml
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

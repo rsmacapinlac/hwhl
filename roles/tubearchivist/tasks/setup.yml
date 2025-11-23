@@ -1,0 +1,48 @@
+---
+# Setup tasks for TubeArchivist environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create tubearchivist config directory locally
+  file:
+    path: "{{ playbook_dir }}/files/config/tubearchivist"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/tubearchivist/environment"
+  register: tubearchivist_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/files/config/tubearchivist/environment"
+    mode: '0640'
+  when: not tubearchivist_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      TubeArchivist environment file created at: {{ playbook_dir }}/files/config/tubearchivist/environment
+
+      Please review and update the following settings:
+      - PUID/PGID: User and group IDs for container permissions
+      - TZ: Timezone for the service
+      - TA_USERNAME/TA_PASSWORD: Initial TubeArchivist admin credentials
+      - ELASTIC_PASSWORD: Password for Elasticsearch
+
+      Media library volumes should be configured in your inventory file using the 'tubearchivist' variable.
+      Example:
+        tubearchivist:
+          - { host_folder: "/mnt/media/youtube", container: "/youtube" }
+
+      After configuration, deploy with: ansible-playbook site.yml --limit tubearchivist
+  when: not tubearchivist_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

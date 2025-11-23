@@ -1,0 +1,21 @@
+# TubeArchivist Environment Configuration
+
+# User/Group Configuration
+PUID={{ tubearchivist_puid | default('1001') }}
+PGID={{ tubearchivist_pgid | default('1001') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# TubeArchivist Configuration
+TA_HOST=https://tubearchivist.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}
+TA_USERNAME={{ ta_username }}
+TA_PASSWORD={{ ta_password }}
+
+# Elasticsearch Configuration
+ES_URL=http://archivist-es:9200
+ELASTIC_PASSWORD={{ elastic_password }}
+ES_JAVA_OPTS=-Xms512m -Xmx512m
+
+# Redis Configuration
+REDIS_CON=redis://archivist-redis:6379

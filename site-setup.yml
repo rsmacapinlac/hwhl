@@ -99,3 +99,12 @@
       include_tasks: roles/audiobookshelf/tasks/setup.yml
       run_once: true
       when: groups['audiobookshelf'] is defined and groups['audiobookshelf'] | length > 0
+
+- name: "Setup TubeArchivist"
+  hosts: tubearchivist
+  connection: local
+  tasks:
+    - name: "Run TubeArchivist setup if group exists"
+      include_tasks: roles/tubearchivist/tasks/setup.yml
+      run_once: true
+      when: groups['tubearchivist'] is defined and groups['tubearchivist'] | length > 0

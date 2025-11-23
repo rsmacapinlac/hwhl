@@ -1,0 +1,9 @@
+---
+# TubeArchivist default configuration variables
+
+# Port configuration
+tubearchivist_port: 8000
+
+# User/Group IDs
+tubearchivist_puid: 1001
+tubearchivist_pgid: 1001

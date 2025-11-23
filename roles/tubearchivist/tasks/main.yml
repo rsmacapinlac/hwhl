@@ -1,16 +1,36 @@
-- name: Create tubearchivist services folder
-  ansible.builtin.file:
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/tubearchivist/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/tubearchivist/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if tubearchivist container exists
+  community.docker.docker_container_info:
+    name: tubearchivist
+  register: tubearchivist_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create tubearchivist service folder
+  become: true
+  file:
     path: /data/services/tubearchivist
     state: directory
     owner: ansible
     group: docker
-
-- name: Setup docker compose file for TubeArchivist stack
-  template:
-    src: docker-compose.j2
-    dest: /data/services/tubearchivist/compose.yml
-    owner: ansible
-    group: docker
+    mode: '0755'
+  when: not tubearchivist_container.container.State.Running | default(false)
 
 # Fix to elastic search issue: https://github.com/tubearchivist/tubearchivist?tab=readme-ov-file#common-errors
 - name: Ensure elastic search folder has the correct owner
@@ -21,6 +41,32 @@
     recurse: true
     owner: 1000
 
-- name: Run container
-  shell:
-    cmd: "docker compose -f /data/services/tubearchivist/compose.yml up -d"
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/tubearchivist/environment"
+    dest: /data/services/tubearchivist/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+
+# Docker Compose deployment
+- name: Setup docker compose file for tubearchivist
+  template:
+    src: docker-compose.j2
+    dest: /data/services/tubearchivist/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart tubearchivist
+
+# Container deployment using docker_compose_v2
+- name: Run tubearchivist container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/tubearchivist
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not tubearchivist_container.container.State.Running | default(false)
+  notify: restart tubearchivist

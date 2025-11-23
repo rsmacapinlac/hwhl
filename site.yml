@@ -103,6 +103,8 @@
   remote_user: ansible
   roles:
     - role: tubearchivist
+      tags:
+        - tubearchivist
 
 - hosts: "obsidian"
   remote_user: ansible
