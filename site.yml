@@ -110,6 +110,8 @@
   remote_user: ansible
   roles:
     - role: obsidian
+      tags:
+        - obsidian
 
 - hosts: "cura"
   remote_user: ansible

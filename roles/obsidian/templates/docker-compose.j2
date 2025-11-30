@@ -1,37 +1,32 @@
+---
 services:
   obsidian:
-    image: lscr.io/linuxserver/obsidian:latest
     container_name: obsidian
-    security_opt:
-      - seccomp:unconfined #optional
-    environment:
-      - PUID=1001
-      - PGID=1001
-      - TZ={{ timezone }}
+    image: lscr.io/linuxserver/obsidian:latest
+    ports:
+      - {{ obsidian_http_port }}:3000
+      - {{ obsidian_https_port }}:3001
+    env_file:
+      - .env
     volumes:
       - /data/containers/obsidian:/config
-    ports:
-      - 8080:3000
-    #devices:
-    #  - /dev/dri:/dev/dri #optional
     shm_size: "1gb"
+    restart: unless-stopped
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.obsidian-by-hostname.entrypoints=http"
-      - "traefik.http.routers.obsidian-by-hostname.rule=Host(`obsidian.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-
-      - "traefik.http.middlewares.obsidian-by-hostname-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.obsidian-by-hostname.middlewares=obsidian-by-hostname-https-redirect"
-
-      - "traefik.http.routers.obsidian-by-hostname-secure.entrypoints=https"
-      - "traefik.http.routers.obsidian-by-hostname-secure.rule=Host(`obsidian.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-      - "traefik.http.routers.obsidian-by-hostname-secure.tls=true"
-      - "traefik.http.routers.obsidian-by-hostname-secure.service=obsidian"
-
-      - "traefik.http.services.obsidian.loadbalancer.server.port=8080"
+      # HTTP router with redirect to HTTPS
+      - "traefik.http.routers.obsidian.entrypoints=http"
+      - "traefik.http.routers.obsidian.rule=Host(`obsidian.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.obsidian-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.obsidian.middlewares=obsidian-https-redirect"
+      # HTTPS router
+      - "traefik.http.routers.obsidian-secure.entrypoints=https"
+      - "traefik.http.routers.obsidian-secure.rule=Host(`obsidian.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.obsidian-secure.tls=true"
+      - "traefik.http.routers.obsidian-secure.service=obsidian"
+      - "traefik.http.services.obsidian.loadbalancer.server.port=3000"
       - "traefik.docker.network=proxy"
-    restart: unless-stopped
     networks:
       - proxy
 

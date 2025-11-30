@@ -108,3 +108,12 @@
       include_tasks: roles/tubearchivist/tasks/setup.yml
       run_once: true
       when: groups['tubearchivist'] is defined and groups['tubearchivist'] | length > 0
+
+- name: "Setup Obsidian"
+  hosts: obsidian
+  connection: local
+  tasks:
+    - name: "Run Obsidian setup if group exists"
+      include_tasks: roles/obsidian/tasks/setup.yml
+      run_once: true
+      when: groups['obsidian'] is defined and groups['obsidian'] | length > 0
