@@ -1,0 +1,57 @@
+---
+- name: Check if environment file exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/blinko/environment"
+  register: blinko_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/blinko/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not blinko_env_file.stat.exists
+
+- name: Check if blinko container exists
+  community.docker.docker_container_info:
+    name: blinko
+  register: blinko_container
+  ignore_errors: true
+
+- name: Create services folder
+  become: true
+  file:
+    path: /data/services/blinko
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not blinko_container.container.State.Running | default(false)
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/blinko/environment"
+    dest: /data/services/blinko/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+
+- name: Setup docker compose file for blinko
+  template:
+    src: docker-compose.j2
+    dest: /data/services/blinko/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart blinko
+
+- name: Run blinko container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/blinko
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not blinko_container.container.State.Running | default(false)
+  notify: restart blinko

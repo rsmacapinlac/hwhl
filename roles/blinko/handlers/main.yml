@@ -1,0 +1,8 @@
+---
+- name: restart blinko
+  community.docker.docker_compose_v2:
+    project_src: /data/services/blinko
+    files:
+      - compose.yml
+    state: restarted
+    remove_orphans: false

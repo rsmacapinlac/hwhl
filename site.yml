@@ -290,3 +290,10 @@
   remote_user: ansible
   roles:
     - role: kasm
+
+- hosts: "blinko"
+  remote_user: ansible
+  roles:
+    - role: blinko
+      tags:
+        - blinko

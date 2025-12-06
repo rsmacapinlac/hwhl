@@ -68,6 +68,12 @@
     - name: "Update TubeArchivist"
       include_tasks: roles/tubearchivist/tasks/update.yml
 
+- hosts: "blinko"
+  remote_user: ansible
+  tasks:
+    - name: "Update Blinko"
+      include_tasks: roles/blinko/tasks/update.yml
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

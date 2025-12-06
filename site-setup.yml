@@ -117,3 +117,12 @@
       include_tasks: roles/obsidian/tasks/setup.yml
       run_once: true
       when: groups['obsidian'] is defined and groups['obsidian'] | length > 0
+
+- name: "Setup Blinko"
+  hosts: blinko
+  connection: local
+  tasks:
+    - name: "Run Blinko setup if group exists"
+      include_tasks: roles/blinko/tasks/setup.yml
+      run_once: true
+      when: groups['blinko'] is defined and groups['blinko'] | length > 0

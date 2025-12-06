@@ -1,0 +1,26 @@
+# Blinko Configuration
+# Documentation: https://docs.blinko.space/en/install
+
+# CRITICAL SECURITY: MUST change this value before deployment
+# Generate a secure random string for production use
+NEXTAUTH_SECRET=change_this_to_a_secure_random_string
+
+# Application Configuration
+NODE_ENV=production
+NEXTAUTH_URL=https://blinko.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}
+
+# Database Configuration
+# Note: Database runs in separate container with hostname 'blinko-db'
+DATABASE_URL=postgresql://postgres:change_this_postgres_password@blinko-db:5432/postgres
+
+# PostgreSQL Database Settings
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=change_this_postgres_password
+
+# Timezone Configuration
+TZ={{ timezone | default('America/Vancouver') }}
+
+# User/Group IDs for file permissions
+PUID={{ puid | default('1000') }}
+PGID={{ pgid | default('1000') }}

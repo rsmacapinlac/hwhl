@@ -1,0 +1,63 @@
+---
+services:
+  blinko:
+    container_name: blinko
+    image: blinkospace/blinko:latest
+    ports:
+      - {{ blinko_port }}:1111
+    env_file:
+      - .env
+    restart: unless-stopped
+    depends_on:
+      blinko-db:
+        condition: service_healthy
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      # HTTP router with redirect to HTTPS
+      - "traefik.http.routers.blinko.entrypoints=http"
+      - "traefik.http.routers.blinko.rule=Host(`blinko.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.blinko-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.blinko.middlewares=blinko-https-redirect"
+      # HTTPS router
+      - "traefik.http.routers.blinko-secure.entrypoints=https"
+      - "traefik.http.routers.blinko-secure.rule=Host(`blinko.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.blinko-secure.tls=true"
+      - "traefik.http.routers.blinko-secure.service=blinko"
+      - "traefik.http.services.blinko.loadbalancer.server.port=1111"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+      - blinko-internal
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:1111"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  blinko-db:
+    container_name: blinko-db
+    image: postgres:14
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - blinko-db-data:/var/lib/postgresql/data
+    networks:
+      - blinko-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  blinko-db-data:
+    driver: local
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+  blinko-internal:
+    driver: bridge
