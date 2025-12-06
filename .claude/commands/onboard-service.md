@@ -42,6 +42,7 @@ You will create a complete Ansible role following the modern pattern documented 
    - `handlers/main.yml` - Restart handler using docker_compose_v2
    - `tasks/main.yml` - Main deployment tasks following modern pattern
    - `tasks/setup.yml` - Environment file creation tasks
+   - `tasks/update.yml` - Update tasks for maintenance playbook integration
 
 3. **Create Templates**
    - `templates/docker-compose.j2` - Docker compose template using env_file
@@ -50,6 +51,7 @@ You will create a complete Ansible role following the modern pattern documented 
 4. **Integration**
    - Add service setup to `site-setup.yml`
    - Add service deployment to `site.yml`
+   - Add service update to `maintenance.yml`
    - Create inventory entry example
 
 5. **Documentation**
@@ -64,6 +66,8 @@ You will create a complete Ansible role following the modern pattern documented 
 - Make ports configurable to avoid conflicts
 - Include proper file permissions (755 for dirs, 644 for compose, 640 for .env)
 - Use handlers for service restarts
+- Include update tasks following the standard pattern (with pull: always, recreate: always)
+- Add service to maintenance.yml for centralized updates
 - Include container status checking before deployment
 
 ## Implementation Process:
