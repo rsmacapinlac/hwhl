@@ -126,3 +126,12 @@
       include_tasks: roles/blinko/tasks/setup.yml
       run_once: true
       when: groups['blinko'] is defined and groups['blinko'] | length > 0
+
+- name: "Setup Cloudflare DDNS"
+  hosts: edge
+  connection: local
+  tasks:
+    - name: "Run Cloudflare DDNS setup if group exists"
+      include_tasks: roles/cloudflare-ddns/tasks/setup.yml
+      run_once: true
+      when: groups['edge'] is defined and groups['edge'] | length > 0

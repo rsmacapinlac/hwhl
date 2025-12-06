@@ -1,0 +1,40 @@
+---
+# Update tasks for cloudflare-ddns
+# Pulls latest image and recreates container
+# Run via: ansible-playbook maintenance.yml
+
+- name: Update cloudflare-ddns container with latest image
+  community.docker.docker_compose_v2:
+    project_src: /data/services/cloudflare-ddns
+    files:
+      - compose.yml
+    state: present
+    pull: always
+    recreate: always
+    remove_orphans: false
+  register: compose_update
+  ignore_errors: true
+
+- name: Wait for cloudflare-ddns container to be running
+  community.docker.docker_container_info:
+    name: cloudflare-ddns
+  register: cloudflare_status
+  until: cloudflare_status.container.State.Running | default(false)
+  retries: 5
+  delay: 2
+  when: compose_update is succeeded
+
+- name: Display update status
+  debug:
+    msg: "cloudflare-ddns has been updated and is running"
+  when: compose_update is succeeded
+
+- name: Display skip message when service unavailable
+  debug:
+    msg: "Skipped cloudflare-ddns update - service unavailable or update failed"
+  when: compose_update is failed
+
+- name: Remove dangling images
+  command: docker image prune -f
+  changed_when: true
+  when: compose_update is succeeded

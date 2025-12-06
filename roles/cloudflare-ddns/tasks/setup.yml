@@ -1,0 +1,38 @@
+---
+# Setup tasks for environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create cloudflare-ddns config directory locally
+  file:
+    path: "{{ playbook_dir }}/files/config/cloudflare-ddns"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/cloudflare-ddns/environment"
+  register: cloudflare_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/files/config/cloudflare-ddns/environment"
+    mode: '0640'
+  when: not cloudflare_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Environment file created at: {{ playbook_dir }}/files/config/cloudflare-ddns/environment
+
+      Please review and update configuration as needed.
+      After configuration, deploy with: ansible-playbook site.yml --limit edge
+  when: not cloudflare_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

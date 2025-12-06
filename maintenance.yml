@@ -43,6 +43,8 @@
   tasks:
     - name: "Update Traefik"
       include_tasks: roles/traefik/tasks/update.yml
+    - name: "Update Cloudflare DDNS"
+      include_tasks: roles/cloudflare-ddns/tasks/update.yml
 
 - hosts: "portainer"
   remote_user: ansible

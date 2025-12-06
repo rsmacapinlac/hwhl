@@ -1,3 +1,23 @@
+---
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/cloudflare-ddns/environment"
+  register: env_file
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/cloudflare-ddns/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+- name: Check if Cloudflare DDNS container exists
+  community.docker.docker_container_info:
+    name: cloudflare-ddns
+  register: cloudflare_container
+  ignore_errors: true
+
 - name: Create services folder
   become: true
   ansible.builtin.file:
@@ -5,16 +25,32 @@
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
 
 - name: Setup docker compose file for cloudflare-ddns
-  become: true
   template:
     src: docker-compose.j2
-    dest: /data/services/cloudflare-ddns/docker-compose.yml
+    dest: /data/services/cloudflare-ddns/compose.yml
     owner: ansible
     group: docker
+    mode: '0644'
+  notify: restart cloudflare-ddns
 
-- name: Run container
-  become: true
-  shell:
-    cmd: "docker compose -f /data/services/cloudflare-ddns/docker-compose.yml up -d"
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/cloudflare-ddns/environment"
+    dest: /data/services/cloudflare-ddns/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart cloudflare-ddns
+
+- name: Run Cloudflare DDNS container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/cloudflare-ddns
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not cloudflare_container.container.State.Running | default(false)
+  notify: restart cloudflare-ddns

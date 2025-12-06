@@ -78,13 +78,14 @@ Based on analysis, create a phased migration plan:
 **Phase 2: Refactor Deployment Tasks** (if using shell/legacy patterns)
 - Update `tasks/main.yml` to use docker_compose_v2 module
 - Add container status checking
-- Add conditional directory creation
+- **CRITICAL:** Directory creation and compose file deployment should NOT be conditional
 - Fix file permissions (640 for .env, 644 for compose.yml)
 - Add environment file deployment
 - Update template deployment to use compose.yml
 - Fix any deprecated Ansible facts (ansible_hostname → ansible_facts["hostname"])
 - Add `become: false` to local tasks
 - Fix task naming issues
+- **Only the initial container start should be conditional** (when not already running)
 
 **Phase 3: Update Templates** (if needed)
 - Update `templates/docker-compose.j2`:
@@ -155,6 +156,9 @@ Mark each todo as in_progress → completed as you work through them.
 2. **Preserve working patterns** - Don't break existing functionality
 3. **Update incrementally** - Make focused changes, one pattern at a time
 4. **Test syntax** - Run ansible-playbook --syntax-check after changes
+5. **CRITICAL for main.yml:** Never add conditionals to directory creation or compose file deployment
+   - Only the initial container start should be conditional
+   - Handlers need these files to exist or they will fail with "Cannot find Compose file"
 
 **When Updating Templates:**
 1. **Preserve dynamic patterns** - Keep Jinja2 loops for volumes, conditionals, etc.
@@ -231,6 +235,72 @@ TZ={{ timezone | default('America/Vancouver') }}
     state: present
     recreate: always
     remove_orphans: false
+```
+
+**Creating main.yml Deployment Tasks (CORRECT PATTERN):**
+```yaml
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/$ARGUMENTS/environment"
+  register: env_file
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/$ARGUMENTS/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status check
+- name: Check if $ARGUMENTS container exists
+  community.docker.docker_container_info:
+    name: $ARGUMENTS
+  register: service_container
+  ignore_errors: true
+
+# IMPORTANT: NO CONDITIONALS on directory/compose deployment!
+- name: Create services folder
+  become: true
+  ansible.builtin.file:
+    path: /data/services/$ARGUMENTS
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+# IMPORTANT: NO CONDITIONAL - must always deploy for handlers to work!
+- name: Setup docker compose file for $ARGUMENTS
+  template:
+    src: docker-compose.j2
+    dest: /data/services/$ARGUMENTS/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart $ARGUMENTS
+
+# Environment file - triggers handler when changed
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/$ARGUMENTS/environment"
+    dest: /data/services/$ARGUMENTS/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart $ARGUMENTS
+
+# ONLY this task should be conditional!
+- name: Run $ARGUMENTS container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/$ARGUMENTS
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not service_container.container.State.Running | default(false)
+  notify: restart $ARGUMENTS
 ```
 
 **Creating Update Tasks:**
@@ -352,6 +422,7 @@ After: 35/35 patterns (100%)
 - ✅ Validate syntax after changes
 - ✅ Reference existing implementations
 - ✅ Preserve working functionality
+- ✅ Deploy directory and compose file unconditionally in main.yml
 
 **Never:**
 - ❌ Make changes without a plan
@@ -359,6 +430,7 @@ After: 35/35 patterns (100%)
 - ❌ Modify files without reading them first
 - ❌ Remove working patterns
 - ❌ Deploy without user confirmation
+- ❌ Add conditionals to compose file deployment (breaks handlers!)
 
 ## Reference Implementations
 
@@ -398,3 +470,10 @@ The role name should match the directory name in `roles/`.
 - Verify environment file exists and has correct permissions
 - Check docker_compose_v2 module syntax
 - Ensure remove_orphans: false is set
+
+**Handler fails with "Cannot find Compose file" error:**
+- **Root Cause:** Compose file deployment has a conditional that prevents it from running
+- **Problem:** Environment file copy triggers handler, but compose.yml doesn't exist yet
+- **Solution:** Remove conditionals from directory creation and compose file deployment
+- **Rule:** Only the initial container start (`docker_compose_v2` task) should be conditional
+- **Why:** Handlers need compose.yml to exist; tasks that trigger handlers must ensure files exist

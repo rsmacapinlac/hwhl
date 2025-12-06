@@ -1,0 +1,8 @@
+---
+# Default variables for cloudflare-ddns role
+# These can be overridden in group_vars or inventory
+
+# Cloudflare API settings (from group_vars/all.yml)
+cloudflare_api_key: "{{ cloudflare_api_key }}"
+cloudflare_zone: "{{ cloudflare_zone }}"
+cloudflare_subdomain: "{{ cloudflare_subdomain }}"

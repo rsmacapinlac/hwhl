@@ -3,7 +3,4 @@ services:
     image: oznu/cloudflare-ddns:latest
     container_name: cloudflare-ddns
     restart: always
-    environment:
-      - API_KEY={{ cloudflare.api_key  }}
-      - ZONE={{ cloudflare.zone }}
-      - SUBDOMAIN={{ cloudflare.subdomain }}
+    env_file: .env
