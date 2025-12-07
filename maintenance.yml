@@ -45,6 +45,8 @@
       include_tasks: roles/traefik/tasks/update.yml
     - name: "Update Cloudflare DDNS"
       include_tasks: roles/cloudflare-ddns/tasks/update.yml
+    - name: "Update WireGuard Easy"
+      include_tasks: roles/wg-easy/tasks/update.yml
 
 - hosts: "portainer"
   remote_user: ansible

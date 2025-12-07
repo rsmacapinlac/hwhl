@@ -1,0 +1,40 @@
+---
+# Update tasks for WireGuard Easy
+# Pulls latest image and recreates container
+# Run via: ansible-playbook maintenance.yml
+
+- name: Update wg-easy container with latest image
+  community.docker.docker_compose_v2:
+    project_src: /data/services/wg-easy
+    files:
+      - compose.yml
+    state: present
+    pull: always
+    recreate: always
+    remove_orphans: false
+  register: compose_update
+  ignore_errors: true
+
+- name: Wait for wg-easy container to be running
+  community.docker.docker_container_info:
+    name: wg-easy
+  register: wg_easy_status
+  until: wg_easy_status.container.State.Running | default(false)
+  retries: 5
+  delay: 2
+  when: compose_update is succeeded
+
+- name: Display update status
+  debug:
+    msg: "wg-easy has been updated and is running"
+  when: compose_update is succeeded
+
+- name: Display skip message when service unavailable
+  debug:
+    msg: "Skipped wg-easy update - service unavailable or update failed"
+  when: compose_update is failed
+
+- name: Remove dangling wg-easy images
+  command: docker image prune -f
+  changed_when: true
+  when: compose_update is succeeded

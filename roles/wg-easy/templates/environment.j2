@@ -1,0 +1,9 @@
+# WireGuard Easy Environment Configuration
+
+# WireGuard Configuration
+WG_HOST={{ wireguard.host }}
+PASSWORD_HASH={{ wireguard.password_hash }}
+WG_DEFAULT_DNS={{ wireguard.dns }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}

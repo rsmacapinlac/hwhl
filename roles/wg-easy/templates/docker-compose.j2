@@ -1,5 +1,7 @@
 services:
   wg-easy:
+    env_file:
+      - .env
     environment:
       - WG_HOST={{ wireguard.host }}
       - PASSWORD_HASH={{ wireguard.password_hash }}
@@ -10,8 +12,8 @@ services:
     volumes:
       - /data/containers/wireguard:/etc/wireguard
     ports:
-      - "51820:51820/udp"
-      - "51821:51821/tcp"
+      - "{{ wg_easy_port_udp }}:51820/udp"
+      - "{{ wg_easy_port_tcp }}:51821/tcp"
     restart: unless-stopped
     cap_add:
       - NET_ADMIN
@@ -26,13 +28,13 @@ services:
 
       - "traefik.enable=true"
       - "traefik.http.routers.wg-easy-by-hostname.entrypoints=http"
-      - "traefik.http.routers.wg-easy-by-hostname.rule=Host(`wg-easy.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.wg-easy-by-hostname.rule=Host(`wg-easy.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
 
       - "traefik.http.middlewares.wg-easy-by-hostname-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.wg-easy-by-hostname.middlewares=wg-easy-by-hostname-https-redirect"
 
       - "traefik.http.routers.wg-easy-by-hostname-secure.entrypoints=https"
-      - "traefik.http.routers.wg-easy-by-hostname-secure.rule=Host(`wg-easy.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.wg-easy-by-hostname-secure.rule=Host(`wg-easy.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.wg-easy-by-hostname-secure.tls=true"
       - "traefik.http.routers.wg-easy-by-hostname-secure.service=wg-easy"
 

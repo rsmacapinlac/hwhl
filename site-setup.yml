@@ -135,3 +135,12 @@
       include_tasks: roles/cloudflare-ddns/tasks/setup.yml
       run_once: true
       when: groups['edge'] is defined and groups['edge'] | length > 0
+
+- name: "Setup WireGuard Easy"
+  hosts: edge
+  connection: local
+  tasks:
+    - name: "Run WireGuard Easy setup if group exists"
+      include_tasks: roles/wg-easy/tasks/setup.yml
+      run_once: true
+      when: groups['edge'] is defined and groups['edge'] | length > 0

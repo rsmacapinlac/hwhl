@@ -1,0 +1,42 @@
+---
+# Setup tasks for environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create wg-easy config directory locally
+  file:
+    path: "{{ playbook_dir }}/files/config/wg-easy"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/wg-easy/environment"
+  register: wg_easy_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/files/config/wg-easy/environment"
+    mode: '0640'
+  when: not wg_easy_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      WireGuard Easy environment file created at: {{ playbook_dir }}/files/config/wg-easy/environment
+
+      Please review and update the following settings if needed:
+      - WG_HOST: WireGuard public hostname
+      - PASSWORD_HASH: bcrypt password hash for web UI
+      - WG_DEFAULT_DNS: DNS servers for VPN clients
+
+      After configuration, deploy with: ansible-playbook site.yml --limit edge
+  when: not wg_easy_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
