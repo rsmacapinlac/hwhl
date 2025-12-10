@@ -45,6 +45,8 @@
   remote_user: ansible
   roles:
     - role: freshrss
+      tags:
+        - freshrss
 
 - hosts: "homeassistant"
   remote_user: ansible

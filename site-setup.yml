@@ -100,6 +100,15 @@
       run_once: true
       when: groups['jellyfin'] is defined and groups['jellyfin'] | length > 0
 
+- name: "Setup FreshRSS"
+  hosts: freshrss
+  connection: local
+  tasks:
+    - name: "Run FreshRSS setup if group exists"
+      include_tasks: roles/freshrss/tasks/setup.yml
+      run_once: true
+      when: groups['freshrss'] is defined and groups['freshrss'] | length > 0
+
 - name: "Setup Audiobookshelf"
   hosts: audiobookshelf
   connection: local

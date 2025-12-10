@@ -1,25 +1,24 @@
+---
 services:
   freshrss:
     image: lscr.io/linuxserver/freshrss
     container_name: freshrss
-    environment:
-      - PUID=1001
-      - PGID=1001
-      - TZ={{ timezone }}
+    env_file:
+      - .env
     volumes:
       - /data/containers/freshrss:/config
       - /mnt/ContainerData:/ContainerData
     ports:
-      - 8082:80
+      - {{ freshrss_port }}:80
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.freshrss.entrypoints=http"
-      - "traefik.http.routers.freshrss.rule=Host(`freshrss.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.freshrss.rule=Host(`freshrss.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
       - "traefik.http.middlewares.freshrss-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.freshrss.middlewares=freshrss-https-redirect"
       - "traefik.http.routers.freshrss-secure.entrypoints=https"
-      - "traefik.http.routers.freshrss-secure.rule=Host(`freshrss.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.freshrss-secure.rule=Host(`freshrss.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.freshrss-secure.tls=true"
       - "traefik.http.routers.freshrss-secure.service=freshrss"
       - "traefik.http.services.freshrss.loadbalancer.server.port=80"

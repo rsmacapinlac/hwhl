@@ -1,0 +1,41 @@
+---
+# Setup tasks for FreshRSS environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create freshrss config directory locally
+  file:
+    path: "{{ playbook_dir }}/files/config/freshrss"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/freshrss/environment"
+  register: freshrss_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/files/config/freshrss/environment"
+    mode: '0640'
+  when: not freshrss_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      FreshRSS environment file created at: {{ playbook_dir }}/files/config/freshrss/environment
+
+      Please review and update the following settings:
+      - PUID/PGID: User and group IDs for container permissions
+      - TZ: Timezone for the service
+
+      After configuration, deploy with: ansible-playbook site.yml --limit freshrss
+  when: not freshrss_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

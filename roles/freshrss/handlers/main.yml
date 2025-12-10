@@ -1,0 +1,9 @@
+---
+- name: restart freshrss
+  community.docker.docker_compose_v2:
+    project_src: /data/services/freshrss
+    files:
+      - compose.yml
+    state: present
+    recreate: always
+    remove_orphans: false

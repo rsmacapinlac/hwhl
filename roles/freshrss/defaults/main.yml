@@ -1,0 +1,9 @@
+---
+# FreshRSS default configuration variables
+
+# Port configuration
+freshrss_port: 8082
+
+# User/Group IDs
+freshrss_puid: 1001
+freshrss_pgid: 1001
