@@ -3,22 +3,9 @@ services:
     container_name: n8n
     image: docker.n8n.io/n8nio/n8n
     ports:
-      - 5678:5678
-    environment:
-      - PUID=1001
-      - PGID=1001
-      - N8N_HOST={{ n8n.subdomain }}.{{ homelab_domain }}
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=https
-      - NODE_ENV=production
-      - WEBHOOK_URL=https://{{ n8n.subdomain }}.{{ homelab_domain }}/
-      - GENERIC_TIMEZONE={{ timezone }}
-      - N8N_EMAIL_MODE=smtp
-      - N8N_SMTP_HOST={{ n8n.smtp.host }}
-      - N8N_SMTP_PORT={{ n8n.smtp.port }}
-      - N8N_SMTP_USER={{ n8n.smtp.user }}
-      - N8N_SMTP_PASS={{ n8n.smtp.password }}
-      - N8N_SMTP_SENDER={{ n8n.smtp.from_email }}
+      - {{ n8n_port }}:5678
+    env_file:
+      - .env
     volumes:
       - /data/containers/n8n/data:/home/node/.n8n
       - /data/containers/n8n/local_files:/files
@@ -26,11 +13,11 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.n8n.entrypoints=http"
-      - "traefik.http.routers.n8n.rule=Host(`n8n.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.n8n.rule=Host(`n8n.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
       - "traefik.http.middlewares.n8n-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.n8n.middlewares=n8n-https-redirect"
       - "traefik.http.routers.n8n-secure.entrypoints=https"
-      - "traefik.http.routers.n8n-secure.rule=Host(`n8n.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.n8n-secure.rule=Host(`n8n.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.n8n-secure.tls=true"
       - "traefik.http.routers.n8n-secure.service=n8n"
       - "traefik.http.services.n8n.loadbalancer.server.port=5678"

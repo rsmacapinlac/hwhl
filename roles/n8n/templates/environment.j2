@@ -1,0 +1,21 @@
+# N8N Environment Configuration
+
+# User/Group Configuration
+PUID={{ n8n_puid | default('1001') }}
+PGID={{ n8n_pgid | default('1001') }}
+
+# N8N Configuration
+N8N_HOST={{ n8n.subdomain }}.{{ homelab_domain }}
+N8N_PORT=5678
+N8N_PROTOCOL=https
+NODE_ENV=production
+WEBHOOK_URL=https://{{ n8n.subdomain }}.{{ homelab_domain }}/
+GENERIC_TIMEZONE={{ timezone }}
+
+# SMTP Configuration
+N8N_EMAIL_MODE=smtp
+N8N_SMTP_HOST={{ n8n.smtp.host }}
+N8N_SMTP_PORT={{ n8n.smtp.port }}
+N8N_SMTP_USER={{ n8n.smtp.user }}
+N8N_SMTP_PASS={{ n8n.smtp.password }}
+N8N_SMTP_SENDER={{ n8n.smtp.from_email }}
