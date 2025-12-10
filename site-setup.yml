@@ -28,6 +28,15 @@
       run_once: true
       when: groups['nebula-sync'] is defined and groups['nebula-sync'] | length > 0
 
+- name: "Setup N8N"
+  hosts: n8n
+  connection: local
+  tasks:
+    - name: "Run N8N setup if group exists"
+      include_tasks: roles/n8n/tasks/setup.yml
+      run_once: true
+      when: groups['n8n'] is defined and groups['n8n'] | length > 0
+
 - name: "Setup Kimai"
   hosts: kimai
   connection: local

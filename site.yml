@@ -255,6 +255,8 @@
   remote_user: ansible
   roles:
     - role: n8n
+      tags:
+        - n8n
 
 - hosts: "docmost"
   remote_user: ansible
