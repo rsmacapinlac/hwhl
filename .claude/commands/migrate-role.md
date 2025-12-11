@@ -39,7 +39,7 @@ Read and analyze the existing role at `roles/$ARGUMENTS/`:
 - [ ] Check for `tasks/update.yml` - see if update tasks exist
 - [ ] Check for `templates/environment.j2` - see if environment template exists
 - [ ] Check `inventory/*.yml` for service configuration
-- [ ] Check `site.yml` for role integration
+- [ ] Check `site.yml` for role integration and tags
 - [ ] Check `site-setup.yml` for setup integration
 - [ ] Check `maintenance.yml` for update integration
 
@@ -101,6 +101,7 @@ Based on analysis, create a phased migration plan:
 - Include `remove_orphans: false`
 
 **Phase 5: Integration** (if missing)
+- Ensure tags are added to role in `site.yml` (role level tags for better targeting)
 - Add setup integration to `site-setup.yml`
 - Add update tasks to `tasks/update.yml` (optional but recommended)
 - Add maintenance integration to `maintenance.yml` (if update tasks added)
@@ -136,10 +137,11 @@ Create todo items for each phase:
 4. Create handlers file
 5. Refactor main.yml deployment tasks
 6. Update docker-compose.j2 template
-7. Add setup integration to site-setup.yml
-8. Create update tasks (optional)
-9. Add maintenance integration (optional)
-10. Test deployment
+7. Add tags to site.yml
+8. Add setup integration to site-setup.yml
+9. Create update tasks (optional)
+10. Add maintenance integration (optional)
+11. Test deployment
 
 Mark each todo as in_progress → completed as you work through them.
 
@@ -346,6 +348,19 @@ TZ={{ timezone | default('America/Vancouver') }}
   changed_when: true
   when: compose_update is succeeded
 ```
+
+**Adding Tags to site.yml:**
+Ensure tags are added at the role level in `site.yml` for better playbook targeting:
+```yaml
+- hosts: "$ARGUMENTS"
+  remote_user: ansible
+  roles:
+    - role: $ARGUMENTS
+      tags:
+        - $ARGUMENTS
+```
+
+This allows running: `ansible-playbook site.yml --tags $ARGUMENTS`
 
 ### Post-Migration Validation
 
