@@ -1,0 +1,20 @@
+# Baserow Environment Configuration
+
+# User/Group Configuration
+PUID={{ baserow_puid | default('1001') }}
+PGID={{ baserow_pgid | default('1001') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# Baserow Configuration
+BASEROW_PUBLIC_URL={{ baserow.public_url }}
+
+# SMTP Configuration
+EMAIL_SMTP={{ baserow.smtp.enabled }}
+EMAIL_SMTP_HOST={{ baserow.smtp.host }}
+EMAIL_SMTP_PORT={{ baserow.smtp.port }}
+EMAIL_SMTP_USE_SSL={{ baserow.smtp.use_ssl }}
+EMAIL_SMTP_USER={{ baserow.smtp.user }}
+EMAIL_SMTP_PASSWORD="l&N&uy+jJ|stCF#m0`R_~1i`}"
+FROM_EMAIL={{ baserow.smtp.from_email }}

@@ -2,31 +2,21 @@ services:
   baserow:
     container_name: baserow
     image: baserow/baserow:latest
-    environment:
-      - BASEROW_PUBLIC_URL={{ baserow.public_url }}
-      - UID=1001
-      - GID=1001
-      - EMAIL_SMTP={{ baserow.smtp.enabled }}
-      - EMAIL_SMTP_HOST={{ baserow.smtp.host }}
-      - EMAIL_SMTP_PORT={{ baserow.smtp.port }}
-      - EMAIL_SMTP_USE_SSL={{ baserow.smtp.use_ssl }}
-      - EMAIL_SMTP_USER={{ baserow.smtp.user }}
-      - EMAIL_SMTP_PASSWORD={{ baserow.smtp.password }}
-      - FROM_EMAIL={{ baserow.smtp.from_email }}
+    env_file: .env
     ports:
-      - "8083:80"
-      - "4433:443"
+      - "{{ baserow_http_port | default('8083') }}:80"
+      - "{{ baserow_https_port | default('4433') }}:443"
     volumes:
       - /data/containers/baserow:/baserow/data
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.baserow.entrypoints=http"
-      - "traefik.http.routers.baserow.rule=Host(`baserow.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.baserow.rule=Host(`baserow.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
       - "traefik.http.middlewares.baserow-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.baserow.middlewares=baserow-https-redirect"
       - "traefik.http.routers.baserow-secure.entrypoints=https"
-      - "traefik.http.routers.baserow-secure.rule=Host(`baserow.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.baserow-secure.rule=Host(`baserow.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.baserow-secure.tls=true"
       - "traefik.http.routers.baserow-secure.service=baserow"
       - "traefik.http.services.baserow.loadbalancer.server.port=80"

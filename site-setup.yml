@@ -145,6 +145,15 @@
       run_once: true
       when: groups['blinko'] is defined and groups['blinko'] | length > 0
 
+- name: "Setup Baserow"
+  hosts: baserow
+  connection: local
+  tasks:
+    - name: "Run Baserow setup if group exists"
+      include_tasks: roles/baserow/tasks/setup.yml
+      run_once: true
+      when: groups['baserow'] is defined and groups['baserow'] | length > 0
+
 - name: "Setup Cloudflare DDNS"
   hosts: edge
   connection: local

@@ -252,6 +252,8 @@
   remote_user: ansible
   roles:
     - role: baserow
+      tags:
+        - baserow
 
 - hosts: "n8n"
   remote_user: ansible

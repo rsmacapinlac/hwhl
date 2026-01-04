@@ -1,0 +1,10 @@
+---
+# Baserow default configuration variables
+
+# Port configuration
+baserow_http_port: 8083
+baserow_https_port: 4433
+
+# User/Group IDs
+baserow_puid: 1001
+baserow_pgid: 1001

@@ -90,6 +90,12 @@
     - name: "Update Blinko"
       include_tasks: roles/blinko/tasks/update.yml
 
+- hosts: "baserow"
+  remote_user: ansible
+  tasks:
+    - name: "Update Baserow"
+      include_tasks: roles/baserow/tasks/update.yml
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:
