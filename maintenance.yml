@@ -96,6 +96,12 @@
     - name: "Update Baserow"
       include_tasks: roles/baserow/tasks/update.yml
 
+- hosts: "outline"
+  remote_user: ansible
+  tasks:
+    - name: "Update Outline"
+      include_tasks: roles/outline/tasks/update.yml
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

@@ -1,0 +1,79 @@
+---
+services:
+  outline:
+    container_name: outline
+    image: docker.getoutline.com/outlinewiki/outline:latest
+    env_file:
+      - .env
+    ports:
+      - {{ outline_port }}:3000
+    volumes:
+      - outline-data:/var/lib/outline/data
+    depends_on:
+      - outline-postgres
+      - outline-redis
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      # HTTP router with redirect to HTTPS
+      - "traefik.http.routers.outline.entrypoints=http"
+      - "traefik.http.routers.outline.rule=Host(`outline.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.outline-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.outline.middlewares=outline-https-redirect"
+      # HTTPS router
+      - "traefik.http.routers.outline-secure.entrypoints=https"
+      - "traefik.http.routers.outline-secure.rule=Host(`outline.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.outline-secure.tls=true"
+      - "traefik.http.routers.outline-secure.service=outline"
+      - "traefik.http.services.outline.loadbalancer.server.port=3000"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+      - outline-internal
+
+  outline-redis:
+    container_name: outline-redis
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - outline-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - outline-internal
+
+  outline-postgres:
+    container_name: outline-postgres
+    image: postgres:16-alpine
+    env_file:
+      - .env
+    volumes:
+      - outline-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U outline"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - outline-internal
+
+volumes:
+  outline-data:
+    driver: local
+  outline-redis-data:
+    driver: local
+  outline-postgres-data:
+    driver: local
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+  outline-internal:
+    name: outline-internal
+    driver: bridge

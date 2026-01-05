@@ -1,0 +1,9 @@
+---
+# Outline default port configuration
+outline_port: 3000
+
+# PostgreSQL port
+outline_postgres_port: 5432
+
+# Redis port
+outline_redis_port: 6379

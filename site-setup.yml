@@ -154,6 +154,15 @@
       run_once: true
       when: groups['baserow'] is defined and groups['baserow'] | length > 0
 
+- name: "Setup Outline"
+  hosts: outline
+  connection: local
+  tasks:
+    - name: "Run Outline setup if group exists"
+      include_tasks: roles/outline/tasks/setup.yml
+      run_once: true
+      when: groups['outline'] is defined and groups['outline'] | length > 0
+
 - name: "Setup Cloudflare DDNS"
   hosts: edge
   connection: local

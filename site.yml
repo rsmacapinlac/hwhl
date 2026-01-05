@@ -303,3 +303,10 @@
     - role: blinko
       tags:
         - blinko
+
+- hosts: "outline"
+  remote_user: ansible
+  roles:
+    - role: outline
+      tags:
+        - outline

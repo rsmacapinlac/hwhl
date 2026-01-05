@@ -1,0 +1,110 @@
+# Outline Environment Configuration
+# Documentation: https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
+
+# ------------------------------------------------------------------
+# REQUIRED SETTINGS
+# ------------------------------------------------------------------
+
+# Generate secret keys with: openssl rand -hex 32
+SECRET_KEY=generate_a_unique_secret_key_here
+UTILS_SECRET=generate_another_unique_secret_key_here
+
+# Database connection (auto-configured for internal PostgreSQL)
+DATABASE_URL=postgres://outline:outline_password@outline-postgres:5432/outline
+DATABASE_URL_TEST=postgres://outline:outline_password@outline-postgres:5432/outline_test
+
+# Redis connection (auto-configured for internal Redis)
+REDIS_URL=redis://outline-redis:6379
+
+# Public URL for accessing Outline (update with your domain)
+URL=https://outline.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}
+
+# Port the application runs on (internal)
+PORT=3000
+
+# ------------------------------------------------------------------
+# FILE STORAGE
+# ------------------------------------------------------------------
+
+# Local file storage (default)
+FILE_STORAGE=local
+FILE_STORAGE_LOCAL_ROOT_DIR=/var/lib/outline/data
+
+# S3-compatible storage (optional, uncomment to use)
+# FILE_STORAGE=s3
+# AWS_ACCESS_KEY_ID=your_access_key
+# AWS_SECRET_ACCESS_KEY=your_secret_key
+# AWS_REGION=us-east-1
+# AWS_S3_UPLOAD_BUCKET_URL=https://s3.amazonaws.com
+# AWS_S3_UPLOAD_BUCKET_NAME=outline-bucket
+# AWS_S3_FORCE_PATH_STYLE=true
+# AWS_S3_ACL=private
+
+# ------------------------------------------------------------------
+# AUTHENTICATION PROVIDERS (at least one required)
+# ------------------------------------------------------------------
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# Email/Magic Link Authentication (requires SMTP)
+# Uncomment to enable email authentication
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=465
+# SMTP_USERNAME=your_email@gmail.com
+# SMTP_PASSWORD=your_app_password
+# SMTP_FROM_EMAIL=outline@yourdomain.com
+# SMTP_REPLY_EMAIL=noreply@yourdomain.com
+# SMTP_TLS_CIPHERS=
+# SMTP_SECURE=true
+
+# Slack OAuth (optional)
+# SLACK_CLIENT_ID=your_slack_client_id
+# SLACK_CLIENT_SECRET=your_slack_client_secret
+
+# OIDC/Authelia (optional)
+# OIDC_CLIENT_ID=outline
+# OIDC_CLIENT_SECRET=your_oidc_secret
+# OIDC_AUTH_URI=https://authelia.yourdomain.com/api/oidc/authorization
+# OIDC_TOKEN_URI=https://authelia.yourdomain.com/api/oidc/token
+# OIDC_USERINFO_URI=https://authelia.yourdomain.com/api/oidc/userinfo
+# OIDC_LOGOUT_URI=https://authelia.yourdomain.com/api/oidc/logout
+# OIDC_USERNAME_CLAIM=preferred_username
+# OIDC_DISPLAY_NAME=Authelia
+# OIDC_SCOPES=openid profile email
+
+# ------------------------------------------------------------------
+# OPTIONAL SETTINGS
+# ------------------------------------------------------------------
+
+# Force HTTPS redirects
+FORCE_HTTPS=false
+
+# Enable collaboration features
+COLLABORATION_URL=
+
+# Default language
+DEFAULT_LANGUAGE=en_US
+
+# Rate limiting
+RATE_LIMITER_ENABLED=true
+RATE_LIMITER_REQUESTS=1000
+RATE_LIMITER_DURATION_WINDOW=60
+
+# Sentry error tracking (optional)
+# SENTRY_DSN=
+
+# Debugging
+DEBUG=cache,presenters,events,emails,multiplayer,http
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# ------------------------------------------------------------------
+# POSTGRESQL CONFIGURATION (for internal database)
+# ------------------------------------------------------------------
+
+POSTGRES_USER=outline
+POSTGRES_PASSWORD=outline_password
+POSTGRES_DB=outline

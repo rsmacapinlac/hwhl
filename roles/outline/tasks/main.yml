@@ -1,0 +1,64 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/outline/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/outline/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if outline container exists
+  community.docker.docker_container_info:
+    name: outline
+  register: outline_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create outline service folder
+  become: true
+  file:
+    path: /data/services/outline
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not outline_container.container.State.Running | default(false)
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/outline/environment"
+    dest: /data/services/outline/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart outline
+
+# Docker Compose deployment
+- name: Setup docker compose file for outline
+  template:
+    src: docker-compose.j2
+    dest: /data/services/outline/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart outline
+
+# Container deployment using docker_compose_v2
+- name: Run outline container stack
+  community.docker.docker_compose_v2:
+    project_src: /data/services/outline
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not outline_container.container.State.Running | default(false)
+  notify: restart outline
