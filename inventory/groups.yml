@@ -5,7 +5,6 @@ managed_hosts:
     dns:
     edge:
     containers:
-    duplicati:
     plex_stack:
     overseer:
     arrs:

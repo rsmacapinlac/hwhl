@@ -174,11 +174,6 @@
   roles:
     - role: watchtower
 
-- hosts: "duplicati"
-  remote_user: ansible
-  roles:
-    - role: duplicati
-
 - hosts: "pihole"
   remote_user: ansible
   roles:

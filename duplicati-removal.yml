@@ -1,0 +1,108 @@
+---
+# Duplicati Removal Playbook
+# This playbook completely removes Duplicati from all hosts
+#
+# Usage:
+#   ansible-playbook duplicati-removal.yml
+#
+# To also remove backup data:
+#   ansible-playbook duplicati-removal.yml -e "remove_backup_data=true"
+
+- name: "Remove Duplicati from all hosts"
+  hosts: "duplicati"
+  remote_user: ansible
+  become: true
+  vars:
+    remove_backup_data: false  # Set to true to remove backup data directories
+
+  tasks:
+    - name: Display removal warning
+      debug:
+        msg: |
+          ============================================
+          Removing Duplicati from {{ ansible_facts['hostname'] }}
+          Backup data removal: {{ remove_backup_data }}
+          ============================================
+
+    - name: Stop Duplicati container
+      community.docker.docker_compose_v2:
+        project_src: /data/services
+        files:
+          - duplicati.yml
+        state: absent
+      ignore_errors: true
+      register: container_stop
+
+    - name: Alternative - Stop via docker compose command
+      shell:
+        cmd: "docker compose -f /data/services/duplicati.yml down"
+      when: container_stop is failed
+      ignore_errors: true
+
+    - name: Alternative - Force remove container
+      shell:
+        cmd: "docker rm -f duplicati"
+      when: container_stop is failed
+      ignore_errors: true
+
+    - name: Remove docker-compose file
+      ansible.builtin.file:
+        path: /data/services/duplicati.yml
+        state: absent
+
+    - name: Remove Duplicati config directory
+      ansible.builtin.file:
+        path: "/data/containers/duplicati_{{ ansible_facts['hostname'] }}"
+        state: absent
+      when: remove_backup_data | bool
+
+    - name: Remove backup directory for this host
+      ansible.builtin.file:
+        path: "/mnt/ContainerBackups/{{ ansible_facts['hostname'] }}"
+        state: absent
+      when: remove_backup_data | bool
+
+    - name: Unmount Duplicati NFS share
+      ansible.posix.mount:
+        path: "/mnt/ContainerBackups"
+        state: unmounted
+      ignore_errors: true
+
+    - name: Remove Duplicati NFS mount from fstab
+      ansible.posix.mount:
+        path: "/mnt/ContainerBackups"
+        state: absent
+      ignore_errors: true
+
+    - name: Remove mount point directory
+      ansible.builtin.file:
+        path: "/mnt/ContainerBackups"
+        state: absent
+
+    - name: Remove host from DNS configuration
+      lineinfile:
+        path: "{{ playbook_dir }}/files/dns/cname/05-duplicati.conf"
+        regexp: ".*duplicati\\.{{ ansible_facts['hostname'] }}\\.{{ homelab_domain }}.*"
+        state: absent
+      delegate_to: 127.0.0.1
+      become: false
+
+    - name: Display completion message
+      debug:
+        msg: |
+          ============================================
+          Duplicati removed from {{ ansible_facts['hostname'] }}
+
+          Removed:
+            - Docker container
+            - Compose file: /data/services/duplicati.yml
+            - NFS mount: /mnt/ContainerBackups
+            {% if remove_backup_data %}
+            - Config: /data/containers/duplicati_{{ ansible_facts['hostname'] }}
+            - Backups: /mnt/ContainerBackups/{{ ansible_facts['hostname'] }}
+            {% endif %}
+
+          Next steps:
+            1. Update Pi-hole DNS by redeploying: ansible-playbook site.yml --limit pihole
+            2. Remove Duplicati inventory definitions and role from codebase
+          ============================================
