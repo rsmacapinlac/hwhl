@@ -24,7 +24,6 @@ services:
       #- 32414:32414/udp
       #- 32469:32469
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.plex.entrypoints=http"
       - "traefik.http.routers.plex.rule=Host(`plex.{{ ansible_hostname }}.{{ homelab_domain }}`)"

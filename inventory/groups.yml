@@ -24,7 +24,6 @@ managed_hosts:
     # additional services
     nebula-sync:
     portainer:
-    watchtower:
     teslamate:
     musicassistant:
     syncthing:

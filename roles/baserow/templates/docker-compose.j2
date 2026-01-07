@@ -9,7 +9,6 @@ services:
     volumes:
       - /data/containers/baserow:/baserow/data
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.baserow.entrypoints=http"
       - "traefik.http.routers.baserow.rule=Host(`baserow.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"

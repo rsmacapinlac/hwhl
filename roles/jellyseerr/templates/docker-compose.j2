@@ -12,7 +12,6 @@ services:
       - /data/containers/jellyseerr:/app/config
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.jellyseerr.entrypoints=http"
       - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.{{ ansible_hostname }}.{{ homelab_domain }}`)"

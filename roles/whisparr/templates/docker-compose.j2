@@ -17,7 +17,6 @@ services:
       - /data/arrs/Downloads/sabnzbd/complete:/sabnzbd
       - /data/arrs/Downloads/transmission/completed:/transmission
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.whisparr.entrypoints=http"
       - "traefik.http.routers.whisparr.rule=Host(`whisparr.{{ ansible_hostname }}.{{ homelab_domain }}`)"

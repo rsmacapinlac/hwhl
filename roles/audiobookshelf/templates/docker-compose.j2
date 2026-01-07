@@ -15,7 +15,6 @@ services:
       - .env
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.audiobookshelf.entrypoints=http"
       - "traefik.http.routers.audiobookshelf.rule=Host(`audiobookshelf.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"

@@ -12,7 +12,6 @@ services:
       - 9696:9696
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.prowlarr.entrypoints=http"
       - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.{{ ansible_hostname}}.{{ homelab_domain }}`)"
@@ -60,7 +59,6 @@ services:
       - 7878:7878
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.radarr.entrypoints=http"
       - "traefik.http.routers.radarr.rule=Host(`radarr.{{ ansible_hostname }}.{{ homelab_domain }}`)"
@@ -93,7 +91,6 @@ services:
       - 8686:8686
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.lidarr.entrypoints=http"
       - "traefik.http.routers.lidarr.rule=Host(`lidarr.{{ ansible_hostname }}.{{ homelab_domain }}`)"
@@ -125,7 +122,6 @@ services:
       - 8989:8989
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.sonarr.entrypoints=http"
       - "traefik.http.routers.sonarr.rule=Host(`sonarr.{{ ansible_hostname }}.{{ homelab_domain }}`)"
@@ -159,7 +155,6 @@ services:
       - 6767:6767
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.bazarr.entrypoints=http"
       - "traefik.http.routers.bazarr.rule=Host(`bazarr.{{ ansible_hostname }}.{{ homelab_domain }}`)"
@@ -194,7 +189,6 @@ services:
       - 8090:8090
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.mylar.entrypoints=http"
       - "traefik.http.routers.mylar.rule=Host(`mylar.{{ ansible_hostname }}.{{ homelab_domain }}`)"
@@ -225,7 +219,6 @@ services:
       - 8080:8080
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.sabnzbd.entrypoints=http"
       - "traefik.http.routers.sabnzbd.rule=Host(`sabnzbd.{{ ansible_hostname }}.{{ homelab_domain }}`)"
@@ -277,7 +270,6 @@ services:
     container_name: transmission-openvpn
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.transmission.entrypoints=http"
       - "traefik.http.routers.transmission.rule=Host(`transmission.{{ ansible_hostname }}.{{ homelab_domain }}`)"

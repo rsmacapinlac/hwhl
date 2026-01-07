@@ -15,7 +15,6 @@ services:
     ports:
       - 5000:5000
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.kavita.entrypoints=http"
       - "traefik.http.routers.kavita.rule=Host(`kavita.{{ ansible_hostname }}.{{ homelab_domain }}`)"

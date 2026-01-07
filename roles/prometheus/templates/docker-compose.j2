@@ -11,7 +11,6 @@ services:
       - /data/containers/prometheus/data:/prometheus
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.prometheus.entrypoints=http"
       - "traefik.http.routers.prometheus.rule=Host(`prometheus.{{ ansible_hostname }}.{{ homelab_domain }}`)"

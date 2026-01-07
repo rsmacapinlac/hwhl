@@ -12,7 +12,6 @@ services:
       - 8181:8181
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.tautulli-by-hostname.entrypoints=http"
       - "traefik.http.routers.tautulli-by-hostname.rule=Host(`tautulli.{{ ansible_hostname }}.{{ homelab_domain }}`)"

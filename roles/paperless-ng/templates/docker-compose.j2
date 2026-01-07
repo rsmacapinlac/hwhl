@@ -24,7 +24,6 @@ services:
     networks:
       - proxy
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.paperless-ng-by-hostname.entrypoints=http"
       - "traefik.http.routers.paperless-ng-by-hostname.rule=Host(`paperless-ng.{{ ansible_hostname }}.{{ homelab_domain }}`)"

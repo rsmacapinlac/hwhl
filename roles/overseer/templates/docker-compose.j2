@@ -13,7 +13,6 @@ services:
       - 5055:5055
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.overseer.entrypoints=http"
       - "traefik.http.routers.overseer.rule=Host(`overseer.{{ ansible_hostname }}.{{ homelab_domain }}`)"

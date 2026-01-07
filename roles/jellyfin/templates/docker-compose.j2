@@ -19,7 +19,6 @@ services:
       - {{ jellyfin_dlna_port }}:1900/udp
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.jellyfin.entrypoints=http"
       - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"

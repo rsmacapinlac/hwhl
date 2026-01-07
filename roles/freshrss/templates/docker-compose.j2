@@ -11,7 +11,6 @@ services:
     ports:
       - {{ freshrss_port }}:80
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.freshrss.entrypoints=http"
       - "traefik.http.routers.freshrss.rule=Host(`freshrss.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"

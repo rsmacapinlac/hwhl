@@ -154,25 +154,18 @@
   remote_user: ansible
   roles:
     - role: portainer
-    - role: watchtower
  ####
 
 - hosts: "containers"
   remote_user: ansible
   roles:
     - role: portainer
-    - role: watchtower
     - role: traefik
 
 - hosts: "portainer"
   remote_user: ansible
   roles:
     - role: portainer
-
-- hosts: "watchtower"
-  remote_user: ansible
-  roles:
-    - role: watchtower
 
 - hosts: "pihole"
   remote_user: ansible

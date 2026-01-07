@@ -10,7 +10,6 @@ services:
       - /data/containers/n8n/data:/home/node/.n8n
       - /data/containers/n8n/local_files:/files
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.n8n.entrypoints=http"
       - "traefik.http.routers.n8n.rule=Host(`n8n.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"

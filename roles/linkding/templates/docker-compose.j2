@@ -14,7 +14,6 @@ services:
     volumes:
       - /data/containers/linkding:/etc/linkding/data
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.linkding-by-hostname.entrypoints=http"
       - "traefik.http.routers.linkding-by-hostname.rule=Host(`linkding.{{ ansible_hostname }}.{{ homelab_domain }}`)"

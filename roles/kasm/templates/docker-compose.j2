@@ -23,7 +23,6 @@ services:
       - 4434:4434
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.kasm.entrypoints=http"
       - "traefik.http.routers.kasm.rule=Host(`kasm.{{ ansible_hostname }}.{{ homelab_domain }}`)"

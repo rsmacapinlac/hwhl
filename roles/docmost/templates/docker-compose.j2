@@ -19,7 +19,6 @@ services:
     volumes:
       - /data/containers/docmost/storage:/app/data/storage
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.docmost.entrypoints=http"
       - "traefik.http.routers.docmost.rule=Host(`docmost.{{ ansible_hostname }}.{{ homelab_domain }}`)"

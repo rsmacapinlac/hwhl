@@ -24,8 +24,6 @@ services:
     networks:
       - proxy
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-
       - "traefik.enable=true"
       - "traefik.http.routers.wg-easy-by-hostname.entrypoints=http"
       - "traefik.http.routers.wg-easy-by-hostname.rule=Host(`wg-easy.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"

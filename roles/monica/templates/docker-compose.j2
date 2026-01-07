@@ -27,7 +27,6 @@ services:
     restart: unless-stopped
 
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.monica-by-hostname.entrypoints=http"
       - "traefik.http.routers.monica-by-hostname.rule=Host(`monica.{{ ansible_hostname }}.{{ homelab_domain }}`)"

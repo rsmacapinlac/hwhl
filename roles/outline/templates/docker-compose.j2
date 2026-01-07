@@ -14,7 +14,6 @@ services:
       - outline-redis
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       # HTTP router with redirect to HTTPS
       - "traefik.http.routers.outline.entrypoints=http"

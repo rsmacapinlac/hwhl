@@ -26,7 +26,6 @@ services:
       - archivist-es
       - archivist-redis
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.tubearchivist.entrypoints=http"
       - "traefik.http.routers.tubearchivist.rule=Host(`tubearchivist.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"

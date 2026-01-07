@@ -14,7 +14,6 @@ services:
       - 3000:3000
       - 3001:3001
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.cura.entrypoints=http"
       - "traefik.http.routers.cura.rule=Host(`cura.{{ ansible_hostname }}.{{ homelab_domain }}`)"

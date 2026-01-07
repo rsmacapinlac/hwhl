@@ -30,7 +30,6 @@ services:
       - 8123:8123 #optional
     restart: unless-stopped
     labels:
-      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.homeassistant-by-hostname.entrypoints=http"
       - "traefik.http.routers.homeassistant-by-hostname.rule=Host(`homeassistant.{{ ansible_hostname }}.{{ homelab_domain }}`)"
