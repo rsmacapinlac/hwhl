@@ -1,13 +1,18 @@
 - name: "Dependencies"
   include_tasks: roles/shares/tasks/dependencies.yml
 
-- name: Check mountpoint exist
+- name: Check if mountpoint directory exists
+  ansible.builtin.stat:
+    path: "{{ destination }}"
+  register: mountpoint_stat
+
+- name: Create mountpoint directory if it doesn't exist
   become: yes
   ansible.builtin.file:
     path: "{{ destination }}"
     state: directory
     mode: '0755'
-  ignore_errors: true
+  when: not mountpoint_stat.stat.exists
 
 #- name: Workaround ensure share is unmounted
 #  command: "umount /media/ContainerData"

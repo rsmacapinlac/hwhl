@@ -75,3 +75,27 @@
 - name: Run BorgBackup container
   shell:
     cmd: "docker compose -f /data/services/borgbackup.yml up -d"
+
+- name: Wait for container to be ready
+  pause:
+    seconds: 5
+
+- name: Check if Borg repository is initialized
+  become: true
+  shell:
+    cmd: "docker exec borgbackup borg info /mnt/borg-repository"
+  register: borg_repo_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Initialize Borg repository if needed
+  become: true
+  shell:
+    cmd: "docker exec borgbackup borg init --encryption=repokey /mnt/borg-repository"
+  when: borg_repo_check.rc != 0
+  register: borg_init_result
+
+- name: Display repository initialization result
+  debug:
+    msg: "Borg repository initialized successfully for {{ ansible_facts['hostname'] }}"
+  when: borg_init_result is changed

@@ -1,11 +1,14 @@
 ---
 # Duplicati Removal Playbook
-# This playbook completely removes Duplicati from all hosts
+# This playbook removes Duplicati from all hosts while preserving BorgBackup
+#
+# IMPORTANT: This playbook preserves /mnt/ContainerBackups NFS mount because
+# BorgBackup is deployed to the same hosts and uses the same mount point.
 #
 # Usage:
 #   ansible-playbook duplicati-removal.yml
 #
-# To also remove backup data:
+# To also remove Duplicati backup data:
 #   ansible-playbook duplicati-removal.yml -e "remove_backup_data=true"
 
 - name: "Remove Duplicati from all hosts"
@@ -56,28 +59,15 @@
         state: absent
       when: remove_backup_data | bool
 
-    - name: Remove backup directory for this host
+    - name: Remove Duplicati backup directory for this host
       ansible.builtin.file:
-        path: "/mnt/ContainerBackups/{{ ansible_facts['hostname'] }}"
+        path: "/mnt/ContainerBackups/{{ ansible_facts['hostname'] }}/duplicati"
         state: absent
       when: remove_backup_data | bool
 
-    - name: Unmount Duplicati NFS share
-      ansible.posix.mount:
-        path: "/mnt/ContainerBackups"
-        state: unmounted
-      ignore_errors: true
-
-    - name: Remove Duplicati NFS mount from fstab
-      ansible.posix.mount:
-        path: "/mnt/ContainerBackups"
-        state: absent
-      ignore_errors: true
-
-    - name: Remove mount point directory
-      ansible.builtin.file:
-        path: "/mnt/ContainerBackups"
-        state: absent
+    # NOTE: Do NOT unmount /mnt/ContainerBackups or remove it from fstab!
+    # BorgBackup uses the same NFS mount and is still active on these hosts.
+    # The mount, directory, and fstab entry must remain for BorgBackup to function.
 
     - name: Remove host from DNS configuration
       lineinfile:
@@ -96,13 +86,17 @@
           Removed:
             - Docker container
             - Compose file: /data/services/duplicati.yml
-            - NFS mount: /mnt/ContainerBackups
             {% if remove_backup_data %}
             - Config: /data/containers/duplicati_{{ ansible_facts['hostname'] }}
-            - Backups: /mnt/ContainerBackups/{{ ansible_facts['hostname'] }}
+            - Duplicati backups: /mnt/ContainerBackups/{{ ansible_facts['hostname'] }}/duplicati
             {% endif %}
+
+          Preserved (used by BorgBackup):
+            - NFS mount: /mnt/ContainerBackups
+            - Mount point directory
+            - fstab entry
 
           Next steps:
             1. Update Pi-hole DNS by redeploying: ansible-playbook site.yml --limit pihole
-            2. Remove Duplicati inventory definitions and role from codebase
+            2. Remove Duplicati inventory definitions and role from codebase (already done)
           ============================================
