@@ -22,6 +22,12 @@
     - name: "Update PiHole Exporter"
       include_tasks: roles/pihole-exporter/tasks/update.yml
 
+- hosts: "prometheus"
+  remote_user: ansible
+  tasks:
+    - name: "Update Prometheus"
+      include_tasks: roles/prometheus/tasks/update.yml
+
 - hosts: "nebula-sync"
   remote_user: ansible
   tasks:

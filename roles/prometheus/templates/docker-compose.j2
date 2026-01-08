@@ -2,6 +2,8 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
+    env_file:
+      - .env
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
@@ -11,13 +13,14 @@ services:
       - /data/containers/prometheus/data:/prometheus
     restart: unless-stopped
     labels:
+      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.prometheus.entrypoints=http"
-      - "traefik.http.routers.prometheus.rule=Host(`prometheus.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
       - "traefik.http.middlewares.prometheus-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.prometheus.middlewares=prometheus-https-redirect"
       - "traefik.http.routers.prometheus-secure.entrypoints=https"
-      - "traefik.http.routers.prometheus-secure.rule=Host(`prometheus.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.prometheus-secure.rule=Host(`prometheus.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.prometheus-secure.tls=true"
       - "traefik.http.routers.prometheus-secure.service=prometheus"
       - "traefik.http.services.prometheus.loadbalancer.server.port={{ prometheus_port }}"

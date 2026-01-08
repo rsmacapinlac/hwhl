@@ -1,4 +1,19 @@
 ---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/prometheus/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/prometheus/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
 - name: Check if Prometheus container exists
   community.docker.docker_container_info:
     name: prometheus
@@ -12,6 +27,8 @@
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
+  when: not prometheus_container.container.State.Running | default(false)
 
 - name: Ensure Prometheus config directory exists
   become: true
@@ -21,6 +38,7 @@
     owner: ansible
     group: docker
     mode: '0755'
+  when: not prometheus_container.container.State.Running | default(false)
 
 - name: Ensure Prometheus data directory exists with correct permissions
   become: true
@@ -30,6 +48,7 @@
     owner: "65534"
     group: "65534"
     mode: '0755'
+  when: not prometheus_container.container.State.Running | default(false)
 
 - name: Deploy default Prometheus config if not present
   become: true
@@ -40,6 +59,14 @@
     group: docker
     mode: '0644'
 
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/prometheus/environment"
+    dest: /data/services/prometheus/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+
 - name: Deploy Prometheus docker-compose file
   become: true
   template:
@@ -48,11 +75,14 @@
     owner: ansible
     group: docker
     mode: '0644'
+  notify: restart prometheus
 
-- name: Start Prometheus container with docker-compose v2
+- name: Run prometheus container
   community.docker.docker_compose_v2:
     project_src: /data/services/prometheus
+    files:
+      - compose.yml
     state: present
-    pull: always
-    recreate: auto
-    remove_orphans: true 
+    remove_orphans: false
+  when: not prometheus_container.container.State.Running | default(false)
+  notify: restart prometheus
