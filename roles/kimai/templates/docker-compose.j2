@@ -41,13 +41,13 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.kimai-by-hostname.entrypoints=http"
-      - "traefik.http.routers.kimai-by-hostname.rule=Host(`kimai.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.kimai-by-hostname.rule=Host(`kimai.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
 
       - "traefik.http.middlewares.kimai-by-hostname-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.kimai-by-hostname.middlewares=kimai-by-hostname-https-redirect"
 
       - "traefik.http.routers.kimai-by-hostname-secure.entrypoints=https"
-      - "traefik.http.routers.kimai-by-hostname-secure.rule=Host(`kimai.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.kimai-by-hostname-secure.rule=Host(`kimai.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.kimai-by-hostname-secure.tls=true"
       - "traefik.http.routers.kimai-by-hostname-secure.service=kimai"
 

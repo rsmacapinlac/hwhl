@@ -280,6 +280,8 @@
   remote_user: ansible
   roles:
     - role: kimai
+      tags:
+        - kimai
 
 - hosts: "immich"
   remote_user: ansible

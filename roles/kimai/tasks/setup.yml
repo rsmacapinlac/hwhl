@@ -1,24 +1,27 @@
 ---
 - name: Create config directory for kimai
-  local_action:
-    module: file
+  file:
     path: "{{ playbook_dir }}/files/config/kimai"
     state: directory
     mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
 
 - name: Check if kimai environment file exists
-  local_action:
-    module: stat
+  stat:
     path: "{{ playbook_dir }}/files/config/kimai/environment"
   register: env_file_stat
+  delegate_to: 127.0.0.1
+  become: false
 
 - name: Create kimai environment file
-  local_action:
-    module: template
-    src: "{{ playbook_dir }}/roles/kimai/templates/environment.j2"
+  template:
+    src: environment.j2
     dest: "{{ playbook_dir }}/files/config/kimai/environment"
+    mode: '0640'
   when: not env_file_stat.stat.exists
-  register: env_created
+  delegate_to: 127.0.0.1
+  become: false
 
 - name: Display setup instructions
   debug:

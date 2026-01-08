@@ -1,2 +1,18 @@
+---
+# Kimai default configuration variables
+
+# Port configuration
 kimai_port: 8001
-timezone: "UTC" 
+
+# Database configuration
+kimai_mysql_database: kimai
+kimai_mysql_user: kimaiuser
+kimai_mysql_password: kimaipassword
+kimai_mysql_root_password: changemeplease
+
+# Admin configuration
+kimai_admin_email: admin@kimai.local
+kimai_admin_password: changemeplease
+
+# System configuration
+timezone: "America/Vancouver" 

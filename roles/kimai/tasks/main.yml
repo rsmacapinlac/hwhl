@@ -3,6 +3,7 @@
     module: stat
     path: "{{ playbook_dir }}/files/config/kimai/environment"
   register: env_file
+  become: false
 
 - name: Fail if environment file doesn't exist
   fail:
@@ -27,7 +28,7 @@
     owner: ansible
     group: docker
     mode: '0755'
-  when: not kimai_container.container.Status.Running | default(false)
+  when: not kimai_container.container.State.Running | default(false)
 
 - name: Create data directories
   become: true
@@ -41,7 +42,7 @@
     - /data/containers/kimai/mysql
     - /data/containers/kimai/data
     - /data/containers/kimai/plugins
-  when: not kimai_container.container.Status.Running | default(false)
+  when: not kimai_container.container.State.Running | default(false)
 
 - name: Copy environment configuration
   copy:
@@ -50,6 +51,7 @@
     owner: ansible
     group: docker
     mode: '0640'
+  notify: restart kimai
 
 - name: Setup docker compose file for Kimai
   template:
@@ -58,6 +60,7 @@
     owner: ansible
     group: docker
     mode: '0644'
+  notify: restart kimai
 
 - name: Verify compose file exists
   stat:

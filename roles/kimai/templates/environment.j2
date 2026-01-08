@@ -1,12 +1,14 @@
 # Kimai Environment Configuration
-# Please edit these values before running the role
 
 # Database Configuration
-MYSQL_DATABASE=kimai
-MYSQL_USER=kimaiuser
-MYSQL_PASSWORD=kimaipassword
-MYSQL_ROOT_PASSWORD=changemeplease
+MYSQL_DATABASE={{ kimai_mysql_database | default('kimai') }}
+MYSQL_USER={{ kimai_mysql_user | default('kimaiuser') }}
+MYSQL_PASSWORD={{ kimai_mysql_password | default('kimaipassword') }}
+MYSQL_ROOT_PASSWORD={{ kimai_mysql_root_password | default('changemeplease') }}
 
 # Kimai Admin Configuration
-ADMINMAIL=admin@kimai.local
-ADMINPASS=changemeplease 
+ADMINMAIL={{ kimai_admin_email | default('admin@kimai.local') }}
+ADMINPASS={{ kimai_admin_password | default('changemeplease') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }} 

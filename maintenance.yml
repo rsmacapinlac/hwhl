@@ -39,8 +39,6 @@
   tasks:
     - name: "Update Traefik"
       include_tasks: roles/traefik/tasks/update.yml
-    - name: "Update Watchtower"
-      include_tasks: roles/watchtower/tasks/update.yml
     - name: "Update Portainer"
       include_tasks: roles/portainer/tasks/update.yml
 
@@ -107,6 +105,13 @@
   tasks:
     - name: "Update Outline"
       include_tasks: roles/outline/tasks/update.yml
+
+- hosts: "kimai"
+  remote_user: ansible
+  tasks:
+    - name: "Update Kimai"
+      include_tasks: roles/kimai/tasks/update.yml
+      when: groups['kimai'] is defined and groups['kimai'] | length > 0
 
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
