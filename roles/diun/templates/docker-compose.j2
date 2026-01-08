@@ -1,0 +1,15 @@
+---
+services:
+  diun:
+    container_name: diun
+    image: crazymax/diun:latest
+    command: serve
+    volumes:
+      - ./data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - .env
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "diun.enable=true"

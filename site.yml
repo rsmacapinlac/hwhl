@@ -161,6 +161,12 @@
   roles:
     - role: portainer
     - role: traefik
+    - role: diun
+
+- hosts: "diun"
+  remote_user: ansible
+  roles:
+    - role: diun
 
 - hosts: "portainer"
   remote_user: ansible

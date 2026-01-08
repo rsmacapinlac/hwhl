@@ -1,0 +1,49 @@
+# Diun Environment Configuration
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# Logging Configuration
+LOG_LEVEL={{ diun_log_level | default('info') }}
+LOG_JSON={{ diun_log_json | default('false') }}
+
+# Watch Configuration
+DIUN_WATCH_WORKERS={{ diun_watch_workers | default('20') }}
+DIUN_WATCH_SCHEDULE={{ diun_watch_schedule | default('0 0 * * *') }}
+DIUN_WATCH_JITTER={{ diun_watch_jitter | default('30s') }}
+
+# Docker Provider Configuration
+DIUN_PROVIDERS_DOCKER=true
+DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT={{ 'true' if diun_watch_by_default | default(true) else 'false' }}
+
+# Notification: Slack
+# Uncomment and configure to enable Slack notifications
+#DIUN_NOTIF_SLACK_WEBHOOKURL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+
+# Notification: Email (SMTP)
+# Uncomment and configure to enable Email notifications
+#DIUN_NOTIF_MAIL_HOST=smtp.example.com
+#DIUN_NOTIF_MAIL_PORT=587
+#DIUN_NOTIF_MAIL_SSL=false
+#DIUN_NOTIF_MAIL_INSECURESKIPVERIFY=false
+#DIUN_NOTIF_MAIL_USERNAME=your-email@example.com
+#DIUN_NOTIF_MAIL_PASSWORD=your-smtp-password
+#DIUN_NOTIF_MAIL_FROM=diun@example.com
+#DIUN_NOTIF_MAIL_TO=you@example.com
+
+# Notification: Discord
+# Uncomment and configure to enable Discord notifications
+#DIUN_NOTIF_DISCORD_WEBHOOKURL=https://discord.com/api/webhooks/YOUR/WEBHOOK/URL
+
+# Notification: Additional Providers
+# Diun supports 15+ notification providers including:
+# - Telegram: DIUN_NOTIF_TELEGRAM_TOKEN and DIUN_NOTIF_TELEGRAM_CHATIDS
+# - Matrix: DIUN_NOTIF_MATRIX_* settings
+# - Gotify: DIUN_NOTIF_GOTIFY_* settings
+# - MQTT: DIUN_NOTIF_MQTT_* settings
+# - Pushover: DIUN_NOTIF_PUSHOVER_* settings
+# - Rocket.Chat: DIUN_NOTIF_ROCKETCHAT_* settings
+# - Teams: DIUN_NOTIF_TEAMS_WEBHOOKURL
+# - Webhook: DIUN_NOTIF_WEBHOOK_* settings
+#
+# See https://crazymax.dev/diun/notif/ for full documentation

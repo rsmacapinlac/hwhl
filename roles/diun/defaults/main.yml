@@ -1,0 +1,17 @@
+---
+# Diun default configuration
+
+# Watch schedule (cron format)
+diun_watch_schedule: "0 0 * * *"  # Daily at midnight
+
+# Number of concurrent workers
+diun_watch_workers: 20
+
+# Jitter for schedule (random delay)
+diun_watch_jitter: "30s"
+
+# Watch all containers by default
+diun_watch_by_default: true
+
+# Notification settings
+# Configured via environment file template

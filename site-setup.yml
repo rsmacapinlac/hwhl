@@ -180,3 +180,12 @@
       include_tasks: roles/wg-easy/tasks/setup.yml
       run_once: true
       when: groups['edge'] is defined and groups['edge'] | length > 0
+
+- name: "Setup Diun"
+  hosts: containers
+  connection: local
+  tasks:
+    - name: "Run Diun setup if group exists"
+      include_tasks: roles/diun/tasks/setup.yml
+      run_once: true
+      when: (groups['containers'] is defined and groups['containers'] | length > 0) or (groups['diun'] is defined and groups['diun'] | length > 0)
