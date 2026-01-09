@@ -1,0 +1,11 @@
+---
+# Syncthing default configuration variables
+
+# Port configuration
+syncthing_port: 8384              # Web UI/API port
+syncthing_sync_port: 22000        # Sync protocol port (TCP/UDP)
+syncthing_discovery_port: 21027   # Local discovery port (UDP)
+
+# User/Group IDs
+syncthing_puid: 1001
+syncthing_pgid: 1001

@@ -1,0 +1,8 @@
+# Syncthing Environment Configuration
+
+# User/Group Configuration
+PUID={{ syncthing_puid | default('1001') }}
+PGID={{ syncthing_pgid | default('1001') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}

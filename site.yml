@@ -277,6 +277,8 @@
   remote_user: ansible
   roles:
     - role: syncthing
+      tags:
+        - syncthing
 
 - hosts: "kimai"
   remote_user: ansible

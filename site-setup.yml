@@ -189,3 +189,12 @@
       include_tasks: roles/diun/tasks/setup.yml
       run_once: true
       when: (groups['containers'] is defined and groups['containers'] | length > 0) or (groups['diun'] is defined and groups['diun'] | length > 0)
+
+- name: "Setup Syncthing"
+  hosts: syncthing
+  connection: local
+  tasks:
+    - name: "Run Syncthing setup if group exists"
+      include_tasks: roles/syncthing/tasks/setup.yml
+      run_once: true
+      when: groups['syncthing'] is defined and groups['syncthing'] | length > 0
