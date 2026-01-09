@@ -46,6 +46,7 @@
     owner: ansible
     group: docker
     mode: '0640'
+  notify: restart semaphore
 
 - name: Setup docker compose file for semaphore
   template:
@@ -54,6 +55,7 @@
     owner: ansible
     group: docker
     mode: '0644'
+  notify: restart semaphore
 
 - name: Verify compose file exists
   stat:

@@ -5,12 +5,14 @@
     path: "{{ playbook_dir }}/files/config/semaphore"
     state: directory
     mode: '0755'
+  become: false
 
 - name: Check if semaphore environment file exists
   local_action:
     module: stat
     path: "{{ playbook_dir }}/files/config/semaphore/environment"
   register: env_file_stat
+  become: false
 
 - name: Create semaphore environment file
   local_action:
@@ -19,6 +21,7 @@
     dest: "{{ playbook_dir }}/files/config/semaphore/environment"
   when: not env_file_stat.stat.exists
   register: env_created
+  become: false
 
 - name: Display setup instructions
   debug:

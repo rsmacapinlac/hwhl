@@ -129,6 +129,8 @@
   remote_user: ansible
   roles:
     - role: semaphore
+      tags:
+        - semaphore
 
 - hosts: "ghostfolio"
   remote_user: ansible

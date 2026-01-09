@@ -16,7 +16,7 @@ services:
     container_name: semaphore
     ports:
       - {{ semaphore_port }}:3000
-    image: semaphoreui/semaphore:latest
+    image: semaphoreui/semaphore:v2.16.47
     env_file:
       - .env
     depends_on:
@@ -24,13 +24,13 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.semaphore-by-hostname.entrypoints=http"
-      - "traefik.http.routers.semaphore-by-hostname.rule=Host(`semaphore.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.semaphore-by-hostname.rule=Host(`semaphore.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
 
       - "traefik.http.middlewares.semaphore-by-hostname-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.semaphore-by-hostname.middlewares=semaphore-by-hostname-https-redirect"
 
       - "traefik.http.routers.semaphore-by-hostname-secure.entrypoints=https"
-      - "traefik.http.routers.semaphore-by-hostname-secure.rule=Host(`semaphore.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.semaphore-by-hostname-secure.rule=Host(`semaphore.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.semaphore-by-hostname-secure.tls=true"
       - "traefik.http.routers.semaphore-by-hostname-secure.service=semaphore"
 

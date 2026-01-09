@@ -119,6 +119,13 @@
       include_tasks: roles/kimai/tasks/update.yml
       when: groups['kimai'] is defined and groups['kimai'] | length > 0
 
+- hosts: "semaphore"
+  remote_user: ansible
+  tasks:
+    - name: "Update Semaphore"
+      include_tasks: roles/semaphore/tasks/update.yml
+      when: groups['semaphore'] is defined and groups['semaphore'] | length > 0
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

@@ -50,6 +50,7 @@
     owner: ansible
     group: docker
     mode: '0640'
+  notify: restart diun
 
 # Docker Compose deployment
 - name: Setup docker compose file for diun
