@@ -12,10 +12,7 @@
     - { name: 'lidarr' }
     - { name: 'sonarr' }
     - { name: 'bazarr' }
-    - { name: 'readarr' }
     - { name: 'mylar' }
-    - { name: 'sabnzbd' }
-    - { name: 'transmission' }
   delegate_to: 127.0.0.1
 
 - name: Create services folder

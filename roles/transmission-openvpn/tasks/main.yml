@@ -1,0 +1,65 @@
+---
+- name: Check if environment file exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/transmission-openvpn/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/transmission-openvpn/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+- name: Check if transmission-openvpn container exists
+  community.docker.docker_container_info:
+    name: transmission-openvpn
+  register: transmission_container
+  ignore_errors: true
+
+- name: Create shared arrs download folder
+  become: true
+  file:
+    path: /data/arrs/Downloads
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+- name: Create transmission-openvpn services folder
+  become: true
+  file:
+    path: /data/services/transmission-openvpn
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/transmission-openvpn/environment"
+    dest: /data/services/transmission-openvpn/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+
+- name: Setup docker compose file for transmission-openvpn
+  template:
+    src: docker-compose.j2
+    dest: /data/services/transmission-openvpn/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart transmission-openvpn
+
+- name: Run transmission-openvpn container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/transmission-openvpn
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not (transmission_container.exists and transmission_container.container.State.Running | default(false))
+  notify: restart transmission-openvpn

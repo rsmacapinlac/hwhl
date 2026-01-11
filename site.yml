@@ -19,6 +19,17 @@
         - borgbackup
         - backup
 
+# Downloaders (deployed before content managers)
+- hosts: "sabnzbd"
+  remote_user: ansible
+  roles:
+    - role: sabnzbd
+
+- hosts: "transmission-openvpn"
+  remote_user: ansible
+  roles:
+    - role: transmission-openvpn
+
 - hosts: "arrs"
   remote_user: ansible
   roles:
@@ -267,6 +278,8 @@
   remote_user: ansible
   roles:
     - role: monica
+      tags:
+        - monica
 
 - hosts: "ofelia"
   remote_user: ansible

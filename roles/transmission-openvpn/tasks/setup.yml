@@ -1,0 +1,50 @@
+---
+- name: Create config directory locally
+  file:
+    path: "{{ playbook_dir }}/files/config/transmission-openvpn"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/transmission-openvpn/environment"
+  register: transmission_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/files/config/transmission-openvpn/environment"
+    mode: '0640'
+  when: not transmission_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup completion message
+  debug:
+    msg: |
+      Transmission-OpenVPN environment file created at: {{ playbook_dir }}/files/config/transmission-openvpn/environment
+
+      IMPORTANT - Please update the following REQUIRED settings:
+      - OPENVPN_PROVIDER: Your VPN provider (default: MULLVAD)
+      - OPENVPN_CONFIG: VPN server configuration (default: ch_all)
+      - OPENVPN_USERNAME: Your VPN username (MUST CHANGE)
+      - OPENVPN_PASSWORD: Your VPN password (MUST CHANGE)
+      - LOCAL_NETWORK: Your local network CIDR (default: 10.1.0.0/24)
+
+      Optional settings:
+      - PUID/PGID if needed (default: 1001)
+      - TRANSMISSION_RATIO_LIMIT settings
+
+      NOTE: This container requires NET_ADMIN capability and /dev/net/tun device.
+      Ensure your LXC container has the necessary permissions if running in Proxmox.
+      See: https://pve.proxmox.com/wiki/OpenVPN_in_LXC
+
+      After configuration, deploy with:
+        ansible-playbook site.yml --limit transmission-openvpn
+  when: not transmission_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

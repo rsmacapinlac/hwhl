@@ -1,0 +1,65 @@
+---
+- name: Check if environment file exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/sabnzbd/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/sabnzbd/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+- name: Check if sabnzbd container exists
+  community.docker.docker_container_info:
+    name: sabnzbd
+  register: sabnzbd_container
+  ignore_errors: true
+
+- name: Create shared arrs download folder
+  become: true
+  file:
+    path: /data/arrs/Downloads
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+- name: Create sabnzbd services folder
+  become: true
+  file:
+    path: /data/services/sabnzbd
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/sabnzbd/environment"
+    dest: /data/services/sabnzbd/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+
+- name: Setup docker compose file for sabnzbd
+  template:
+    src: docker-compose.j2
+    dest: /data/services/sabnzbd/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart sabnzbd
+
+- name: Run sabnzbd container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/sabnzbd
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not (sabnzbd_container.exists and sabnzbd_container.container.State.Running | default(false))
+  notify: restart sabnzbd

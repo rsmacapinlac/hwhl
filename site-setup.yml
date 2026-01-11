@@ -37,6 +37,15 @@
       run_once: true
       when: groups['n8n'] is defined and groups['n8n'] | length > 0
 
+- name: "Setup Monica"
+  hosts: monica
+  connection: local
+  tasks:
+    - name: "Run Monica setup if group exists"
+      include_tasks: roles/monica/tasks/setup.yml
+      run_once: true
+      when: groups['monica'] is defined and groups['monica'] | length > 0
+
 - name: "Setup Kimai"
   hosts: kimai
   connection: local
@@ -198,3 +207,21 @@
       include_tasks: roles/syncthing/tasks/setup.yml
       run_once: true
       when: groups['syncthing'] is defined and groups['syncthing'] | length > 0
+
+- name: "Setup Sabnzbd"
+  hosts: sabnzbd
+  connection: local
+  tasks:
+    - name: "Run Sabnzbd setup if group exists"
+      include_tasks: roles/sabnzbd/tasks/setup.yml
+      run_once: true
+      when: groups['sabnzbd'] is defined and groups['sabnzbd'] | length > 0
+
+- name: "Setup Transmission-OpenVPN"
+  hosts: transmission-openvpn
+  connection: local
+  tasks:
+    - name: "Run Transmission-OpenVPN setup if group exists"
+      include_tasks: roles/transmission-openvpn/tasks/setup.yml
+      run_once: true
+      when: groups['transmission-openvpn'] is defined and groups['transmission-openvpn'] | length > 0

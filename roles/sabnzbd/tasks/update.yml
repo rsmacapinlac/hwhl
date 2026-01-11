@@ -1,0 +1,36 @@
+---
+- name: Update sabnzbd container with latest image
+  community.docker.docker_compose_v2:
+    project_src: /data/services/sabnzbd
+    files:
+      - compose.yml
+    state: present
+    pull: always
+    recreate: always
+    remove_orphans: false
+  register: compose_update
+  ignore_errors: true
+
+- name: Wait for sabnzbd container to be running
+  community.docker.docker_container_info:
+    name: sabnzbd
+  register: sabnzbd_status
+  until: sabnzbd_status.container.State.Running | default(false)
+  retries: 5
+  delay: 2
+  when: compose_update is succeeded
+
+- name: Display update status
+  debug:
+    msg: "Sabnzbd has been updated and is running"
+  when: compose_update is succeeded
+
+- name: Display skip message when service unavailable
+  debug:
+    msg: "Skipped sabnzbd update - service unavailable or update failed"
+  when: compose_update is failed
+
+- name: Remove dangling sabnzbd images
+  command: docker image prune -f
+  changed_when: true
+  when: compose_update is succeeded

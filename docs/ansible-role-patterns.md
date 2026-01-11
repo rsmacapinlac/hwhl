@@ -50,6 +50,7 @@ roles/{service}/
     module: stat
     path: "{{ playbook_dir }}/files/config/{service}/environment"
   register: env_file
+  become: false
 
 - name: Fail if environment file doesn't exist
   fail:
@@ -84,6 +85,7 @@ roles/{service}/
     owner: ansible
     group: docker
     mode: '0640'
+  notify: restart {service}
 
 # Docker Compose deployment
 - name: Setup docker compose file for {service}
@@ -106,6 +108,18 @@ roles/{service}/
   when: not {service}_container.container.Status.Running | default(false)
   notify: restart {service}
 ```
+
+**Important: DNS CNAME Configuration NOT Required**
+
+The modern pattern **does not** include Pi-hole DNS CNAME configuration tasks. Service discovery is handled entirely through Traefik routing labels in the docker-compose templates.
+
+**Why DNS CNAME tasks are excluded:**
+- Traefik provides dynamic service discovery through Docker labels
+- DNS routing is configured through Traefik's `Host()` rules
+- Adding separate DNS CNAME tasks creates redundant configuration
+- Reduces role complexity and maintenance burden
+
+**Legacy roles may have DNS CNAME tasks** - these can be safely removed during migration without affecting service functionality.
 
 #### 4. Configuration Management
 - Default variables in `defaults/main.yml`
@@ -587,6 +601,7 @@ services:
 14. **Always add `become: false`** to tasks using `local_action` or `delegate_to: 127.0.0.1`
 15. **Use modern `ansible_facts["fact_name"]` syntax** instead of deprecated `ansible_fact_name` variables
 16. **Compare Traefik labels** with working roles (kavita, semaphore, jellyfin) before deploying new services
+17. **Do NOT include DNS CNAME configuration tasks** - Traefik handles service discovery through Docker labels
 
 ## Reference Implementations
 

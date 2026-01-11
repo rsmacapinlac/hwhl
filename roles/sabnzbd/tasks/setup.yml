@@ -1,0 +1,39 @@
+---
+- name: Create config directory locally
+  file:
+    path: "{{ playbook_dir }}/files/config/sabnzbd"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/sabnzbd/environment"
+  register: sabnzbd_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/files/config/sabnzbd/environment"
+    mode: '0640'
+  when: not sabnzbd_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup completion message
+  debug:
+    msg: |
+      Sabnzbd environment file created at: {{ playbook_dir }}/files/config/sabnzbd/environment
+
+      Please review and update the following:
+      - PUID/PGID if needed (default: 1001)
+      - Configure Usenet server settings in Sabnzbd UI after first start
+
+      After configuration, deploy with:
+        ansible-playbook site.yml --limit sabnzbd
+  when: not sabnzbd_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
