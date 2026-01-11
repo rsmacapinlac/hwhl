@@ -1,0 +1,9 @@
+---
+# Monica CRM default configuration variables
+
+# Port configuration
+monica_port: 8084
+
+# User/Group IDs
+monica_puid: 1001
+monica_pgid: 1001

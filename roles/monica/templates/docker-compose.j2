@@ -1,3 +1,4 @@
+---
 services:
   monicacrm:
     image: monica
@@ -5,56 +6,35 @@ services:
     depends_on:
       - monica_db
     ports:
-      - "8084:80"
-    environment:
-      - APP_KEY={{ monica.app_key }}
-      - APP_ENV=production
-      - DB_HOST=monica_db:3306
-      - DB_USERNAME={{ monica.mysql.username }}
-      - DB_PASSWORD={{ monica.mysql.password }}
-      - DEBUG=false
-      - MAIL_MAILER=smtp
-      - MAIL_HOST={{ monica.smtp.host }}
-      - MAIL_PORT={{ monica.smtp.port }}
-      - MAIL_USERNAME={{ monica.smtp.user }}
-      - MAIL_PASSWORD={{ monica.smtp.password }}
-      - MAIL_ENCRYPTION=tls
-      - MAIL_FROM_ADDRESS={{ monica.smtp.from_email }}
-      - MAIL_FROM_NAME=Monica
-      - APP_DISABLE_SIGNUP={{ monica.disable_signup }}
+      - {{ monica_port }}:80
+    env_file:
+      - .env
     volumes:
       - /data/containers/monica/data:/var/www/html/storage
+      - /data/services/monica/.env:/var/www/html/.env:ro
     restart: unless-stopped
-
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.monica-by-hostname.entrypoints=http"
-      - "traefik.http.routers.monica-by-hostname.rule=Host(`monica.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-
-      - "traefik.http.middlewares.monica-by-hostname-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.monica-by-hostname.middlewares=monica-by-hostname-https-redirect"
-
-      - "traefik.http.routers.monica-by-hostname-secure.entrypoints=https"
-      - "traefik.http.routers.monica-by-hostname-secure.rule=Host(`monica.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-      - "traefik.http.routers.monica-by-hostname-secure.tls=true"
-      - "traefik.http.routers.monica-by-hostname-secure.service=monica"
-
+      # HTTP router with redirect to HTTPS
+      - "traefik.http.routers.monica.entrypoints=http"
+      - "traefik.http.routers.monica.rule=Host(`monica.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.monica-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.monica.middlewares=monica-https-redirect"
+      # HTTPS router
+      - "traefik.http.routers.monica-secure.entrypoints=https"
+      - "traefik.http.routers.monica-secure.rule=Host(`monica.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.monica-secure.tls=true"
+      - "traefik.http.routers.monica-secure.service=monica"
       - "traefik.http.services.monica.loadbalancer.server.port=80"
       - "traefik.docker.network=proxy"
-
     networks:
       - proxy
 
   monica_db:
     image: mariadb:11
     container_name: monica_db
-    environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=true
-      - MYSQL_DATABASE=monica
-      - MYSQL_USER={{ monica.mysql.username }}
-      - MYSQL_PASSWORD={{ monica.mysql.password }}
-      - PUID=1001
-      - PGID=1001
+    env_file:
+      - .env
     volumes:
       - /data/containers/monica/db:/var/lib/mysql
     restart: always
@@ -62,7 +42,22 @@ services:
       ofelia.enabled: "true"
       ofelia.job-exec.monica_mariadb_maintenance.schedule: "0 30 1 * * 0"
       ofelia.job-exec.monica_mariadb_maintenance.command: "mariadb-check -u root -p{{ monica.mysql.root_password }} --auto-repair --optimize --all-databases"
+    networks:
+      - proxy
 
+  monica_scheduler:
+    image: monica
+    container_name: monica_scheduler
+    command: /usr/local/bin/cron.sh
+    depends_on:
+      - monica_db
+      - monicacrm
+    env_file:
+      - .env
+    volumes:
+      - /data/containers/monica/data:/var/www/html/storage
+      - /data/services/monica/.env:/var/www/html/.env:ro
+    restart: unless-stopped
     networks:
       - proxy
 

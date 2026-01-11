@@ -1,0 +1,37 @@
+# Monica CRM Environment Configuration
+
+# User/Group Configuration
+PUID={{ monica_puid | default('1001') }}
+PGID={{ monica_pgid | default('1001') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# Monica Application Configuration
+APP_KEY={{ monica.app_key }}
+APP_ENV=production
+DEBUG=false
+APP_DISABLE_SIGNUP={{ monica.disable_signup }}
+
+# Database Connection Configuration
+DB_HOST=monica_db:3306
+DB_DATABASE=monica
+DB_USERNAME={{ monica.mysql.username }}
+DB_PASSWORD={{ monica.mysql.password }}
+
+# Mail Configuration
+MAIL_MAILER=smtp
+MAIL_HOST={{ monica.smtp.host }}
+MAIL_PORT={{ monica.smtp.port }}
+MAIL_USERNAME={{ monica.smtp.user }}
+MAIL_PASSWORD="{{ monica.smtp.password }}"
+MAIL_ENCRYPTION=ssl
+MAIL_FROM_ADDRESS={{ monica.smtp.from_email }}
+MAIL_FROM_NAME=Monica
+
+# MariaDB Database Configuration
+MYSQL_RANDOM_ROOT_PASSWORD=true
+MYSQL_DATABASE=monica
+MYSQL_USER={{ monica.mysql.username }}
+MYSQL_PASSWORD={{ monica.mysql.password }}
+MYSQL_ROOT_PASSWORD={{ monica.mysql.root_password }}

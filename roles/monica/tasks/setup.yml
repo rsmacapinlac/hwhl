@@ -1,0 +1,50 @@
+---
+# Setup tasks for Monica environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create config directory for monica
+  local_action:
+    module: file
+    path: "{{ playbook_dir }}/files/config/monica"
+    state: directory
+    mode: '0755'
+  become: false
+
+- name: Check if monica environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/monica/environment"
+  register: env_file_stat
+  become: false
+
+- name: Create monica environment file
+  local_action:
+    module: template
+    src: "{{ playbook_dir }}/roles/monica/templates/environment.j2"
+    dest: "{{ playbook_dir }}/files/config/monica/environment"
+    mode: '0640'
+  when: not env_file_stat.stat.exists
+  register: env_created
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      {% if env_file_stat.stat.exists %}
+      Environment file already exists at {{ playbook_dir }}/files/config/monica/environment
+      Skipping creation to preserve your custom configuration.
+      {% else %}
+      Environment file has been created at {{ playbook_dir }}/files/config/monica/environment
+
+      Please review and update the following settings:
+      - APP_KEY: Application encryption key (already set from inventory)
+      - Database credentials: MYSQL_USER, MYSQL_PASSWORD (already set from inventory)
+      - SMTP configuration: Mail server settings (already set from inventory)
+      - PUID/PGID: User and group IDs for container permissions
+      - TZ: Timezone for the service
+
+      Monica requires a MariaDB database which will be deployed alongside the application.
+      The database will use the credentials configured in the environment file.
+
+      After configuration, deploy with: ansible-playbook site.yml --limit monica
+      {% endif %}
