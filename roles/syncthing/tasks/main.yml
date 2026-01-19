@@ -21,15 +21,6 @@
   register: syncthing_container
   ignore_errors: true
 
-# DNS CNAME configuration for Pi-hole
-- name: Add host into the 05-syncthing.conf for pihole
-  lineinfile:
-    path: "{{ playbook_dir }}/files/dns/cname/05-syncthing.conf"
-    line: "cname=syncthing.{{ ansible_facts['hostname'] }}.{{ homelab_domain }},{{ ansible_facts['hostname'] }}.int.{{ homelab_domain }}"
-    create: true
-  delegate_to: 127.0.0.1
-  become: false
-
 # Directory creation - NO CONDITIONAL (handlers need this directory to exist)
 - name: Create syncthing service folder
   become: true

@@ -50,17 +50,6 @@
     mode: '0644'
   notify: restart wg-easy
 
-# DNS CNAME configuration
-- name: Add host into the 05-wg-easy.conf for pihole
-  lineinfile:
-    path: "{{ playbook_dir }}/files/dns/cname/05-wg-easy.conf"
-    line: "{{ item }}"
-    create: true
-  loop:
-    - "cname=wg-easy.{{ ansible_facts['hostname'] }}.{{ homelab_domain }},{{ ansible_facts['hostname'] }}.int.{{ homelab_domain }}"
-  delegate_to: 127.0.0.1
-  become: false
-
 # Container deployment using docker_compose_v2
 - name: Run wg-easy container
   community.docker.docker_compose_v2:

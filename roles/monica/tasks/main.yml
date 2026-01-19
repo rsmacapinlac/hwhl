@@ -85,13 +85,3 @@
     - compose_file.stat.exists
   notify: restart monica
 
-# DNS CNAME configuration
-- name: Add host into the 05-monica.conf for pihole
-  lineinfile:
-    path: "{{ playbook_dir }}/files/dns/cname/05-monica.conf"
-    line: "{{ item }}"
-    create: true
-  loop:
-    - "cname=monica.{{ ansible_facts['hostname'] }}.{{ homelab_domain }},{{ ansible_facts['hostname'] }}.int.{{ homelab_domain }}"
-  delegate_to: 127.0.0.1
-  become: false

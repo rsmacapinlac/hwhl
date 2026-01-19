@@ -21,17 +21,6 @@
   register: service_container
   ignore_errors: true
 
-# DNS CNAME configuration
-- name: Add host into the 05-freshrss.conf for pihole
-  lineinfile:
-    path: "{{ playbook_dir }}/files/dns/cname/05-freshrss.conf"
-    line: "{{ item }}"
-    create: true
-  loop:
-    - "cname=freshrss.{{ ansible_facts['hostname'] }}.{{ homelab_domain }},{{ ansible_facts['hostname'] }}.int.{{ homelab_domain }}"
-  delegate_to: 127.0.0.1
-  become: false
-
 # Directory creation with proper permissions (MUST run unconditionally)
 - name: Create services folder
   become: true

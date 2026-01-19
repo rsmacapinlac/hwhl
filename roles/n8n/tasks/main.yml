@@ -1,13 +1,4 @@
 ---
-# DNS CNAME configuration (preserve existing pattern)
-- name: Add host into the 05-n8n.conf for pihole
-  lineinfile:
-    path: "{{ playbook_dir }}/files/dns/cname/05-n8n.conf"
-    line: "cname=n8n.{{ ansible_facts['hostname'] }}.{{ homelab_domain }},{{ ansible_facts['hostname'] }}.int.{{ homelab_domain }}"
-    create: true
-  delegate_to: 127.0.0.1
-  become: false
-
 # Environment file validation
 - name: Check if environment file exists
   stat:

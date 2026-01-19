@@ -1,13 +1,4 @@
 ---
-# Add host into the Pi-hole CNAME configuration
-- name: Add host into the 05-audiobookshelf.conf for pihole
-  lineinfile:
-    path: "{{ playbook_dir }}/files/dns/cname/05-audiobookshelf.conf"
-    line: "cname=audiobookshelf.{{ ansible_facts['hostname'] }}.{{ homelab_domain }},{{ ansible_facts['hostname'] }}.int.{{ homelab_domain }}"
-    create: true
-  delegate_to: 127.0.0.1
-  become: false
-
 # Environment file validation
 - name: Check if environment file exists
   local_action:

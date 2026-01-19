@@ -14,15 +14,6 @@
       Please run site-setup.yml first to create the environment file.
   when: not env_file.stat.exists
 
-# DNS CNAME configuration (preserve existing functionality)
-- name: Add host into the 05-baserow.conf for pihole
-  lineinfile:
-    path: "{{ playbook_dir }}/files/dns/cname/05-baserow.conf"
-    line: "cname=baserow.{{ ansible_facts['hostname'] }}.{{ homelab_domain }},{{ ansible_facts['hostname'] }}.int.{{ homelab_domain }}"
-    create: true
-  delegate_to: 127.0.0.1
-  become: false
-
 # Container status check
 - name: Check if baserow container exists
   community.docker.docker_container_info:
