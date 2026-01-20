@@ -24,11 +24,18 @@
   remote_user: ansible
   roles:
     - role: sabnzbd
+      tags:
+        - sabnzbd
+        - arrs
 
 - hosts: "transmission-openvpn"
   remote_user: ansible
   roles:
     - role: transmission-openvpn
+      tags:
+        - transmission
+        - transmission-openvpn
+        - arrs
 
 - hosts: "arrs"
   remote_user: ansible
