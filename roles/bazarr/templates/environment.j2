@@ -1,0 +1,8 @@
+# Bazarr Environment Configuration
+
+# User/Group Configuration
+PUID={{ bazarr_puid | default('1001') }}
+PGID={{ bazarr_pgid | default('1001') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}

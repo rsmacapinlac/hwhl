@@ -194,6 +194,15 @@
         - flaresolverr
         - arrs
 
+- hosts: "bazarr"
+  remote_user: ansible
+  tasks:
+    - name: "Update Bazarr"
+      include_tasks: roles/bazarr/tasks/update.yml
+      tags:
+        - bazarr
+        - arrs
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

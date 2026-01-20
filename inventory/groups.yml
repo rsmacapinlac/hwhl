@@ -8,6 +8,7 @@ managed_hosts:
     plex_stack:
     overseer:
     arrs:
+    bazarr:
     homepage:
     paperless-ng:
     photoprism:

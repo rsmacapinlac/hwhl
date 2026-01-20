@@ -1,0 +1,63 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/bazarr/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/bazarr/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if bazarr container exists
+  community.docker.docker_container_info:
+    name: bazarr
+  register: bazarr_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create bazarr service folder
+  become: true
+  file:
+    path: /data/services/bazarr
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/bazarr/environment"
+    dest: /data/services/bazarr/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart bazarr
+
+# Docker Compose deployment
+- name: Setup docker compose file for bazarr
+  template:
+    src: docker-compose.j2
+    dest: /data/services/bazarr/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart bazarr
+
+# Container deployment using docker_compose_v2
+- name: Run bazarr container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/bazarr
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not bazarr_container.container.State.Running | default(false)
+  notify: restart bazarr

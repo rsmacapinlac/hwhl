@@ -43,6 +43,15 @@
     - role: shares
     - role: arrs
 
+- hosts: "bazarr"
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: bazarr
+      tags:
+        - bazarr
+        - arrs
+
 # Indexers
 - hosts: "prowlarr"
   remote_user: ansible

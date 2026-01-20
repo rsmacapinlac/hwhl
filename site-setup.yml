@@ -261,3 +261,12 @@
       include_tasks: roles/flaresolverr/tasks/setup.yml
       run_once: true
       when: groups['flaresolverr'] is defined and groups['flaresolverr'] | length > 0
+
+- name: "Setup Bazarr"
+  hosts: bazarr
+  connection: local
+  tasks:
+    - name: "Run Bazarr setup if group exists"
+      include_tasks: roles/bazarr/tasks/setup.yml
+      run_once: true
+      when: groups['bazarr'] is defined and groups['bazarr'] | length > 0
