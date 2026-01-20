@@ -203,6 +203,15 @@
         - bazarr
         - arrs
 
+- hosts: "lidarr"
+  remote_user: ansible
+  tasks:
+    - name: "Update Lidarr"
+      include_tasks: roles/lidarr/tasks/update.yml
+      tags:
+        - lidarr
+        - arrs
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

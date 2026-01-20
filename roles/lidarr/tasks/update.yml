@@ -1,0 +1,40 @@
+---
+# Update tasks for Lidarr
+# Pulls latest image and recreates container
+# Run via: ansible-playbook maintenance.yml
+
+- name: Update lidarr container with latest image
+  community.docker.docker_compose_v2:
+    project_src: /data/services/lidarr
+    files:
+      - compose.yml
+    state: present
+    pull: always
+    recreate: always
+    remove_orphans: false
+  register: compose_update
+  ignore_errors: true
+
+- name: Wait for lidarr container to be running
+  community.docker.docker_container_info:
+    name: lidarr
+  register: lidarr_status
+  until: lidarr_status.container.State.Running | default(false)
+  retries: 5
+  delay: 2
+  when: compose_update is succeeded
+
+- name: Display update status
+  debug:
+    msg: "Lidarr has been updated and is running"
+  when: compose_update is succeeded
+
+- name: Display skip message when service unavailable
+  debug:
+    msg: "Skipped lidarr update - service unavailable or update failed"
+  when: compose_update is failed
+
+- name: Remove dangling lidarr images
+  command: docker image prune -f
+  changed_when: true
+  when: compose_update is succeeded

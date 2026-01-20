@@ -9,6 +9,7 @@ managed_hosts:
     overseer:
     arrs:
     bazarr:
+    lidarr:
     homepage:
     paperless-ng:
     photoprism:

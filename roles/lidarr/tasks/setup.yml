@@ -1,0 +1,44 @@
+---
+# Setup tasks for Lidarr environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create lidarr config directory locally
+  file:
+    path: "{{ playbook_dir }}/files/config/lidarr"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/lidarr/environment"
+  register: lidarr_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/files/config/lidarr/environment"
+    mode: '0640'
+  when: not lidarr_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Lidarr environment file created at: {{ playbook_dir }}/files/config/lidarr/environment
+
+      Please review and update the following settings:
+      - PUID/PGID: User and group IDs for container permissions
+      - TZ: Timezone for the service
+
+      Lidarr is a music collection manager for the *arr ecosystem.
+      Volume mounts are configured in inventory via the 'lidarr' variable.
+
+      After configuration, deploy with: ansible-playbook site.yml --limit lidarr
+  when: not lidarr_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

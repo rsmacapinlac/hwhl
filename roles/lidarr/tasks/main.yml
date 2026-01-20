@@ -1,0 +1,63 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/lidarr/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/lidarr/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if lidarr container exists
+  community.docker.docker_container_info:
+    name: lidarr
+  register: lidarr_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create lidarr service folder
+  become: true
+  file:
+    path: /data/services/lidarr
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/lidarr/environment"
+    dest: /data/services/lidarr/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart lidarr
+
+# Docker Compose deployment
+- name: Setup docker compose file for lidarr
+  template:
+    src: docker-compose.j2
+    dest: /data/services/lidarr/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart lidarr
+
+# Container deployment using docker_compose_v2
+- name: Run lidarr container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/lidarr
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not lidarr_container.container.State.Running | default(false)
+  notify: restart lidarr

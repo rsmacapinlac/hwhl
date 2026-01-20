@@ -1,0 +1,10 @@
+---
+# Lidarr default configuration variables
+
+# Port configuration
+lidarr_port: 8686
+
+# User/Group IDs
+lidarr_puid: 1001
+lidarr_pgid: 1001
+lidarr_umask: 002

@@ -1,0 +1,11 @@
+# Lidarr Environment Configuration
+
+# User/Group Configuration
+PUID={{ lidarr_puid | default('1001') }}
+PGID={{ lidarr_pgid | default('1001') }}
+
+# File Permissions
+UMASK={{ lidarr_umask | default('002') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}

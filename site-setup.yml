@@ -270,3 +270,12 @@
       include_tasks: roles/bazarr/tasks/setup.yml
       run_once: true
       when: groups['bazarr'] is defined and groups['bazarr'] | length > 0
+
+- name: "Setup Lidarr"
+  hosts: lidarr
+  connection: local
+  tasks:
+    - name: "Run Lidarr setup if group exists"
+      include_tasks: roles/lidarr/tasks/setup.yml
+      run_once: true
+      when: groups['lidarr'] is defined and groups['lidarr'] | length > 0

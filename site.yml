@@ -52,6 +52,15 @@
         - bazarr
         - arrs
 
+- hosts: "lidarr"
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: lidarr
+      tags:
+        - lidarr
+        - arrs
+
 # Indexers
 - hosts: "prowlarr"
   remote_user: ansible
