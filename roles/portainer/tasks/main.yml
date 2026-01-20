@@ -6,15 +6,42 @@
     owner: ansible
     group: docker
 
+# Container status check
+- name: Check if portainer container exists
+  community.docker.docker_container_info:
+    name: portainer
+  register: portainer_container
+  ignore_errors: true
+
+# IMPORTANT: NO CONDITIONALS on directory/compose deployment!
+- name: Create portainer service folder
+  become: true
+  ansible.builtin.file:
+    path: /data/services/portainer
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+# IMPORTANT: NO CONDITIONAL - must always deploy for handlers to work!
 - name: Setup docker compose file for portainer
   become: true
   template:
     src: docker-compose.j2
-    dest: /data/services/portainer.yml
+    dest: /data/services/portainer/compose.yml
     owner: ansible
     group: docker
+    mode: '0644'
+  notify: restart portainer
 
-- name: Run container
-  shell:
-    cmd: "docker compose -f /data/services/portainer.yml up -d"
+# ONLY this task should be conditional!
+- name: Run portainer container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/portainer
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not portainer_container.container.State.Running | default(false)
+  notify: restart portainer
 

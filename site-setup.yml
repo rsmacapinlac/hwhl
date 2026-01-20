@@ -107,6 +107,24 @@
       run_once: true
       when: groups['jellyfin'] is defined and groups['jellyfin'] | length > 0
 
+- name: "Setup Kavita"
+  hosts: kavita
+  connection: local
+  tasks:
+    - name: "Run Kavita setup if group exists"
+      include_tasks: roles/kavita/tasks/setup.yml
+      run_once: true
+      when: groups['kavita'] is defined and groups['kavita'] | length > 0
+
+- name: "Setup Navidrome"
+  hosts: navidrome
+  connection: local
+  tasks:
+    - name: "Run Navidrome setup if group exists"
+      include_tasks: roles/navidrome/tasks/setup.yml
+      run_once: true
+      when: groups['navidrome'] is defined and groups['navidrome'] | length > 0
+
 - name: "Setup FreshRSS"
   hosts: freshrss
   connection: local

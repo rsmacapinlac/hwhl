@@ -1,31 +1,40 @@
 ---
-- name: Check if Portainer compose file exists
-  stat:
-    path: /data/services/portainer.yml
-  register: portainer_compose_file
+# Update tasks for portainer
+# Pulls latest image and recreates container
+# Run via: ansible-playbook maintenance.yml
 
-- name: Update Portainer container with latest image
+- name: Update portainer container with latest image
   community.docker.docker_compose_v2:
-    project_src: /data/services
+    project_src: /data/services/portainer
     files:
-      - portainer.yml
+      - compose.yml
     state: present
     pull: always
     recreate: always
     remove_orphans: false
+  register: compose_update
+  ignore_errors: true
 
-- name: Wait for Portainer container to be running
+- name: Wait for portainer container to be running
   community.docker.docker_container_info:
     name: portainer
   register: portainer_status
   until: portainer_status.container.State.Running | default(false)
   retries: 5
   delay: 2
+  when: compose_update is succeeded
 
 - name: Display update status
   debug:
-    msg: "Portainer has been updated and is running"
+    msg: "portainer has been updated and is running"
+  when: compose_update is succeeded
 
-- name: Remove dangling Portainer images
+- name: Display skip message when service unavailable
+  debug:
+    msg: "Skipped portainer update - service unavailable or update failed"
+  when: compose_update is failed
+
+- name: Remove dangling images
   command: docker image prune -f
   changed_when: true
+  when: compose_update is succeeded

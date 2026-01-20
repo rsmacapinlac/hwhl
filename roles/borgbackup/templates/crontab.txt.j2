@@ -1,4 +1,4 @@
-# Borgmatic backup schedule for {{ ansible_hostname }}
+# Borgmatic backup schedule for {{ ansible_facts["hostname"] }}
 # Backup: {{ borgbackup_schedule_backup }}
 # Prune: {{ borgbackup_schedule_prune }}
 

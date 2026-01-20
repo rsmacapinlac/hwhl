@@ -1,18 +1,64 @@
-- name: Create services folder
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/navidrome/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/navidrome/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if navidrome container exists
+  community.docker.docker_container_info:
+    name: navidrome
+  register: navidrome_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create navidrome service folder
   become: true
-  ansible.builtin.file:
+  file:
     path: /data/services/navidrome
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
+  when: not navidrome_container.container.State.Running | default(false)
 
-- name: Setup docker compose file for navidrome stack
-  template:
-    src: docker-compose.j2
-    dest: /data/services/navidrome/docker-compose.yml
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/navidrome/environment"
+    dest: /data/services/navidrome/.env
     owner: ansible
     group: docker
+    mode: '0640'
+  notify: restart navidrome
 
-- name: Run container
-  shell:
-    cmd: "docker compose -f /data/services/navidrome/docker-compose.yml up -d"
+# Docker Compose deployment
+- name: Setup docker compose file for navidrome
+  template:
+    src: docker-compose.j2
+    dest: /data/services/navidrome/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart navidrome
+
+# Container deployment using docker_compose_v2
+- name: Run navidrome container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/navidrome
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not navidrome_container.container.State.Running | default(false)
+  notify: restart navidrome

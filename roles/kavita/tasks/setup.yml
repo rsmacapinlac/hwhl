@@ -1,0 +1,44 @@
+---
+# Setup tasks for Kavita environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create kavita config directory locally
+  file:
+    path: "{{ playbook_dir }}/files/config/kavita"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/kavita/environment"
+  register: kavita_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/files/config/kavita/environment"
+    mode: '0640'
+  when: not kavita_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Kavita environment file created at: {{ playbook_dir }}/files/config/kavita/environment
+
+      Please review and update configuration as needed.
+      Media library volumes should be configured in your inventory file using the 'kavita_volumes' variable.
+      Example:
+        kavita_volumes:
+          - { host_folder: "/mnt/media/books", container: "/books" }
+          - { host_folder: "/mnt/media/comics", container: "/comics" }
+
+      After configuration, deploy with: ansible-playbook site.yml --limit kavita
+  when: not kavita_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

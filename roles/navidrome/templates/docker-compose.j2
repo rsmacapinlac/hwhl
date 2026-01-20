@@ -2,9 +2,11 @@ services:
   navidrome:
     image: deluan/navidrome:latest
     container_name: navidrome
-    user: 1001:1001 # should be owner of volumes
+    user: {{ navidrome_puid }}:{{ navidrome_pgid }}
     ports:
-      - "4533:4533"
+      - "{{ navidrome_port }}:4533"
+    env_file:
+      - .env
     environment:
       ND_CACHEFOLDER: /cache
       ND_MUSICFOLDER: {{ navidrome.container_path }}
@@ -13,13 +15,14 @@ services:
       - "/data/containers/navidrome/cache:/cache"
       - {{ navidrome.host_folder }}:{{ navidrome.container_path }}
     labels:
+      - "com.centurylinklabs.watchtower.enable=true"
       - "traefik.enable=true"
       - "traefik.http.routers.navidrome.entrypoints=http"
-      - "traefik.http.routers.navidrome.rule=Host(`navidrome.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.navidrome.rule=Host(`navidrome.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
       - "traefik.http.middlewares.navidrome-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.navidrome.middlewares=navidrome-https-redirect"
       - "traefik.http.routers.navidrome-secure.entrypoints=https"
-      - "traefik.http.routers.navidrome-secure.rule=Host(`navidrome.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.navidrome-secure.rule=Host(`navidrome.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.navidrome-secure.tls=true"
       - "traefik.http.routers.navidrome-secure.service=navidrome"
       - "traefik.http.services.navidrome.loadbalancer.server.port=4533"

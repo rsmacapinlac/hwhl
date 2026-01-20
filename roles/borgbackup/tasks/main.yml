@@ -11,17 +11,8 @@
 - name: Create Borg repository base directory
   become: true
   ansible.builtin.file:
-    path: "{{ borgbackup_share_destination }}/{{ ansible_hostname }}"
+    path: "{{ borgbackup_share_destination }}/{{ ansible_facts['hostname'] }}"
     state: directory
-
-- name: Create services directory
-  become: true
-  ansible.builtin.file:
-    path: /data/services
-    state: directory
-    owner: ansible
-    group: docker
-    mode: '0755'
 
 - name: Create the 'proxy' network
   community.docker.docker_network:
@@ -63,18 +54,44 @@
     group: docker
     mode: '0644'
 
-- name: Setup docker compose file for BorgBackup
+# Container status check
+- name: Check if borgbackup container exists
+  community.docker.docker_container_info:
+    name: borgbackup
+  register: borgbackup_container
+  ignore_errors: true
+
+# IMPORTANT: NO CONDITIONALS on directory/compose deployment!
+- name: Create borgbackup service folder
+  become: true
+  ansible.builtin.file:
+    path: /data/services/borgbackup
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+# IMPORTANT: NO CONDITIONAL - must always deploy for handlers to work!
+- name: Setup docker compose file for borgbackup
   become: true
   template:
     src: docker-compose.j2
-    dest: /data/services/borgbackup.yml
+    dest: /data/services/borgbackup/compose.yml
     owner: ansible
     group: docker
     mode: '0644'
+  notify: restart borgbackup
 
-- name: Run BorgBackup container
-  shell:
-    cmd: "docker compose -f /data/services/borgbackup.yml up -d"
+# ONLY this task should be conditional!
+- name: Run borgbackup container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/borgbackup
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not borgbackup_container.container.State.Running | default(false)
+  notify: restart borgbackup
 
 - name: Wait for container to be ready
   pause:

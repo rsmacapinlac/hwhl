@@ -1,0 +1,9 @@
+---
+# Kavita default configuration variables
+
+# Port configuration
+kavita_port: 5000
+
+# User/Group IDs
+kavita_puid: 1001
+kavita_pgid: 1001

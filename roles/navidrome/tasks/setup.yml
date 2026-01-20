@@ -1,0 +1,47 @@
+---
+# Setup tasks for Navidrome environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create navidrome config directory locally
+  file:
+    path: "{{ playbook_dir }}/files/config/navidrome"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/navidrome/environment"
+  register: navidrome_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/files/config/navidrome/environment"
+    mode: '0640'
+  when: not navidrome_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Navidrome environment file created at: {{ playbook_dir }}/files/config/navidrome/environment
+
+      Please review and update the following settings:
+      - PUID/PGID: User and group IDs for container permissions
+      - TZ: Timezone for the service
+
+      Music library volumes should be configured in your inventory file using the 'navidrome' variable.
+      Example:
+        navidrome:
+          host_folder: "/mnt/media/music"
+          container_path: "/music"
+
+      After configuration, deploy with: ansible-playbook site.yml --limit navidrome
+  when: not navidrome_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

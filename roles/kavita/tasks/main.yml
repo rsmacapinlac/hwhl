@@ -1,26 +1,64 @@
-- name: Create services folder
-  become: true
-  ansible.builtin.file:
-    path: /data/services/
-    state: directory
-    owner: ansible
-    group: docker
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/kavita/environment"
+  register: env_file
+  become: false
 
-- name: Create kavita folder
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/kavita/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if kavita container exists
+  community.docker.docker_container_info:
+    name: kavita
+  register: kavita_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create kavita service folder
   become: true
-  ansible.builtin.file:
+  file:
     path: /data/services/kavita
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
+  when: not kavita_container.container.State.Running | default(false)
 
-- name: Setup docker compose file for Kavita stack
-  template:
-    src: docker-compose.j2
-    dest: /data/services/kavita/docker-compose.yml
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/kavita/environment"
+    dest: /data/services/kavita/.env
     owner: ansible
     group: docker
+    mode: '0640'
+  notify: restart kavita
 
-- name: Run container
-  shell:
-    cmd: "docker compose -f /data/services/kavita/docker-compose.yml up -d"
+# Docker Compose deployment
+- name: Setup docker compose file for kavita
+  template:
+    src: docker-compose.j2
+    dest: /data/services/kavita/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart kavita
+
+# Container deployment using docker_compose_v2
+- name: Run kavita container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/kavita
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not kavita_container.container.State.Running | default(false)
+  notify: restart kavita

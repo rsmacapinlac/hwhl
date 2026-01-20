@@ -1,11 +1,5 @@
-
-- name: Traefik routes
-  copy:
-    src: "{{ playbook_dir }}/files/traefik/config.yml"
-    dest: "/data/containers/traefik/config.yml"
-
-- name: Restart traefik
-  become: true
+---
+- name: restart traefik
   community.docker.docker_compose_v2:
     project_src: /data/services/traefik
     files:

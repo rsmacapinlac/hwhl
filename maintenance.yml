@@ -90,6 +90,19 @@
     - name: "Update Jellyfin"
       include_tasks: roles/jellyfin/tasks/update.yml
 
+- hosts: "kavita"
+  remote_user: ansible
+  tasks:
+    - name: "Update Kavita"
+      include_tasks: roles/kavita/tasks/update.yml
+      when: groups['kavita'] is defined and groups['kavita'] | length > 0
+
+- hosts: "navidrome"
+  remote_user: ansible
+  tasks:
+    - name: "Update Navidrome"
+      include_tasks: roles/navidrome/tasks/update.yml
+
 - hosts: "freshrss"
   remote_user: ansible
   tasks:

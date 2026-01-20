@@ -3,7 +3,7 @@ source_directories:
 
 repositories:
     - path: /mnt/borg-repository
-      label: {{ ansible_hostname }}
+      label: {{ ansible_facts["hostname"] }}
 
 exclude_patterns:
     - /mnt/source/borgbackup
@@ -16,7 +16,7 @@ exclude_patterns:
 
 encryption_passphrase: {{ borgbackup_encryption_passphrase }}
 compression: {{ borgbackup_compression | default('lz4') }}
-archive_name_format: '{{ ansible_hostname }}-{now:%Y-%m-%d-%H%M%S}'
+archive_name_format: '{{ ansible_facts["hostname"] }}-{now:%Y-%m-%d-%H%M%S}'
 
 keep_hourly: {{ borgbackup_keep_hourly | default(0) }}
 keep_daily: {{ borgbackup_keep_daily | default(7) }}

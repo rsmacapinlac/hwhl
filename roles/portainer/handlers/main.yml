@@ -1,0 +1,9 @@
+---
+- name: restart portainer
+  community.docker.docker_compose_v2:
+    project_src: /data/services/portainer
+    files:
+      - compose.yml
+    state: present
+    recreate: always
+    remove_orphans: false

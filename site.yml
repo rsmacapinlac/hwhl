@@ -152,6 +152,8 @@
   remote_user: ansible
   roles:
     - role: navidrome
+      tags:
+        - navidrome
 
 - hosts: "jellyfin"
   remote_user: ansible
@@ -217,6 +219,8 @@
   roles:
     - role: shares
     - role: kavita
+      tags:
+        - kavita
 
 - hosts: "audiobookshelf"
   remote_user: ansible
@@ -231,14 +235,26 @@
   remote_user: ansible
   roles:
     - role: portainer
+      tags:
+        - portainer
+        - containers
  ####
 
 - hosts: "containers"
   remote_user: ansible
   roles:
     - role: portainer
+      tags:
+        - portainer
+        - containers
     - role: traefik
+      tags:
+        - traefik
+        - containers
     - role: diun
+      tags:
+        - diun
+        - containers
 
 - hosts: "diun"
   remote_user: ansible
@@ -249,6 +265,9 @@
   remote_user: ansible
   roles:
     - role: portainer
+      tags:
+        - portainer
+        - containers
 
 - hosts: "pihole"
   remote_user: ansible
@@ -285,12 +304,18 @@
   remote_user: ansible
   roles:
     - role: traefik
+      tags:
+        - traefik
+        - containers
     - role: authelia
     - role: cloudflare-ddns
     - role: wg-easy
   tasks:
     - name: "Update external routes"
       include_tasks: roles/traefik/tasks/update_routes_external.yml
+      tags:
+        - traefik
+        - containers
 
 - hosts: "prometheus"
   remote_user: ansible

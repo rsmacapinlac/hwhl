@@ -1,26 +1,40 @@
 ---
-- name: Update Traefik container with latest image
+# Update tasks for traefik
+# Pulls latest image and recreates container
+# Run via: ansible-playbook maintenance.yml
+
+- name: Update traefik container with latest image
   community.docker.docker_compose_v2:
-    project_src: /data/services
+    project_src: /data/services/traefik
     files:
-      - traefik.yml
+      - compose.yml
     state: present
     pull: always
     recreate: always
     remove_orphans: false
+  register: compose_update
+  ignore_errors: true
 
-- name: Wait for Traefik container to be running
+- name: Wait for traefik container to be running
   community.docker.docker_container_info:
     name: traefik
   register: traefik_status
   until: traefik_status.container.State.Running | default(false)
   retries: 5
   delay: 2
+  when: compose_update is succeeded
 
 - name: Display update status
   debug:
-    msg: "Traefik has been updated and is running"
+    msg: "traefik has been updated and is running"
+  when: compose_update is succeeded
 
-- name: Remove dangling Traefik images
+- name: Display skip message when service unavailable
+  debug:
+    msg: "Skipped traefik update - service unavailable or update failed"
+  when: compose_update is failed
+
+- name: Remove dangling images
   command: docker image prune -f
   changed_when: true
+  when: compose_update is succeeded

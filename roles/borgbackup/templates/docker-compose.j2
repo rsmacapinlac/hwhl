@@ -8,7 +8,7 @@ services:
       - BORG_PASSPHRASE={{ borgbackup_encryption_passphrase }}
     volumes:
       - /data/containers:/mnt/source:ro
-      - {{ borgbackup_share_destination }}/{{ ansible_hostname }}:/mnt/borg-repository
+      - {{ borgbackup_share_destination }}/{{ ansible_facts["hostname"] }}:/mnt/borg-repository
       - /data/containers/borgbackup/config.yaml:/etc/borgmatic.d/config.yaml:ro
       - /data/containers/borgbackup/cron/crontab.txt:/etc/borgmatic.d/crontab.txt:ro
     networks:

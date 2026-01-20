@@ -1,11 +1,3 @@
-- name: Setup docker compose file for traefik
-  become: true
-  template:
-    src: docker-compose.j2
-    dest: /data/services/traefik.yml
-    owner: ansible
-    group: docker
-
 - name: Traefik folder
   become: true
   ansible.builtin.file:
@@ -21,6 +13,7 @@
     dest: /data/containers/traefik/traefik.yml
     owner: ansible
     group: docker
+  notify: restart traefik
 
 - name: Traefik routes
   become: true
@@ -29,6 +22,7 @@
     dest: /data/containers/traefik/config.yml
     owner: ansible
     group: docker
+  notify: restart traefik
 
 - name: Traefik cert file
   become: true
@@ -37,9 +31,44 @@
     state: touch
     mode: '0600'
 
+# Container status check
+- name: Check if traefik container exists
+  community.docker.docker_container_info:
+    name: traefik
+  register: traefik_container
+  ignore_errors: true
+
+# IMPORTANT: NO CONDITIONALS on directory/compose deployment!
+- name: Create traefik service folder
+  become: true
+  ansible.builtin.file:
+    path: /data/services/traefik
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+# IMPORTANT: NO CONDITIONAL - must always deploy for handlers to work!
+- name: Setup docker compose file for traefik
+  become: true
+  template:
+    src: docker-compose.j2
+    dest: /data/services/traefik/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart traefik
+
 # Update the DNS records as well
 - include_tasks: update_routes.yml
 
-- name: Run container
-  shell:
-    cmd: "docker compose -f /data/services/traefik.yml up -d"
+# ONLY this task should be conditional!
+- name: Run traefik container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/traefik
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not traefik_container.container.State.Running | default(false)
+  notify: restart traefik

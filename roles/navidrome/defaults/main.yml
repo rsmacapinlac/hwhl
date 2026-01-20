@@ -1,0 +1,9 @@
+---
+# Navidrome default configuration variables
+
+# Port configuration
+navidrome_port: 4533
+
+# User/Group IDs
+navidrome_puid: 1001
+navidrome_pgid: 1001
