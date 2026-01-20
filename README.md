@@ -1,55 +1,14 @@
 # Happy wife, Happy life (hwhl)
 
-This is my ansible setup for my homelab.
+This is my homelab setup. This project is built on the shoulder of giants:
+
+- Proxmox
+- Terraform (coming soon)
+- Ansible
 
 ## Project Overview
 
-This Ansible project automates the setup and management of a comprehensive homelab environment. It includes:
-
-### Core Infrastructure
-- DNS management with [PiHole](docs/pihole-setup.md)
-- Reverse proxy with Traefik
-- Authentication with Authelia
-- Container management with Portainer
-- Automated updates with Watchtower
-
-### Media Services
-- Jellyfin/Plex for media streaming
-- Tautulli for media statistics
-- Tdarr for media transcoding
-- Tubearchivist for YouTube archiving
-- Navidrome for music streaming
-- Audiobookshelf for audiobook management
-- Kavita for e-book management
-
-### Productivity & Organization
-- Nextcloud for file sharing and collaboration
-- Paperless-ng for document management
-- Photoprism for photo management
-- Baserow for database management
-- Docmost for documentation
-- Monica for personal relationship management
-- Homepage for dashboard
-
-### Monitoring & Automation
-- Prometheus for metrics collection
-- Traggo for time tracking
-- N8n for workflow automation
-- Ofelia for task scheduling
-- Syncthing for file synchronization
-
-## Directory Structure
-
-```
-.
-├── ansible.cfg          # Ansible configuration
-├── site.yml            # Main playbook
-├── inventory/          # Host inventory files
-├── roles/             # Ansible roles
-├── files/             # Configuration files
-├── group_vars/        # Group variables
-└── collections/       # Ansible collections
-```
+The goal for my homelab is to simplify getting up and running as well as maintenance (scripts to run and some level of automation). It tries to make it easy to access services. It attempts to make the setup of services somewhat configurable so you can start hosting and using services as quickly as possible.
 
 ## Getting Started
 
@@ -150,6 +109,43 @@ The playbook is organized into the following host groups:
 ## License
 
 This project is licensed under the terms of the included LICENSE file.
+
+## TODO
+
+### Services Using Wrong Compose Filename
+
+These services need to be updated to use `compose.yml` instead of `docker-compose.yml`:
+
+4. **homeassistant** - smarthome host
+   - Status: Running container ✅
+   - Issue: Uses `docker-compose.yml` instead of `compose.yml`
+
+5. **tdarr** - media-support host
+   - Status: Running container ✅
+   - Issue: Uses `docker-compose.yml` instead of `compose.yml`
+
+7. **homepage** - family host
+   - Status: Running container ✅
+   - Issue: Uses `docker-compose.yml` instead of `compose.yml`
+
+8. **linkding** - family host
+   - Status: Running container ✅
+   - Issue: Uses `docker-compose.yml` instead of `compose.yml`
+
+11. **ofelia** - family host
+    - Status: Running container ✅
+    - Issue: Uses `docker-compose.yml` instead of `compose.yml`
+
+12. **paperless-ng** - family host
+    - Status: Running container ✅
+    - Issue: Uses `docker-compose.yml` instead of `compose.yml`
+
+### Legacy Pattern (Flat Files)
+
+13. **nextcloud** - yamaguchi host
+    - Status: Running (AIO deployment) ✅
+    - Issue: Uses flat `nextcloud.yml` file
+    - ⚠️ Special case (AIO deployment may not need standard migration)
 
 ## Documentation
 
