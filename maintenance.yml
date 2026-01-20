@@ -154,6 +154,13 @@
       include_tasks: roles/transmission-openvpn/tasks/update.yml
       when: groups['transmission-openvpn'] is defined and groups['transmission-openvpn'] | length > 0
 
+- hosts: "mylar3"
+  remote_user: ansible
+  tasks:
+    - name: "Update Mylar3"
+      include_tasks: roles/mylar3/tasks/update.yml
+      when: groups['mylar3'] is defined and groups['mylar3'] | length > 0
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

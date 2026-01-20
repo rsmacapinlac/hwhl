@@ -1,0 +1,9 @@
+---
+# Mylar3 default configuration variables
+
+# Port configuration
+mylar3_port: 8090
+
+# User/Group IDs
+mylar3_puid: 1001
+mylar3_pgid: 1001

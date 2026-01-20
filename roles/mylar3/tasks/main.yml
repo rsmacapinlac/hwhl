@@ -1,0 +1,63 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/mylar3/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/mylar3/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if mylar3 container exists
+  community.docker.docker_container_info:
+    name: mylar3
+  register: mylar3_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create mylar3 service folder
+  become: true
+  file:
+    path: /data/services/mylar3
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/mylar3/environment"
+    dest: /data/services/mylar3/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart mylar3
+
+# Docker Compose deployment
+- name: Setup docker compose file for mylar3
+  template:
+    src: docker-compose.j2
+    dest: /data/services/mylar3/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart mylar3
+
+# Container deployment using docker_compose_v2
+- name: Run mylar3 container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/mylar3
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not mylar3_container.container.State.Running | default(false)
+  notify: restart mylar3

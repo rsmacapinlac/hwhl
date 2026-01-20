@@ -169,40 +169,6 @@ services:
     networks:
       - proxy
 
-  mylar3:
-    image: lscr.io/linuxserver/mylar3:latest
-    container_name: mylar3
-    environment:
-      - PUID=1001
-      - PGID=1001
-      - TZ={{ timezone }}
-    volumes:
-      - /data/containers/mylar3:/config
-
-{% for item in mylar3 %}
-      - {{ item.host_folder }}:{{ item.container }}
-{% endfor %}
-
-      # download folders
-      - /data/arrs/Downloads/sabnzbd/complete:/downloads
-    ports:
-      - 8090:8090
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mylar.entrypoints=http"
-      - "traefik.http.routers.mylar.rule=Host(`mylar.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-      - "traefik.http.middlewares.mylar-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.mylar.middlewares=mylar-https-redirect"
-      - "traefik.http.routers.mylar-secure.entrypoints=https"
-      - "traefik.http.routers.mylar-secure.rule=Host(`mylar.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-      - "traefik.http.routers.mylar-secure.tls=true"
-      - "traefik.http.routers.mylar-secure.service=mylar"
-      - "traefik.http.services.mylar.loadbalancer.server.port=8090"
-      - "traefik.docker.network=proxy"
-    networks:
-      - proxy
-
 networks:
   proxy:
     external: true

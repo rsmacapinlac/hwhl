@@ -1,0 +1,37 @@
+---
+services:
+  mylar3:
+    container_name: mylar3
+    image: lscr.io/linuxserver/mylar3:latest
+    env_file:
+      - .env
+    volumes:
+      - /data/containers/mylar3:/config
+{% for item in mylar3_volumes %}
+      - {{ item.host_folder }}:{{ item.container }}
+{% endfor %}
+      # download folders
+      - /data/arrs/Downloads/sabnzbd/complete:/downloads
+    ports:
+      - {{ mylar3_port }}:8090
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.mylar.entrypoints=http"
+      - "traefik.http.routers.mylar.rule=Host(`mylar.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.mylar-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.mylar.middlewares=mylar-https-redirect"
+      - "traefik.http.routers.mylar-secure.entrypoints=https"
+      - "traefik.http.routers.mylar-secure.rule=Host(`mylar.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.mylar-secure.tls=true"
+      - "traefik.http.routers.mylar-secure.service=mylar"
+      - "traefik.http.services.mylar.loadbalancer.server.port=8090"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true

@@ -42,6 +42,14 @@
     - role: shares
     - role: whisparr
 
+- hosts: "mylar3"
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: mylar3
+      tags:
+        - mylar3
+
 - hosts: "jellyseerr"
   remote_user: ansible
   roles:
