@@ -1,0 +1,5 @@
+---
+# Flaresolverr default configuration variables
+
+# Port configuration
+flaresolverr_port: 8191

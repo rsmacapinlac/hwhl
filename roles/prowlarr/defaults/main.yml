@@ -1,0 +1,10 @@
+---
+# Prowlarr default configuration variables
+
+# Port configuration
+prowlarr_port: 9696
+
+# User/Group IDs
+prowlarr_puid: 1001
+prowlarr_pgid: 1001
+prowlarr_umask: 002

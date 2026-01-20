@@ -1,0 +1,40 @@
+---
+# Setup tasks for Flaresolverr environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create flaresolverr config directory locally
+  file:
+    path: "{{ playbook_dir }}/files/config/flaresolverr"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/flaresolverr/environment"
+  register: flaresolverr_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/files/config/flaresolverr/environment"
+    mode: '0640'
+  when: not flaresolverr_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Flaresolverr environment file created at: {{ playbook_dir }}/files/config/flaresolverr/environment
+
+      Flaresolverr is a CloudFlare bypass proxy used by Prowlarr.
+      It runs as an internal service without external access.
+
+      After configuration, deploy with: ansible-playbook site.yml --limit flaresolverr
+  when: not flaresolverr_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

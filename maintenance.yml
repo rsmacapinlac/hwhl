@@ -145,28 +145,54 @@
   tasks:
     - name: "Update Sabnzbd"
       include_tasks: roles/sabnzbd/tasks/update.yml
-      when: groups['sabnzbd'] is defined and groups['sabnzbd'] | length > 0
+      tags:
+        - sabnzbd
+        - arrs
 
 - hosts: "transmission-openvpn"
   remote_user: ansible
   tasks:
     - name: "Update Transmission-OpenVPN"
       include_tasks: roles/transmission-openvpn/tasks/update.yml
-      when: groups['transmission-openvpn'] is defined and groups['transmission-openvpn'] | length > 0
+      tags:
+        - transmission
+        - transmission-openvpn
+        - arrs
 
 - hosts: "mylar3"
   remote_user: ansible
   tasks:
     - name: "Update Mylar3"
       include_tasks: roles/mylar3/tasks/update.yml
-      when: groups['mylar3'] is defined and groups['mylar3'] | length > 0
+      tags:
+        - mylar3
+        - arrs
 
 - hosts: "whisparr"
   remote_user: ansible
   tasks:
     - name: "Update Whisparr"
       include_tasks: roles/whisparr/tasks/update.yml
-      when: groups['whisparr'] is defined and groups['whisparr'] | length > 0
+      tags:
+        - whisparr
+
+- hosts: "prowlarr"
+  remote_user: ansible
+  tasks:
+    - name: "Update Prowlarr"
+      include_tasks: roles/prowlarr/tasks/update.yml
+      tags:
+        - prowlarr
+        - arrs
+
+- hosts: "flaresolverr"
+  remote_user: ansible
+  tasks:
+    - name: "Update Flaresolverr"
+      include_tasks: roles/flaresolverr/tasks/update.yml
+      tags:
+        - flaresolverr
+        - arrs
 
 #- hosts: 'managed_hosts'
 #  remote_user: ansible

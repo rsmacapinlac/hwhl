@@ -243,3 +243,21 @@
       include_tasks: roles/whisparr/tasks/setup.yml
       run_once: true
       when: groups['whisparr'] is defined and groups['whisparr'] | length > 0
+
+- name: "Setup Prowlarr"
+  hosts: prowlarr
+  connection: local
+  tasks:
+    - name: "Run Prowlarr setup if group exists"
+      include_tasks: roles/prowlarr/tasks/setup.yml
+      run_once: true
+      when: groups['prowlarr'] is defined and groups['prowlarr'] | length > 0
+
+- name: "Setup Flaresolverr"
+  hosts: flaresolverr
+  connection: local
+  tasks:
+    - name: "Run Flaresolverr setup if group exists"
+      include_tasks: roles/flaresolverr/tasks/setup.yml
+      run_once: true
+      when: groups['flaresolverr'] is defined and groups['flaresolverr'] | length > 0
