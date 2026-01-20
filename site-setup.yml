@@ -279,3 +279,12 @@
       include_tasks: roles/lidarr/tasks/setup.yml
       run_once: true
       when: groups['lidarr'] is defined and groups['lidarr'] | length > 0
+
+- name: "Setup Sonarr"
+  hosts: sonarr
+  connection: local
+  tasks:
+    - name: "Run Sonarr setup if group exists"
+      include_tasks: roles/sonarr/tasks/setup.yml
+      run_once: true
+      when: groups['sonarr'] is defined and groups['sonarr'] | length > 0

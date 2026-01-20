@@ -1,0 +1,11 @@
+# Sonarr Environment Configuration
+
+# User/Group Configuration
+PUID={{ sonarr_puid | default('1001') }}
+PGID={{ sonarr_pgid | default('1001') }}
+
+# File Permissions
+UMASK={{ sonarr_umask | default('002') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}

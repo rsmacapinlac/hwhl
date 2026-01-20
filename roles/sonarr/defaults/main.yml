@@ -1,0 +1,10 @@
+---
+# Sonarr default configuration variables
+
+# Port configuration
+sonarr_port: 8989
+
+# User/Group IDs
+sonarr_puid: 1001
+sonarr_pgid: 1001
+sonarr_umask: 002

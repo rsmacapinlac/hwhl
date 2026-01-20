@@ -10,6 +10,7 @@ managed_hosts:
     arrs:
     bazarr:
     lidarr:
+    sonarr:
     homepage:
     paperless-ng:
     photoprism:

@@ -61,6 +61,15 @@
         - lidarr
         - arrs
 
+- hosts: "sonarr"
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: sonarr
+      tags:
+        - sonarr
+        - arrs
+
 # Indexers
 - hosts: "prowlarr"
   remote_user: ansible
