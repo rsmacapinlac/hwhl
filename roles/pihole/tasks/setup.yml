@@ -1,21 +1,39 @@
 ---
-- name: Create config directory for pihole
-  local_action:
-    module: file
+# Setup tasks for PiHole environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create pihole config directory locally
+  file:
     path: "{{ playbook_dir }}/files/config/pihole"
     state: directory
     mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/pihole/environment"
+  register: pihole_env_file
+  delegate_to: 127.0.0.1
+  become: false
 
 - name: Create pihole environment file
-  local_action:
-    module: template
+  template:
     src: "{{ playbook_dir }}/roles/pihole/templates/environment.j2"
     dest: "{{ playbook_dir }}/files/config/pihole/environment"
+    mode: '0640'
+  when: not pihole_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
   register: env_created
 
 - name: Display setup instructions
   debug:
     msg: |
-      Environment file has been created at {{ playbook_dir }}/files/config/pihole/environment
+      PiHole environment file created at: {{ playbook_dir }}/files/config/pihole/environment
+
       Please review and customize this file with your desired configuration before running site.yml
-      After customization, you can run site.yml to deploy the services. 
+      After customization, you can run site.yml to deploy the services.
+  when: not pihole_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false 

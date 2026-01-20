@@ -221,6 +221,15 @@
         - sonarr
         - arrs
 
+- hosts: "radarr"
+  remote_user: ansible
+  tasks:
+    - name: "Update Radarr"
+      include_tasks: roles/radarr/tasks/update.yml
+      tags:
+        - radarr
+        - arrs
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

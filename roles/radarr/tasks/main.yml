@@ -1,0 +1,63 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/radarr/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/radarr/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if radarr container exists
+  community.docker.docker_container_info:
+    name: radarr
+  register: radarr_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create radarr service folder
+  become: true
+  file:
+    path: /data/services/radarr
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/radarr/environment"
+    dest: /data/services/radarr/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart radarr
+
+# Docker Compose deployment
+- name: Setup docker compose file for radarr
+  template:
+    src: docker-compose.j2
+    dest: /data/services/radarr/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart radarr
+
+# Container deployment using docker_compose_v2
+- name: Run radarr container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/radarr
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not radarr_container.container.State.Running | default(false)
+  notify: restart radarr

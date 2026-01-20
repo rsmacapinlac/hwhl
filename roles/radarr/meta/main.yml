@@ -1,0 +1,5 @@
+---
+# Radarr role metadata
+
+dependencies:
+  - role: docker

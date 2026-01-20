@@ -7,10 +7,10 @@ managed_hosts:
     containers:
     plex_stack:
     overseer:
-    arrs:
     bazarr:
     lidarr:
     sonarr:
+    radarr:
     homepage:
     paperless-ng:
     photoprism:

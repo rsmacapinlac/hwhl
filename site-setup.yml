@@ -1,8 +1,7 @@
 ---
 - name: "Setup PiHole DNS"
   hosts: pihole
-  remote_user: ansible
-  become: true
+  connection: local
   tasks:
     - name: "Run PiHole setup if group exists"
       include_tasks: roles/pihole/tasks/setup.yml
@@ -20,8 +19,7 @@
 
 - name: "Setup Nebula Sync"
   hosts: nebula-sync
-  remote_user: ansible
-  become: true
+  connection: local
   tasks:
     - name: "Run Nebula Sync setup if group exists"
       include_tasks: roles/nebula-sync/tasks/setup.yml
@@ -288,3 +286,12 @@
       include_tasks: roles/sonarr/tasks/setup.yml
       run_once: true
       when: groups['sonarr'] is defined and groups['sonarr'] | length > 0
+
+- name: "Setup Radarr"
+  hosts: radarr
+  connection: local
+  tasks:
+    - name: "Run Radarr setup if group exists"
+      include_tasks: roles/radarr/tasks/setup.yml
+      run_once: true
+      when: groups['radarr'] is defined and groups['radarr'] | length > 0

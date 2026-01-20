@@ -37,12 +37,6 @@
         - transmission-openvpn
         - arrs
 
-- hosts: "arrs"
-  remote_user: ansible
-  roles:
-    - role: shares
-    - role: arrs
-
 - hosts: "bazarr"
   remote_user: ansible
   roles:
@@ -68,6 +62,15 @@
     - role: sonarr
       tags:
         - sonarr
+        - arrs
+
+- hosts: "radarr"
+  remote_user: ansible
+  roles:
+    - role: shares
+    - role: radarr
+      tags:
+        - radarr
         - arrs
 
 # Indexers

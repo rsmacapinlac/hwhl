@@ -1,0 +1,10 @@
+---
+# Radarr default configuration variables
+
+# Port configuration
+radarr_port: 7878
+
+# User/Group IDs
+radarr_puid: 1001
+radarr_pgid: 1001
+radarr_umask: 002

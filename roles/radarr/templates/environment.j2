@@ -1,0 +1,11 @@
+# Radarr Environment Configuration
+
+# User/Group Configuration
+PUID={{ radarr_puid | default('1001') }}
+PGID={{ radarr_pgid | default('1001') }}
+
+# File Permissions
+UMASK={{ radarr_umask | default('002') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}

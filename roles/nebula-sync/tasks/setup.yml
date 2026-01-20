@@ -1,21 +1,37 @@
 ---
-- name: Create configuration directory
-  local_action:
-    module: file
+# Setup tasks for Nebula Sync environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create nebula-sync config directory locally
+  file:
     path: "{{ playbook_dir }}/files/config/nebula-sync"
     state: directory
     mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/files/config/nebula-sync/environment"
+  register: nebula_sync_env_file
+  delegate_to: 127.0.0.1
+  become: false
 
 - name: Generate environment file from template
-  local_action:
-    module: template
+  template:
     src: environment.j2
     dest: "{{ playbook_dir }}/files/config/nebula-sync/environment"
     mode: '0640'
-  when: not env_file.stat.exists | default(true)
+  when: not nebula_sync_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
 
 - name: Display setup instructions
   debug:
     msg: |
-      Nebula Sync environment file has been created at {{ playbook_dir }}/files/config/nebula-sync/environment
-      Please review and modify the configuration as needed before running the main playbook. 
+      Nebula Sync environment file created at: {{ playbook_dir }}/files/config/nebula-sync/environment
+
+      Please review and modify the configuration as needed before running the main playbook.
+  when: not nebula_sync_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false 
