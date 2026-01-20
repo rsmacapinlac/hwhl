@@ -161,6 +161,13 @@
       include_tasks: roles/mylar3/tasks/update.yml
       when: groups['mylar3'] is defined and groups['mylar3'] | length > 0
 
+- hosts: "whisparr"
+  remote_user: ansible
+  tasks:
+    - name: "Update Whisparr"
+      include_tasks: roles/whisparr/tasks/update.yml
+      when: groups['whisparr'] is defined and groups['whisparr'] | length > 0
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

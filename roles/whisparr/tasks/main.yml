@@ -1,18 +1,63 @@
-- name: Create services folder
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/whisparr/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/whisparr/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if whisparr container exists
+  community.docker.docker_container_info:
+    name: whisparr
+  register: whisparr_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create whisparr service folder
   become: true
-  ansible.builtin.file:
+  file:
     path: /data/services/whisparr
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
 
-- name: Setup docker compose file for whisparr stack
-  template:
-    src: docker-compose.j2
-    dest: /data/services/whisparr/docker-compose.yml
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/whisparr/environment"
+    dest: /data/services/whisparr/.env
     owner: ansible
     group: docker
+    mode: '0640'
+  notify: restart whisparr
 
-- name: Run container
-  shell:
-    cmd: "docker compose -f /data/services/whisparr/docker-compose.yml up -d"
+# Docker Compose deployment
+- name: Setup docker compose file for whisparr
+  template:
+    src: docker-compose.j2
+    dest: /data/services/whisparr/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart whisparr
+
+# Container deployment using docker_compose_v2
+- name: Run whisparr container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/whisparr
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not whisparr_container.container.State.Running | default(false)
+  notify: restart whisparr

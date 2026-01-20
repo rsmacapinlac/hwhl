@@ -41,6 +41,8 @@
   roles:
     - role: shares
     - role: whisparr
+      tags:
+        - whisparr
 
 - hosts: "mylar3"
   remote_user: ansible

@@ -1,0 +1,10 @@
+---
+# Whisparr default configuration variables
+
+# Port configuration
+whisparr_port: 6969
+
+# User/Group IDs
+whisparr_puid: 1001
+whisparr_pgid: 1001
+whisparr_umask: 002
