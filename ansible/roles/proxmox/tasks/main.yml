@@ -54,9 +54,13 @@
 
 - name: Download the Debian 12 standard template
   ansible.builtin.shell:
-    cmd: pveam download local debian-12-standard_12.7-1_amd64.tar.zst
-    # cmd: pveam download local debian-12-standard_12.2-1_amd64.tar.zst
+    cmd: pveam download local debian-12-standard_12.12-1_amd64.tar.zst
 
-# pveam update
+# ============================================
+# Terraform Setup
+# ============================================
+- name: Setup Terraform user and API token
+  include_tasks: terraform-setup.yml
+  when: setup_terraform | default(true)
 
 
