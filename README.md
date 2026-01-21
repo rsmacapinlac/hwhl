@@ -34,10 +34,10 @@ cd hwhl
 3. Configure your Proxmox inventory:
 ```bash
 # Create and edit your inventory file
-touch inventory/proxmox.yml
+touch ansible/inventory/proxmox.yml
 ```
 
-Add the following content to `inventory/proxmox.yml`:
+Add the following content to `ansible/inventory/proxmox.yml`:
 ```yaml
 proxmox_control_node_by_ip:
   hosts:
@@ -47,7 +47,11 @@ proxmox_control_node_by_ip:
 
 4. Run the Proxmox setup playbook:
 ```bash
-ansible-playbook proxmox-setup.yml
+# Option 1: Change to ansible directory
+cd ansible && ansible-playbook proxmox-setup.yml
+
+# Option 2: Use wrapper script from repository root
+./bin/ansible-playbook.sh proxmox-setup.yml
 ```
 
 ## Usage
@@ -56,20 +60,24 @@ ansible-playbook proxmox-setup.yml
 
 ```bash
 # Run the entire playbook
-ansible-playbook site.yml
+# Option 1: Change to ansible directory
+cd ansible && ansible-playbook site.yml
+
+# Option 2: Use wrapper script from repository root
+./bin/ansible-playbook.sh site.yml
 
 # Run specific services by host group
-ansible-playbook site.yml --limit dns          # Run only DNS (PiHole) setup
-ansible-playbook site.yml --limit edge         # Run edge services (Traefik, Authelia, etc.)
-ansible-playbook site.yml --limit containers   # Run container management services
-ansible-playbook site.yml --limit jellyfin     # Run Jellyfin setup
-ansible-playbook site.yml --limit plex         # Run Plex setup
+cd ansible && ansible-playbook site.yml --limit dns          # Run only DNS (PiHole) setup
+cd ansible && ansible-playbook site.yml --limit edge         # Run edge services (Traefik, Authelia, etc.)
+cd ansible && ansible-playbook site.yml --limit containers   # Run container management services
+cd ansible && ansible-playbook site.yml --limit jellyfin     # Run Jellyfin setup
+cd ansible && ansible-playbook site.yml --limit plex         # Run Plex setup
 
 # Check syntax
-ansible-playbook site.yml --syntax-check
+cd ansible && ansible-playbook site.yml --syntax-check
 
 # Dry run
-ansible-playbook site.yml --check
+cd ansible && ansible-playbook site.yml --check
 ```
 
 ### Available Host Groups
@@ -87,13 +95,13 @@ The playbook is organized into the following host groups:
 
 ### Maintenance
 
-- Use `maintenance.yml` for routine maintenance tasks
-- Use `provision.yml` for initial provisioning
-- Use `de-provision.yml` for cleanup
+- Use `ansible/maintenance.yml` for routine maintenance tasks
+- Use `ansible/provision.yml` for initial provisioning (if exists)
+- Use `ansible/de-provision.yml` for cleanup (if exists)
 
 ## Security Notes
 
-- All sensitive credentials should be stored in `files/config/`
+- All sensitive credentials should be stored in `ansible/files/config/`
 - Use environment variables or Ansible vault for secrets
 - Keep your Ansible control node secure
 - Regularly update your systems using the maintenance playbook

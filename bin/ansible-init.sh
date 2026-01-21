@@ -41,4 +41,4 @@ fi
 # ansible-galaxy role install --force --roles-path galaxy/roles -r galaxy/requirements.yml
 # ansible-galaxy collection install --force --collections-path ~/code/personal/ansible/collections -r $ansible_path/requirements.yml
 
-ansible-galaxy collection install --force -r galaxy/requirements.yml
+ansible-galaxy collection install --force -r ansible/galaxy/requirements.yml

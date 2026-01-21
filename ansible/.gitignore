@@ -1,0 +1,19 @@
+.vault-pass-file
+.become-pass-file
+.facts.json
+.envrc
+.env
+
+# inventory files
+inventory/proxmox-nodes.yml
+inventory/proxmox-node-*.yml
+inventory/host_vars/*
+
+# exclude all host_vars
+inventory/host_vars/*
+
+# exclude group_vars with sensitive information
+group_vars/all.yml
+
+# exclude files folder
+files

@@ -16,11 +16,11 @@ This is an Ansible-based homelab automation project for managing a comprehensive
 - **Service Discovery**: DNS-based service routing through homelab domain
 
 ### Ansible Structure
-- **Main Playbook**: `site.yml` - orchestrates all service deployments
-- **Inventory**: Host groups organized by service type in `inventory/` directory
-- **Roles**: Self-contained service deployments in `roles/` directory
-- **Configuration**: Environment files and templates in `files/config/`
-- **Variables**: Global settings in `group_vars/all.yml`
+- **Main Playbook**: `ansible/site.yml` - orchestrates all service deployments
+- **Inventory**: Host groups organized by service type in `ansible/inventory/` directory
+- **Roles**: Self-contained service deployments in `ansible/roles/` directory
+- **Configuration**: Environment files and templates in `ansible/files/config/`
+- **Variables**: Global settings in `ansible/group_vars/all.yml`
 
 ### Service Organization
 Services are deployed across host groups:
@@ -39,10 +39,12 @@ Services are deployed across host groups:
 ./bin/ansible-init.sh
 
 # Deploy Proxmox infrastructure
-ansible-playbook proxmox-setup.yml
+cd ansible && ansible-playbook proxmox-setup.yml
+# OR: ./bin/ansible-playbook.sh proxmox-setup.yml
 
 # Deploy all services
-ansible-playbook site.yml
+cd ansible && ansible-playbook site.yml
+# OR: ./bin/ansible-playbook.sh site.yml
 ```
 
 ### Service Management
@@ -64,10 +66,10 @@ ansible-playbook maintenance.yml
 ```
 
 ### Key Files
-- `ansible.cfg`: Ansible configuration with optimized settings
-- `inventory/`: Host definitions organized by service type
-- `group_vars/all.yml`: Global variables including domain and API keys
-- `files/config/`: Service-specific environment files and configurations
+- `ansible/ansible.cfg`: Ansible configuration with optimized settings
+- `ansible/inventory/`: Host definitions organized by service type
+- `ansible/group_vars/all.yml`: Global variables including domain and API keys
+- `ansible/files/config/`: Service-specific environment files and configurations
 
 ## Development Patterns
 
