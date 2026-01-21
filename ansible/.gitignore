@@ -1,6 +1,5 @@
 .vault-pass-file
 .become-pass-file
-.facts.json
 .envrc
 .env
 
