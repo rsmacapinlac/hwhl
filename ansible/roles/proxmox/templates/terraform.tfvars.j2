@@ -14,6 +14,7 @@ proxmox_api_token = "{{ terraform_full_token_id }}={{ terraform_api_token }}"
 proxmox_api_token = "terraform@pam!terraform=REPLACE-WITH-YOUR-TOKEN"
 {% endif %}
 proxmox_insecure  = true
+proxmox_host      = "{{ hostvars[ansible_play_hosts[0]]['ansible_host'] | default(hostvars[ansible_play_hosts[0]]['inventory_hostname']) }}"
 
 # ============================================
 # Global Settings
@@ -29,7 +30,7 @@ root_password      = "{{ lxc_root_password | default('CHANGE-ME-SECURE-PASSWORD'
 # SSH Configuration
 # ============================================
 
-ssh_public_key_file = "~/.ssh/id_rsa.pub"
+ssh_public_key_file = "~/.ssh/id_rsa_homelab_terraform.pub"
 
 # ============================================
 # LXC Template
@@ -46,26 +47,28 @@ network_bridge  = "vmbr0"
 
 dns_containers = {
   "dns-01" = {
-    vmid       = 300
+    vmid       = 301
     node       = "pve-01"
-    ip_address = "10.1.0.10/24"
+    ip_address = "10.1.0.2/24"
     gateway    = "{{ default_gateway | default('10.1.0.1') }}"
-    nameserver = "1.1.1.1"
+    nameserver = "1.1.1.1, 1.0.0.1"
     memory     = 2048
     swap       = 4096
     cores      = 1
-    disk_size  = 64
+    disk_size  = 32
+    mount_points = []  # No mount points for DNS containers
   }
   "dns-02" = {
-    vmid       = 301
-    node       = "pve-02"
-    ip_address = "10.1.0.11/24"
+    vmid       = 302
+    node       = "pve-01"
+    ip_address = "10.1.0.3/24"
     gateway    = "{{ default_gateway | default('10.1.0.1') }}"
-    nameserver = "1.1.1.1"
+    nameserver = "1.1.1.1, 1.0.0.1"
     memory     = 2048
     swap       = 4096
     cores      = 1
-    disk_size  = 64
+    disk_size  = 32
+    mount_points = []  # No mount points for DNS containers
   }
 }
 
@@ -78,18 +81,23 @@ edge_containers = {
   "edge-01" = {
     vmid       = 400
     node       = "pve-01"
-    ip_address = "10.1.0.20/24"
+    ip_address = "10.1.0.10/24"
     gateway    = "{{ default_gateway | default('10.1.0.1') }}"
-    nameserver = "10.1.0.10"  # Use local DNS container
+    nameserver = "10.1.0.3, 10.1.0.2"  # Use local DNS container
     memory     = 4096
-    swap       = 4096
-    cores      = 2
+    swap       = 8192
+    cores      = 1
     disk_size  = 64
+    # Mount NFS shares from Proxmox host into container
+    # These paths must exist on the Proxmox host (mounted via Ansible)
+    mount_points = [
+      # Example: Mount ContainerBackups NFS share
+      # {
+      #   host_path      = "/mnt/ContainerBackups"  # Path on Proxmox host (from proxmox_nfs_shares)
+      #   container_path  = "/mnt/backups"           # Path inside container
+      # }
+    ]
   }
 }
 
-# ============================================
-# Additional Service Containers
-# ============================================
-# Add more service definitions as you expand your Terraform setup
-# Examples: media_containers, productivity_containers, automation_containers
+

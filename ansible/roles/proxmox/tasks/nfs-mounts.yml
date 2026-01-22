@@ -1,0 +1,45 @@
+---
+# ============================================
+# Proxmox NFS Share Mounting
+# ============================================
+# Mounts NFS shares configured in proxmox_nfs_shares variable
+# Configuration should be in group_vars/all.yml or host_vars/<hostname>.yml
+#
+# Example configuration:
+#   proxmox_nfs_shares:
+#     - source: "nas.local:/export/backups"
+#       destination: "/mnt/backups"
+#       options: "defaults,noatime"
+#     - source: "nas.local:/export/vm-storage"
+#       destination: "/mnt/vm-storage"
+#       options: "defaults,noatime,rsize=8192,wsize=8192"
+# ============================================
+
+- name: Install NFS client packages
+  apt:
+    name:
+      - nfs-common
+      - nfs4-acl-tools
+    state: present
+    update_cache: yes
+  when: proxmox_nfs_shares | default([]) | length > 0
+
+- name: Create mountpoint directories
+  file:
+    path: "{{ item.destination }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ proxmox_nfs_shares | default([]) }}"
+  when: proxmox_nfs_shares | default([]) | length > 0
+  ignore_errors: true
+  # Ignore errors if directory already exists (including if it's already a mount point)
+
+- name: Mount NFS shares
+  ansible.posix.mount:
+    fstype: nfs
+    src: "{{ item.source }}"
+    path: "{{ item.destination }}"
+    opts: "{{ item.options | default('defaults') }}"
+    state: mounted
+  loop: "{{ proxmox_nfs_shares | default([]) }}"
+  when: proxmox_nfs_shares | default([]) | length > 0

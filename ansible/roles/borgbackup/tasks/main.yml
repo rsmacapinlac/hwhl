@@ -1,17 +1,17 @@
 ---
-- name: "Mount ContainerBackups share for BorgBackup"
-  include_tasks: roles/shares/tasks/single_share.yml
-  vars:
-    type: "{{ borgbackup_share_type }}"
-    destination: "{{ borgbackup_share_destination }}"
-    source: "{{ borgbackup_share_source }}"
-    options: "{{ borgbackup_share_options }}"
-  when: borgbackup_mount_share | default(true)
-
+#- name: "Mount ContainerBackups share for BorgBackup"
+#  include_tasks: roles/shares/tasks/single_share.yml
+#  vars:
+#    type: "{{ borgbackup_share_type }}"
+#    destination: "{{ borgbackup_share_destination }}"
+#    source: "{{ borgbackup_share_source }}"
+#    options: "{{ borgbackup_share_options }}"
+#  when: borgbackup_mount_share | default(true)
+#
 - name: Create Borg repository base directory
   become: true
   ansible.builtin.file:
-    path: "{{ borgbackup_share_destination }}/{{ ansible_facts['hostname'] }}"
+    path: "/data/borgbackup/{{ ansible_facts['hostname'] }}"
     state: directory
 
 - name: Create the 'proxy' network

@@ -2,12 +2,8 @@
 - hosts: all
   gather_facts: true  # Explicitly gather facts for this play
 
-#- hosts: "managed_hosts"
-#  remote_user: ansible
-#  become: true
-#  tasks:
-#    - name: 'Apt update'
-#      include_tasks: roles/common/tasks/apt-update.yml
+# Note: Initial host setup (ansible user creation) is handled by host-setup.yml
+# Run host-setup.yml once for new hosts before running site.yml
 
 - name: "Deploy BorgBackup (Foundational Backup Service)"
   hosts: "managed_hosts"
@@ -321,6 +317,8 @@
   remote_user: ansible
   roles:
     - role: prometheus
+      tags:
+        - prometheus
 
 - hosts: "photoprism"
   remote_user: ansible

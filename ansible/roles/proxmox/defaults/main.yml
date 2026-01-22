@@ -1,0 +1,51 @@
+---
+# ============================================
+# Proxmox Role Default Variables
+# ============================================
+# These variables can be overridden in:
+#   - group_vars/all.yml (recommended for shared values)
+#   - host_vars/<hostname>.yml (for host-specific values)
+#   - Command line with -e flag
+# ============================================
+
+# ============================================
+# Terraform Integration
+# ============================================
+
+# ============================================
+# LXC Template Configuration
+# ============================================
+# Debian template version to download
+# Update this if you need a different version
+debian_template_version: "12.12-1"
+
+# ============================================
+# NFS Share Configuration
+# ============================================
+# List of NFS shares to mount on Proxmox nodes
+# Configure in group_vars/all.yml or host_vars/<hostname>.yml
+#
+# Example:
+#   proxmox_nfs_shares:
+#     - source: "nas.local:/export/backups"
+#       destination: "/mnt/backups"
+#       options: "defaults,noatime"
+#     - source: "nas.local:/export/vm-storage"
+#       destination: "/mnt/vm-storage"
+#       options: "defaults,noatime,rsize=8192,wsize=8192"
+#
+# Options:
+#   - source: NFS server and export path (required)
+#   - destination: Local mount point (required)
+#   - options: Mount options (optional, defaults to "defaults")
+#   - name: Optional name/identifier for the share (optional)
+proxmox_nfs_shares: []
+
+# ============================================
+# Note: Additional variables used by this role
+# ============================================
+# The following variables should be defined in group_vars/all.yml:
+#   - homelab_domain: Domain name for your homelab
+#   - timezone: Timezone (e.g., 'America/Vancouver')
+#   - default_gateway: Default gateway IP for LXC containers
+#   - lxc_root_password: Root password for LXC containers (consider using Ansible Vault)

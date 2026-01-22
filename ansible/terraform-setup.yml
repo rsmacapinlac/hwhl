@@ -1,0 +1,28 @@
+---
+# ============================================
+# Terraform Setup Playbook
+# ============================================
+# This playbook sets up Proxmox for Terraform automation by:
+#   - Creating a dedicated Terraform user (if it doesn't exist)
+#   - Granting Administrator role to the user
+#   - Creating an API token for Terraform operations
+#   - Saving the token to terraform/.proxmox-token
+#   - Generating terraform.tfvars configuration file
+#
+# This should be run after proxmox-setup.yml has been executed.
+# It can be run multiple times safely (idempotent).
+#
+# Usage:
+#   ansible-playbook terraform-setup.yml
+#   ansible-playbook terraform-setup.yml -e terraform_force_regenerate_token=true  # Regenerate token
+# ============================================
+
+- name: "Setup Proxmox for Terraform"
+  hosts: "proxmox_control_node_by_ip"
+  remote_user: root
+  gather_facts: true
+  tasks:
+    - name: Setup Terraform user and API token
+      include_tasks: roles/proxmox/tasks/terraform-setup.yml
+      tags:
+        - terraform

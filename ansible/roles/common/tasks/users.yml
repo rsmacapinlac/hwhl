@@ -5,14 +5,33 @@
     uid: 1001
     shell: /bin/bash
 
-- name: Set authorized key for ansible
+- name: Ensure .ssh directory exists for ansible user
   become: true
-  ansible.posix.authorized_key:
-    user: ansible
+  ansible.builtin.file:
+    path: "/home/ansible/.ssh"
+    state: directory
+    mode: "0700"
+    owner: ansible
+    group: ansible
+
+- name: Read SSH public key content
+  ansible.builtin.slurp:
+    src: "{{ lookup('env', 'HOME') }}/.ssh/id_rsa_homelab_ansible.pub"
+  register: ssh_key_content
+  delegate_to: localhost
+  become: false
+
+- name: Set authorized key for ansible using lineinfile
+  become: true
+  ansible.builtin.lineinfile:
+    path: "/home/ansible/.ssh/authorized_keys"
+    line: "{{ ssh_key_content.content | b64decode | trim }}"
+    regexp: "^{{ (ssh_key_content.content | b64decode | trim) | regex_escape() }}$"
     state: present
-    key: "{{ lookup('file', item) }}"
-  with_fileglob:
-    - "{{ lookup('env', 'HOME') }}/.ssh/id_rsa.pub"
+    create: true
+    mode: "0600"
+    owner: ansible
+    group: ansible
 
 - name: Install sudo
   become: true

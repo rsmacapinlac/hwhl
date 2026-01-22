@@ -28,7 +28,6 @@
     owner: ansible
     group: docker
     mode: '0755'
-  when: not prometheus_container.container.State.Running | default(false)
 
 - name: Ensure Prometheus config directory exists
   become: true
@@ -38,7 +37,6 @@
     owner: ansible
     group: docker
     mode: '0755'
-  when: not prometheus_container.container.State.Running | default(false)
 
 - name: Ensure Prometheus data directory exists with correct permissions
   become: true
@@ -48,7 +46,6 @@
     owner: "65534"
     group: "65534"
     mode: '0755'
-  when: not prometheus_container.container.State.Running | default(false)
 
 - name: Deploy default Prometheus config if not present
   become: true
@@ -66,6 +63,7 @@
     owner: ansible
     group: docker
     mode: '0640'
+  notify: restart prometheus
 
 - name: Deploy Prometheus docker-compose file
   become: true

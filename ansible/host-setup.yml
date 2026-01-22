@@ -1,0 +1,24 @@
+---
+# ============================================
+# Host Initial Setup Playbook
+# ============================================
+# This playbook performs initial setup on new hosts/containers:
+#   - Creates ansible user with SSH keys
+#   - Configures sudo access
+#   - Sets up basic system configuration
+#
+# This should be run once for each new host before running site.yml.
+# It requires root access to the host.
+#
+# Usage:
+#   ansible-playbook host-setup.yml
+#   ansible-playbook host-setup.yml --limit <host-group>
+# ============================================
+
+- name: "Initial Host Setup - Configure Ansible User"
+  hosts: "managed_hosts"
+  remote_user: root
+  gather_facts: true
+  tasks:
+    - name: Configure ansible user
+      include_tasks: roles/common/tasks/users.yml

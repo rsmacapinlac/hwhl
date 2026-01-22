@@ -1,6 +1,38 @@
 ---
-# playbook for setting up proxmox
-- hosts: "proxmox_control_node_by_ip"
+# ============================================
+# Proxmox Initial Setup Playbook
+# ============================================
+# This playbook performs initial configuration of a new Proxmox installation.
+# It should be run once after a fresh Proxmox install.
+#
+# Tasks performed:
+#   - Configure Debian repositories
+#   - Disable enterprise repositories (enable no-subscription)
+#   - Update LXC templates
+#   - Download Debian 12 standard template
+#   - Mount NFS shares (if configured)
+#
+# Usage:
+#   ansible-playbook proxmox-setup.yml
+#
+# Note: For Terraform setup, run terraform-setup.yml separately after this playbook.
+# ============================================
+
+- name: "Initial Proxmox Setup"
+  hosts: "proxmox_control_node_by_ip"
   remote_user: root
+  gather_facts: true
   roles:
     - role: proxmox
+      tags:
+        - proxmox
+
+  # ============================================
+  # NFS Share Mounting
+  # ============================================
+  post_tasks:
+    - name: Setup NFS shares
+      include_tasks: roles/proxmox/tasks/nfs-mounts.yml
+      when: proxmox_nfs_shares | default([]) | length > 0
+      tags:
+        - proxmox

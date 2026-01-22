@@ -1,4 +1,0 @@
-[desktops]
-127.0.0.1 ansible_connection=local
-kaburagi.int.macapinlac.network
-urahada.int.macapinlac.network

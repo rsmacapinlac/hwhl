@@ -1,9 +1,12 @@
-# https://technotim.live/posts/first-11-things-proxmox/
-#
-- name: Install required packages
+# ============================================
+# Proxmox Initial Configuration
+# ============================================
+# Based on: https://technotim.live/posts/first-11-things-proxmox/
+# ============================================
 
+- name: Install required packages for Proxmox automation
   apt:
-    name: "{{item}}"
+    name: "{{ item }}"
     state: present
     update_cache: yes
   loop:
@@ -35,7 +38,7 @@
     create: yes
     state: present
 
-- name: Correcting Ceph package repositories 
+- name: Comment out Ceph enterprise repositories (use community repos instead)
   ansible.builtin.lineinfile:
     path: /etc/apt/sources.list.d/pve-enterprise.list
     regexp: '^{{ item.line }}'
@@ -48,19 +51,14 @@
     - line: "deb http://download.proxmox.com/debian/ceph-reef bookworm enterprise"
     - line: "deb http://download.proxmox.com/debian/ceph-reef bookworm no-subscription"
 
-- name: Update LXC images
+- name: Update LXC template repository
   ansible.builtin.shell:
     cmd: pveam update
+  changed_when: false
 
-- name: Download the Debian 12 standard template
+- name: Download Debian 12 standard LXC template
   ansible.builtin.shell:
     cmd: pveam download local debian-12-standard_12.12-1_amd64.tar.zst
-
-# ============================================
-# Terraform Setup
-# ============================================
-- name: Setup Terraform user and API token
-  include_tasks: terraform-setup.yml
-  when: setup_terraform | default(true)
-
+  args:
+    creates: /var/lib/vz/template/cache/debian-12-standard_12.12-1_amd64.tar.zst
 

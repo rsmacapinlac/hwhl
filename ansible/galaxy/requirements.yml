@@ -9,3 +9,7 @@
 collections:
   - name: kewlfft.aur
   - name: tribe29.checkmk
+  - name: ansible.posix
+    version: ">=1.5.0"  # Updated version to avoid deprecation warnings
+  - name: community.general
+    version: ">=7.0.0"  # Required for sudoers module

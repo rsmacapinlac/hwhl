@@ -3,24 +3,28 @@
 This is my homelab setup. This project is built on the shoulder of giants:
 
 - Proxmox
-- Terraform (coming soon)
+- Terraform
 - Ansible
 
 ## Project Overview
 
-The goal for my homelab is to simplify getting up and running as well as maintenance (scripts to run and some level of automation). It tries to make it easy to access services. It attempts to make the setup of services somewhat configurable so you can start hosting and using services as quickly as possible.
+The goal for my homelab is to simplify getting up and running. Simplify maintenance (scripts to run and some level of automation). It tries to make it easy to access self-hosted services. It attempts to make the setup of these services easy so you can get up and running quickly.
+
+_It is definitely *not* there yet. It is a work in progress and I'm open to feedback._
 
 ## Getting Started
 
 ### Prerequisites
-- A running Proxmox node
+
+- A running Proxmox node (and knowledge of it's IP address), with some knowlege on how to use it.
 - Your own domain that is configured with Cloudflare
-- A working knowledge of your router's DHCP configuration
-- Your public key (scripts assume that it can be found in $HOME/.ssh/id_rsa.pub)
+- A working knowledge of your router's configuration
 
 ### Initial Setup
 
-1. Clone the repository:
+
+1. Clone the repository
+
 ```bash
 git clone git@github.com:rsmacapinlac/hwhl.git
 cd hwhl
@@ -29,9 +33,24 @@ cd hwhl
 2. Initialize your environment:
 ```bash
 ./bin/ansible-init.sh
+./bin/terraform-init.sh
 ```
 
-3. Configure your Proxmox inventory:
+3. Generate SSH keys for your homelab:
+
+```bash
+./bin/generate-ssh-keys.sh
+```
+
+This will create two SSH key pairs:
+- `~/.ssh/id_rsa_homelab_terraform` - For Terraform/Root access to LXC containers
+- `~/.ssh/id_rsa_homelab_ansible` - For Ansible user access
+
+The configuration files are already set up to use these keys. If you need to use different key names, update:
+- `ansible/roles/proxmox/templates/terraform.tfvars.j2` (for Terraform keys)
+- `ansible/roles/common/tasks/users.yml` (for Ansible keys)
+
+4. Configure your Proxmox inventory:
 ```bash
 # Create and edit your inventory file
 touch ansible/inventory/proxmox.yml
@@ -47,12 +66,38 @@ proxmox_control_node_by_ip:
 
 4. Run the Proxmox setup playbook:
 ```bash
-# Option 1: Change to ansible directory
 cd ansible && ansible-playbook proxmox-setup.yml
-
-# Option 2: Use wrapper script from repository root
-./bin/ansible-playbook.sh proxmox-setup.yml
 ```
+*note: if you have a NFS share that you'd like to setup. Add it to group_vars/all.yml as follows:
+```bash
+# ============================================
+# Proxmox NFS Shares Configuration
+# ============================================
+# NFS shares to mount on Proxmox nodes
+# Configured automatically when proxmox-setup.yml is run
+#
+# Example configuration (uncomment and customize):
+proxmox_nfs_shares:
+   - source: "NAS_IP_ADDR:/nfs/ContainerBackups"
+     destination: "/mnt/ContainerBackups"
+     options: "defaults,noatime"
+#   - source: "nas.local:/export/vm-storage"
+#     destination: "/mnt/vm-storage"
+#     options: "defaults,noatime,rsize=8192,wsize=8192"
+#
+# Options:
+#   - source: NFS server and export path (required, format: "server:/export/path")
+#   - destination: Local mount point (required, e.g., "/mnt/share-name")
+#   - options: Mount options (optional, defaults to "defaults")
+#     Common options: defaults, noatime, rsize=8192, wsize=8192, soft, timeo=30
+
+```
+
+5. Run the Terraform setup playbook:
+```bash
+cd ansible && ansible-playbook terraform-setup.yml
+```
+
 
 ## Usage
 
@@ -80,24 +125,9 @@ cd ansible && ansible-playbook site.yml --syntax-check
 cd ansible && ansible-playbook site.yml --check
 ```
 
-### Available Host Groups
-
-The playbook is organized into the following host groups:
-
-- `dns`: PiHole DNS servers
-- `edge`: Edge services (Traefik, Authelia, Cloudflare DDNS, WireGuard)
-- `containers`: Container management (Portainer, Watchtower, Traefik)
-- `arrs`: *Arr suite (Sonarr, Radarr, etc.)
-- `jellyfin`: Jellyfin media server
-- `plex`: Plex media server
-- `nextcloud`: Nextcloud file sharing
-- And many more services as defined in site.yml
-
 ### Maintenance
 
 - Use `ansible/maintenance.yml` for routine maintenance tasks
-- Use `ansible/provision.yml` for initial provisioning (if exists)
-- Use `ansible/de-provision.yml` for cleanup (if exists)
 
 ## Security Notes
 
@@ -124,6 +154,8 @@ This project is licensed under the terms of the included LICENSE file.
 
 These services need to be updated to use `compose.yml` instead of `docker-compose.yml`:
 
+3. Authelia
+
 4. **homeassistant** - smarthome host
    - Status: Running container ✅
    - Issue: Uses `docker-compose.yml` instead of `compose.yml`
@@ -148,15 +180,8 @@ These services need to be updated to use `compose.yml` instead of `docker-compos
     - Status: Running container ✅
     - Issue: Uses `docker-compose.yml` instead of `compose.yml`
 
-### Legacy Pattern (Flat Files)
-
 13. **nextcloud** - yamaguchi host
     - Status: Running (AIO deployment) ✅
     - Issue: Uses flat `nextcloud.yml` file
     - ⚠️ Special case (AIO deployment may not need standard migration)
 
-## Documentation
-
-- [Services Documentation](docs/services.md) - Overview and setup guides for all services
-- [Pi-hole Setup](docs/pihole-setup.md) - Detailed guide for Pi-hole deployment
-- [Nebula Sync Setup](docs/nebula-sync-setup.md) - Guide for Pi-hole synchronization
