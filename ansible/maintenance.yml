@@ -77,6 +77,11 @@
       include_tasks: roles/cloudflare-ddns/tasks/update.yml
     - name: "Update WireGuard Easy"
       include_tasks: roles/wg-easy/tasks/update.yml
+    - name: "Update Authelia"
+      include_tasks: roles/authelia/tasks/update.yml
+      tags:
+        - authelia
+        - edge
 
 - hosts: "portainer"
   remote_user: ansible

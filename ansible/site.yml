@@ -304,8 +304,17 @@
         - traefik
         - containers
     - role: authelia
+      tags:
+        - authelia
+        - edge
     - role: cloudflare-ddns
+      tags:
+        - cloudflare-ddns
+        - edge
     - role: wg-easy
+      tags:
+        - wg-easy
+        - edge
   tasks:
     - name: "Update external routes"
       include_tasks: roles/traefik/tasks/update_routes_external.yml

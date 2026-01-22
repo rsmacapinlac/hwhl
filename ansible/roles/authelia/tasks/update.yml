@@ -1,0 +1,26 @@
+---
+- name: Update Authelia container with latest image
+  community.docker.docker_compose_v2:
+    project_src: /data/services/authelia
+    files:
+      - compose.yml
+    state: present
+    pull: always
+    recreate: always
+    remove_orphans: false
+
+- name: Wait for Authelia container to be running
+  community.docker.docker_container_info:
+    name: authelia
+  register: authelia_status
+  until: authelia_status.container.State.Running | default(false)
+  retries: 5
+  delay: 2
+
+- name: Display update status
+  debug:
+    msg: "Authelia has been updated and is running"
+
+- name: Remove dangling Authelia images
+  command: docker image prune -f
+  changed_when: true

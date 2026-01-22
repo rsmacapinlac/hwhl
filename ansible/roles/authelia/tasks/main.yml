@@ -1,31 +1,166 @@
-- name: Create services folder
+---
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/authelia/environment"
+  register: env_file
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/authelia/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Migration: Handle old compose file location
+- name: Check if old compose file exists
   become: true
-  ansible.builtin.file:
-    path: /data/services/
+  stat:
+    path: /data/services/authelia.yml
+  register: old_compose_file
+
+- name: Stop and remove old Authelia container
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /data/services
+    files:
+      - authelia.yml
+    state: absent
+    remove_orphans: true
+  when: old_compose_file.stat.exists
+  ignore_errors: true
+
+- name: Remove old compose file
+  become: true
+  file:
+    path: /data/services/authelia.yml
+    state: absent
+  when: old_compose_file.stat.exists
+
+- name: Check if Authelia container exists (legacy)
+  community.docker.docker_container_info:
+    name: authelia
+  register: authelia_container_legacy
+  ignore_errors: true
+
+- name: Remove legacy Authelia container if not managed by new compose
+  become: true
+  community.docker.docker_container:
+    name: authelia
+    state: absent
+  when:
+    - authelia_container_legacy.exists | default(false)
+    - old_compose_file.stat.exists or (authelia_container_legacy.container.Config.Labels['com.docker.compose.project.working_dir'] | default('') != '/data/services/authelia')
+  ignore_errors: true
+
+- name: Check if Authelia container exists
+  community.docker.docker_container_info:
+    name: authelia
+  register: authelia_container
+  ignore_errors: true
+
+- name: Create authelia service directory
+  become: true
+  file:
+    path: /data/services/authelia
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
 
-- name: Setup docker compose file for authelia
+- name: Create authelia config directory
   become: true
-  template:
-    src: docker-compose.j2
-    dest: /data/services/authelia.yml
-    owner: ansible
-    group: docker
-
-- name: Authelia config folder
-  become: true
-  ansible.builtin.file:
+  file:
     path: /data/containers/authelia
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
 
-# Update the DNS records as well
-- include_tasks: update_configuration.yml
-
-- name: Run container
+- name: Create authelia secrets directory
   become: true
-  shell:
-    cmd: "docker compose -f /data/services/authelia.yml up -d"
+  file:
+    path: /data/containers/authelia/secrets
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0700'
+
+- name: Setup docker compose file for Authelia
+  become: true
+  template:
+    src: docker-compose.j2
+    dest: /data/services/authelia/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart authelia
+
+- name: Copy environment configuration
+  become: true
+  copy:
+    src: "{{ playbook_dir }}/files/config/authelia/environment"
+    dest: /data/services/authelia/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart authelia
+
+- name: Copy Authelia configuration
+  become: true
+  copy:
+    src: "{{ playbook_dir }}/files/config/authelia/configuration.yml"
+    dest: /data/containers/authelia/configuration.yml
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart authelia
+
+- name: Copy users database
+  become: true
+  copy:
+    src: "{{ playbook_dir }}/files/config/authelia/users_database.yml"
+    dest: /data/containers/authelia/users_database.yml
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart authelia
+
+- name: Copy jwt_secret
+  become: true
+  copy:
+    src: "{{ playbook_dir }}/files/config/authelia/secrets/jwt_secret"
+    dest: /data/containers/authelia/secrets/jwt_secret
+    owner: ansible
+    group: docker
+    mode: '0600'
+  notify: restart authelia
+
+- name: Copy storage_encryption_key
+  become: true
+  copy:
+    src: "{{ playbook_dir }}/files/config/authelia/secrets/storage_encryption_key"
+    dest: /data/containers/authelia/secrets/storage_encryption_key
+    owner: ansible
+    group: docker
+    mode: '0600'
+  notify: restart authelia
+
+- name: Copy session_secret
+  become: true
+  copy:
+    src: "{{ playbook_dir }}/files/config/authelia/secrets/session_secret"
+    dest: /data/containers/authelia/secrets/session_secret
+    owner: ansible
+    group: docker
+    mode: '0600'
+  notify: restart authelia
+
+- name: Run Authelia container
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /data/services/authelia
+    files:
+      - compose.yml
+    state: present
+  when: not authelia_container.container.State.Running | default(false)

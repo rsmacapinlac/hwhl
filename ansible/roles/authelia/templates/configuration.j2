@@ -4,22 +4,19 @@
 ###############################################################
 
 server:
-  host: 0.0.0.0
-  port: 9091
+  address: 'tcp://0.0.0.0:{{ authelia_port }}/'
+
 log:
   level: debug
+
 theme: dark
-# This secret can also be set using the env variables AUTHELIA_JWT_SECRET_FILE
-jwt_secret: {{ authelia_jwt_secret }}
-default_redirection_url: https://auth.macapinlac.network
+
+# JWT secret loaded from environment variable AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE
+
+default_redirection_url: {{ authelia_auth_url }}
+
 totp:
   issuer: authelia.com
-
-# duo_api:
-#  hostname: api-123456789.example.com
-#  integration_key: ABCDEF
-#  # This secret can also be set using the env variables AUTHELIA_DUO_API_SECRET_KEY_FILE
-#  secret_key: 1234567890abcdefghifjkl
 
 authentication_backend:
   file:
@@ -34,39 +31,19 @@ authentication_backend:
 access_control:
   default_policy: deny
   rules:
-    # Rules applied to everyone
-    #- domain: public.example.com
-    #  policy: bypass
-    - domain: van.macapinlac.network
+    - domain: van.{{ cloudflare_zone }}
       policy: one_factor
-    - domain: pkm.macapinlac.network
+    - domain: pkm.{{ cloudflare_zone }}
       policy: one_factor
-    #- domain: rss.macapinlac.network
-    #  policy: one_factor
-    #- domain: ta.macapinlac.network
-    #  policy: one_factor
-    #- domain: bookmarks.macapinlac.network
-    #  policy: one_factor
-    - domain: documents.macapinlac.network
+    - domain: documents.{{ cloudflare_zone }}
       policy: one_factor
-    #- domain: plx-request.macapinlac.network
-    #  policy: one_factor
-    #- domain: pve1.local.example.com
-    #  policy: two_factor
 
 session:
   name: authelia_session
-  # This secret can also be set using the env variables AUTHELIA_SESSION_SECRET_FILE
-  secret: unsecure_session_secret
+  # Secret loaded from environment variable AUTHELIA_SESSION_SECRET_FILE
   expiration: 3600  # 1 hour
   inactivity: 300  # 5 minutes
-  domain: {{ cloudflare_zone }}  # Should match whatever your root protected domain is
-
-  # redis:
-  #   host: redis
-  #   port: 6379
-  #   # This secret can also be set using the env variables AUTHELIA_SESSION_REDIS_PASSWORD_FILE
-  #   # password: authelia
+  domain: {{ cloudflare_zone }}
 
 regulation:
   max_retries: 3
@@ -74,18 +51,11 @@ regulation:
   ban_time: 300
 
 storage:
-  encryption_key: {{ authelia_storage_encryption }} # Now required
+  # Encryption key loaded from environment variable AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
   local:
     path: /config/db.sqlite3
 
 notifier:
-  #smtp:
-  #  username: {{ authelia_smtp_username }}
-  #  # This secret can also be set using the env variables AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE
-  #  password: {{ authelia_smtp_password }}
-  #  host: {{ authelia_smtp_host }}
-  #  port: {{ authelia_smtp_port }}
-  #  sender: {{ authelia_smtp_sender }}
   filesystem:
     filename: /config/notification.txt
 ...

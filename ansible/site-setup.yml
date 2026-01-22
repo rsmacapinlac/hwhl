@@ -206,6 +206,15 @@
       run_once: true
       when: groups['edge'] is defined and groups['edge'] | length > 0
 
+- name: "Setup Authelia"
+  hosts: edge
+  connection: local
+  tasks:
+    - name: "Run Authelia setup if group exists"
+      include_tasks: roles/authelia/tasks/setup.yml
+      run_once: true
+      when: groups['edge'] is defined and groups['edge'] | length > 0
+
 - name: "Setup Diun"
   hosts: containers
   connection: local
