@@ -1,9 +1,9 @@
 # WireGuard Easy Environment Configuration
 
 # WireGuard Configuration
-WG_HOST={{ wireguard.host }}
-PASSWORD_HASH={{ wireguard.password_hash }}
-WG_DEFAULT_DNS={{ wireguard.dns }}
+WG_HOST={{ cloudflare_subdomain }}.{{ cloudflare_zone  }}
+PASSWORD_HASH={{ wg_easy_password_hash }}
+WG_DEFAULT_DNS={{ wg_easy_dns }}
 
 # Timezone
 TZ={{ timezone | default('America/Vancouver') }}

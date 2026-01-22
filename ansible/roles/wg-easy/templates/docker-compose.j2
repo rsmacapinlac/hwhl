@@ -2,10 +2,6 @@ services:
   wg-easy:
     env_file:
       - .env
-    environment:
-      - WG_HOST={{ wireguard.host }}
-      - PASSWORD_HASH={{ wireguard.password_hash }}
-      - WG_DEFAULT_DNS={{ wireguard.dns }}
     # image: weejewel/wg-easy
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy
