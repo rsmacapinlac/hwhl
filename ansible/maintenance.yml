@@ -248,6 +248,14 @@
         - radarr
         - arrs
 
+- hosts: "bentopdf"
+  remote_user: ansible
+  tasks:
+    - name: "Update BentoPDF"
+      include_tasks: roles/bentopdf/tasks/update.yml
+      tags:
+        - bentopdf
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

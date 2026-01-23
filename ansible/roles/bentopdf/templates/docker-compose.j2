@@ -1,0 +1,30 @@
+---
+services:
+  bentopdf:
+    container_name: bentopdf
+    image: bentopdf/bentopdf:latest
+    ports:
+      - {{ bentopdf_port }}:8080
+    env_file:
+      - .env
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.bentopdf.entrypoints=http"
+      - "traefik.http.routers.bentopdf.rule=Host(`pdf.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.bentopdf-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.bentopdf.middlewares=bentopdf-https-redirect"
+      - "traefik.http.routers.bentopdf-secure.entrypoints=https"
+      - "traefik.http.routers.bentopdf-secure.rule=Host(`pdf.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.bentopdf-secure.tls=true"
+      - "traefik.http.routers.bentopdf-secure.service=bentopdf"
+      - "traefik.http.services.bentopdf.loadbalancer.server.port=8080"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true

@@ -322,3 +322,12 @@
       include_tasks: roles/radarr/tasks/setup.yml
       run_once: true
       when: groups['radarr'] is defined and groups['radarr'] | length > 0
+
+- name: "Setup BentoPDF"
+  hosts: bentopdf
+  connection: local
+  tasks:
+    - name: "Run BentoPDF setup if group exists"
+      include_tasks: roles/bentopdf/tasks/setup.yml
+      run_once: true
+      when: groups['bentopdf'] is defined and groups['bentopdf'] | length > 0

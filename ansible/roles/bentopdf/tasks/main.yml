@@ -1,0 +1,58 @@
+---
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/files/config/bentopdf/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/files/config/bentopdf/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+- name: Check if bentopdf container exists
+  community.docker.docker_container_info:
+    name: bentopdf
+  register: bentopdf_container
+  ignore_errors: true
+
+- name: Create services folder
+  become: true
+  file:
+    path: /data/services/bentopdf
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not bentopdf_container.container.State.Running | default(false)
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/files/config/bentopdf/environment"
+    dest: /data/services/bentopdf/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart bentopdf
+
+- name: Setup docker compose file for bentopdf
+  template:
+    src: docker-compose.j2
+    dest: /data/services/bentopdf/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart bentopdf
+
+- name: Run bentopdf container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/bentopdf
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not bentopdf_container.container.State.Running | default(false)
+  notify: restart bentopdf

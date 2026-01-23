@@ -419,3 +419,10 @@
     - role: outline
       tags:
         - outline
+
+- hosts: "bentopdf"
+  remote_user: ansible
+  roles:
+    - role: bentopdf
+      tags:
+        - bentopdf
