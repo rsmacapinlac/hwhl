@@ -33,6 +33,18 @@ ${name}.int.${var.homelab_domain} ansible_host=${split("/", container.ip_address
 %{for name, container in module.monitoring_containers~}
 ${name}.int.${var.homelab_domain}
 %{endfor~}
+
+[services]
+%{for name, container in module.services_containers~}
+${name}.int.${var.homelab_domain} ansible_host=${split("/", container.ip_address)[0]}
+%{endfor~}
+%{for group, containers in local.services_by_group~}
+
+[${group}]
+%{for name in containers~}
+${name}.int.${var.homelab_domain}
+%{endfor~}
+%{endfor~}
 EOT
 }
 

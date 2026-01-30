@@ -93,3 +93,35 @@ module "monitoring_containers" {
   tags           = concat(local.common_tags, ["monitoring"])
   mount_points   = each.value.mount_points
 }
+
+# ============================================
+# Service Containers (Generic/Flexible)
+# ============================================
+# Use this for additional services with configurable resources.
+# Each container can specify its own cores, memory, disk, and Ansible groups.
+
+module "services_containers" {
+  source   = "./modules/lxc-container"
+  for_each = var.services_containers
+
+  name           = each.key
+  vmid           = each.value.vmid
+  node           = each.value.node
+  template       = var.debian_template
+  datastore      = var.datastore
+  disk_size      = each.value.disk_size
+  cores          = each.value.cores
+  memory         = each.value.memory
+  swap           = each.value.swap
+  ip_address     = each.value.ip_address
+  gateway        = each.value.gateway
+  nameserver     = each.value.nameserver
+  dns_domain     = var.homelab_domain
+  network_bridge = var.network_bridge
+  root_password  = var.root_password
+  ssh_public_key = local.ssh_public_key
+  proxmox_host   = lookup(var.proxmox_node_ips, each.value.node, "")
+  startup_order  = 4
+  tags           = concat(local.common_tags, ["services"], each.value.extra_tags)
+  mount_points   = each.value.mount_points
+}

@@ -139,3 +139,25 @@ variable "monitoring_containers" {
   }))
   default = {}
 }
+
+variable "services_containers" {
+  description = "Map of generic service container configurations with flexible resource allocation"
+  type = map(object({
+    vmid           = number
+    node           = string
+    ip_address     = string
+    gateway        = string
+    nameserver     = string
+    disk_size      = optional(number, 64)
+    cores          = optional(number, 2)
+    memory         = optional(number, 4096)
+    swap           = optional(number, 8192)
+    ansible_groups = optional(list(string), [])  # Groups for Ansible inventory
+    extra_tags     = optional(list(string), [])  # Additional Proxmox tags
+    mount_points = optional(list(object({
+      host_path      = string
+      container_path = string
+    })), [])
+  }))
+  default = {}
+}
