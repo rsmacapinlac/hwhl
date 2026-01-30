@@ -256,6 +256,14 @@
       tags:
         - bentopdf
 
+- hosts: "tdarr"
+  remote_user: ansible
+  tasks:
+    - name: "Update Tdarr"
+      include_tasks: roles/tdarr/tasks/update.yml
+      tags:
+        - tdarr
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

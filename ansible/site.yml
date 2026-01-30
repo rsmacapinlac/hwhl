@@ -168,6 +168,8 @@
   roles:
     - role: shares
     - role: tdarr
+      tags:
+        - tdarr
 
 - hosts: "tautulli"
   remote_user: ansible

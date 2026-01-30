@@ -331,3 +331,12 @@
       include_tasks: roles/bentopdf/tasks/setup.yml
       run_once: true
       when: groups['bentopdf'] is defined and groups['bentopdf'] | length > 0
+
+- name: "Setup Tdarr"
+  hosts: tdarr
+  connection: local
+  tasks:
+    - name: "Run Tdarr setup if group exists"
+      include_tasks: roles/tdarr/tasks/setup.yml
+      run_once: true
+      when: groups['tdarr'] is defined and groups['tdarr'] | length > 0

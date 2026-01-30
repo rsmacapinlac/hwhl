@@ -1,0 +1,48 @@
+---
+# Setup tasks for Tdarr environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create tdarr config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/tdarr"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/tdarr/environment"
+  register: tdarr_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/tdarr/environment"
+    mode: '0640'
+  when: not tdarr_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Tdarr environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/tdarr/environment
+
+      Please review and update the following settings:
+      - PUID/PGID: User and group IDs for container permissions
+      - TZ: Timezone for the service
+      - Server and node port configuration
+
+      Media library volumes should be configured in your inventory file using the 'tdarr_volumes' variable.
+      Example:
+        tdarr_volumes:
+          - { host_folder: "/mnt/media/movies", container: "/movies" }
+          - { host_folder: "/mnt/media/tv", container: "/tv" }
+
+      After configuration, deploy with: ansible-playbook site.yml --limit tdarr
+  when: not tdarr_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

@@ -5,7 +5,7 @@
 # based on containers provisioned by Terraform.
 
 resource "local_file" "ansible_inventory" {
-  filename = "${path.module}/../ansible/inventory/generated/terraform-hosts.ini"
+  filename = "${path.module}/../homelab_config/ansible/inventory/generated/terraform-hosts.ini"
   content  = <<-EOT
 # ===========================================
 # Terraform-Generated Ansible Inventory

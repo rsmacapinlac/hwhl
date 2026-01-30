@@ -1,18 +1,63 @@
-- name: Create services folder
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/tdarr/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/tdarr/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if tdarr container exists
+  community.docker.docker_container_info:
+    name: tdarr
+  register: tdarr_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create tdarr service folder
   become: true
-  ansible.builtin.file:
+  file:
     path: /data/services/tdarr
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
 
-- name: Setup docker compose file for Tdarr stack
-  template:
-    src: docker-compose.j2
-    dest: /data/services/tdarr/docker-compose.yml
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/tdarr/environment"
+    dest: /data/services/tdarr/.env
     owner: ansible
     group: docker
+    mode: '0640'
+  notify: restart tdarr
 
-- name: Run container
-  shell:
-    cmd: "docker compose -f /data/services/tdarr/docker-compose.yml up -d"
+# Docker Compose deployment
+- name: Setup docker compose file for tdarr
+  template:
+    src: docker-compose.j2
+    dest: /data/services/tdarr/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart tdarr
+
+# Container deployment using docker_compose_v2
+- name: Run tdarr container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/tdarr
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not tdarr_container.container.State.Running | default(false)
+  notify: restart tdarr

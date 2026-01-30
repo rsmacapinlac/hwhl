@@ -17,10 +17,10 @@ This is an Ansible-based homelab automation project for managing a comprehensive
 
 ### Ansible Structure
 - **Main Playbook**: `ansible/site.yml` - orchestrates all service deployments
-- **Inventory**: Host groups organized by service type in `ansible/inventory/` directory
+- **Inventory**: Host groups in `ansible/inventory/` (groups) and `homelab_config/ansible/inventory/` (hosts and group vars)
 - **Roles**: Self-contained service deployments in `ansible/roles/` directory
-- **Configuration**: Environment files and templates in `ansible/files/config/`
-- **Variables**: Global settings in `ansible/group_vars/all.yml`
+- **Configuration**: Environment files and templates in `homelab_config/ansible/files/config/` and role defaults
+- **Variables**: Global settings in `homelab_config/ansible/group_vars/all.yml`
 
 ### Service Organization
 Services are deployed across host groups:
@@ -66,10 +66,11 @@ ansible-playbook maintenance.yml
 ```
 
 ### Key Files
-- `ansible/ansible.cfg`: Ansible configuration with optimized settings
-- `ansible/inventory/`: Host definitions organized by service type
-- `ansible/group_vars/all.yml`: Global variables including domain and API keys
-- `ansible/files/config/`: Service-specific environment files and configurations
+- `ansible/ansible.cfg`: Ansible configuration (inventory points to ansible + homelab_config)
+- `ansible/inventory/`: Group hierarchy (e.g. groups.yml)
+- `homelab_config/ansible/inventory/`: Host definitions
+- `homelab_config/ansible/group_vars/all.yml`: Global variables (domain, API keys, etc.); `ansible/group_vars/all.yml` is a symlink to this file
+- `homelab_config/ansible/files/config/`: Service-specific environment files
 
 ## Development Patterns
 
@@ -82,7 +83,7 @@ Each service role follows standard Ansible patterns:
 
 ### Configuration Management
 - Environment variables stored in `files/config/{service}/environment`
-- Sensitive data in `group_vars/all.yml` (should use Ansible Vault in production)
+- Sensitive data in `homelab_config/ansible/group_vars/all.yml` (should use Ansible Vault in production)
 - Docker Compose templates use Jinja2 for dynamic configuration
 
 ### Host Groups and Targeting

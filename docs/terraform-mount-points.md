@@ -14,7 +14,7 @@ This document explains how to bind mount NFS shares (or any host directories) in
 
 ### Step 1: Mount NFS Shares on Proxmox Host (Ansible)
 
-Configure NFS shares in `ansible/group_vars/all.yml`:
+Configure NFS shares in `homelab_config/ansible/group_vars/all.yml`:
 
 ```yaml
 proxmox_nfs_shares:

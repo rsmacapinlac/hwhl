@@ -31,7 +31,7 @@ roles/{service}/
 ### Key Components
 
 #### 1. Environment File Management
-- Environment files stored in `files/config/{service}/environment`
+- Environment files stored in `homelab_config/ansible/files/config/{service}/environment`
 - Template-based environment file generation using `templates/environment.j2`
 - Environment file validation before deployment in `tasks/main.yml`
 - Secure file permissions (640) for environment files
@@ -48,14 +48,14 @@ roles/{service}/
 - name: Check if environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/{service}/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/{service}/environment"
   register: env_file
   become: false
 
 - name: Fail if environment file doesn't exist
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/files/config/{service}/environment
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/{service}/environment
       Please run site-setup.yml first to create the environment file.
   when: not env_file.stat.exists
 
@@ -80,7 +80,7 @@ roles/{service}/
 # Environment file deployment
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/files/config/{service}/environment"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/{service}/environment"
     dest: /data/services/{service}/.env
     owner: ansible
     group: docker
@@ -442,13 +442,13 @@ volumes:
 - name: Check if environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/{service}/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/{service}/environment"
   register: env_file
   become: false  # ← Critical for local tasks
 
 - name: Create config directory locally
   file:
-    path: "{{ playbook_dir }}/files/config/{service}"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/{service}"
     state: directory
   delegate_to: 127.0.0.1
   become: false  # ← Critical for delegated local tasks

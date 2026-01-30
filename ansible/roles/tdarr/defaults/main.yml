@@ -1,0 +1,11 @@
+---
+# Tdarr default configuration variables
+
+# Port configuration
+tdarr_webui_port: 8265
+tdarr_server_port: 8266
+tdarr_node_port: 8267
+
+# User/Group IDs
+tdarr_puid: 1001
+tdarr_pgid: 1001

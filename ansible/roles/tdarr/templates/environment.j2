@@ -1,0 +1,22 @@
+# Tdarr Environment Configuration
+
+# User/Group Configuration
+PUID={{ tdarr_puid | default('1001') }}
+PGID={{ tdarr_pgid | default('1001') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# Umask
+UMASK_SET=002
+
+# Server Configuration
+serverIP=0.0.0.0
+serverPort={{ tdarr_server_port | default('8266') }}
+webUIPort={{ tdarr_webui_port | default('8265') }}
+
+# Internal Node Configuration
+internalNode=true
+nodeID=TDarr Internal Node
+nodeIP=0.0.0.0
+nodePort={{ tdarr_node_port | default('8267') }}

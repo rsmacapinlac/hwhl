@@ -68,7 +68,7 @@ proxmox_control_node_by_ip:
 ```bash
 cd ansible && ansible-playbook proxmox-setup.yml
 ```
-*note: if you have a NFS share that you'd like to setup. Add it to group_vars/all.yml as follows:
+*note: if you have a NFS share that you'd like to setup. Add it to homelab_config/ansible/group_vars/all.yml as follows:
 ```bash
 # ============================================
 # Proxmox NFS Shares Configuration
