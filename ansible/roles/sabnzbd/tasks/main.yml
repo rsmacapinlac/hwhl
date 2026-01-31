@@ -1,7 +1,7 @@
 ---
 - name: Check if environment file exists
   stat:
-    path: "{{ playbook_dir }}/files/config/sabnzbd/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/sabnzbd/environment"
   register: env_file
   delegate_to: localhost
   become: false
@@ -9,7 +9,7 @@
 - name: Fail if environment file doesn't exist
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/files/config/sabnzbd/environment
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/sabnzbd/environment
       Please run site-setup.yml first to create the environment file.
   when: not env_file.stat.exists
 
@@ -39,7 +39,7 @@
 
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/files/config/sabnzbd/environment"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/sabnzbd/environment"
     dest: /data/services/sabnzbd/.env
     owner: ansible
     group: docker

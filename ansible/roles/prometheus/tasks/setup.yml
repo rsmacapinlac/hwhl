@@ -2,7 +2,7 @@
 - name: Create config directory for prometheus
   local_action:
     module: file
-    path: "{{ playbook_dir }}/files/config/prometheus"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus"
     state: directory
     mode: '0755'
   become: false
@@ -10,7 +10,7 @@
 - name: Check if prometheus environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/prometheus/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/environment"
   register: env_file_stat
   become: false
 
@@ -18,7 +18,7 @@
   local_action:
     module: template
     src: ../templates/environment.j2
-    dest: "{{ playbook_dir }}/files/config/prometheus/environment"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/environment"
   when: not env_file_stat.stat.exists
   register: env_created
   become: false
@@ -26,7 +26,7 @@
 - name: Check if prometheus.yml exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/prometheus/prometheus.yml"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/prometheus.yml"
   register: prom_config_stat
   become: false
 
@@ -34,7 +34,7 @@
   local_action:
     module: template
     src: ../templates/prometheus.yml.j2
-    dest: "{{ playbook_dir }}/files/config/prometheus/prometheus.yml"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/prometheus.yml"
   when: not prom_config_stat.stat.exists
   register: prom_config_created
   become: false
@@ -43,17 +43,17 @@
   debug:
     msg: |
       {% if env_file_stat.stat.exists %}
-      Environment file already exists at {{ playbook_dir }}/files/config/prometheus/environment
+      Environment file already exists at {{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/environment
       Skipping creation to preserve your custom configuration.
       {% else %}
-      Environment file has been created at {{ playbook_dir }}/files/config/prometheus/environment
+      Environment file has been created at {{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/environment
       Please review and customize this file with your desired configuration before running site.yml
       {% endif %}
       {% if prom_config_stat.stat.exists %}
-      prometheus.yml already exists at {{ playbook_dir }}/files/config/prometheus/prometheus.yml
+      prometheus.yml already exists at {{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/prometheus.yml
       Skipping creation to preserve your custom configuration.
       {% else %}
-      Default prometheus.yml has been created at {{ playbook_dir }}/files/config/prometheus/prometheus.yml
+      Default prometheus.yml has been created at {{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/prometheus.yml
       Please review and customize this file with your desired configuration before running site.yml
       {% endif %}
       After customization, you can run site.yml to deploy the services. 

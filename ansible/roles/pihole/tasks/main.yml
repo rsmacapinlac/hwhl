@@ -1,13 +1,13 @@
 - name: Check if environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/pihole/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/pihole/environment"
   register: env_file
 
 - name: Fail if environment file doesn't exist
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/files/config/pihole/environment
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/pihole/environment
       Please run site-setup.yml first to create the environment file.
   when: not env_file.stat.exists
 
@@ -39,7 +39,7 @@
 
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/files/config/pihole/environment"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/pihole/environment"
     dest: /data/services/pihole/.env
     owner: ansible
     group: docker

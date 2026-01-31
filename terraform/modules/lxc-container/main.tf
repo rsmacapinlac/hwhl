@@ -105,6 +105,11 @@ resource "terraform_data" "enable_nesting" {
 
   depends_on = [proxmox_virtual_environment_container.container]
 
+  # Re-run when container is recreated
+  triggers_replace = [
+    proxmox_virtual_environment_container.container.id,
+  ]
+
   provisioner "local-exec" {
     command = "ssh -o StrictHostKeyChecking=no root@${var.proxmox_host} 'pct set ${var.vmid} -features nesting=1 && pct reboot ${var.vmid}'"
   }
@@ -116,6 +121,11 @@ resource "terraform_data" "enable_mount_features" {
 
   depends_on = [proxmox_virtual_environment_container.container]
 
+  # Re-run when container is recreated
+  triggers_replace = [
+    proxmox_virtual_environment_container.container.id,
+  ]
+
   provisioner "local-exec" {
     command = "ssh -o StrictHostKeyChecking=no root@${var.proxmox_host} 'pct set ${var.vmid} -features nesting=1,mount=nfs\\;cifs && pct reboot ${var.vmid}'"
   }
@@ -125,11 +135,18 @@ resource "terraform_data" "enable_mount_features" {
 resource "terraform_data" "configure_mount_points" {
   count = var.proxmox_host != "" ? 1 : 0
 
-  depends_on = [proxmox_virtual_environment_container.container]
+  # Run after container creation AND after features are configured (to avoid race conditions)
+  depends_on = [
+    proxmox_virtual_environment_container.container,
+    terraform_data.enable_mount_features,
+    terraform_data.enable_nesting,
+  ]
 
-  # Re-run if mount points change - store as JSON string for change detection
-  # The mount_points list is encoded to detect changes in the list contents
-  input = jsonencode(var.mount_points)
+  # Re-run when container is recreated or mount points change
+  triggers_replace = [
+    proxmox_virtual_environment_container.container.id,
+    jsonencode(var.mount_points),
+  ]
 
   provisioner "local-exec" {
     command = <<-EOT
@@ -156,12 +173,28 @@ resource "terraform_data" "configure_mount_points" {
       ssh -o StrictHostKeyChecking=no root@${var.proxmox_host} "pct start ${var.vmid}" || true
     EOT
   }
+}
 
-  # Remove mount points when resource is destroyed (e.g., when mount_points becomes empty)
-  # Note: We can't access var.* in destroy provisioners, so we store needed values separately
-  # For now, we'll rely on the main provisioner handling empty mount_points lists
-  # If the resource is destroyed entirely, mount points will remain (this is acceptable
-  # as the container itself would typically be destroyed too)
+# Enable /dev/net/tun passthrough for VPN containers (e.g., transmission-openvpn)
+# This writes LXC config entries directly since pct set doesn't support lxc.cdev.allow
+resource "terraform_data" "enable_tun_device" {
+  count = var.tun_device && var.proxmox_host != "" ? 1 : 0
+
+  depends_on = [
+    proxmox_virtual_environment_container.container,
+    terraform_data.configure_mount_points,
+  ]
+
+  triggers_replace = [
+    proxmox_virtual_environment_container.container.id,
+    var.tun_device,
+  ]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      ssh -o StrictHostKeyChecking=no root@${var.proxmox_host} 'CONF="/etc/pve/lxc/${var.vmid}.conf" && grep -q "lxc.cdev.allow: c 10:200 rwm" "$CONF" || echo "lxc.cdev.allow: c 10:200 rwm" >> "$CONF" && grep -q "lxc.mount.entry: /dev/net" "$CONF" || echo "lxc.mount.entry: /dev/net dev/net none bind,create=dir" >> "$CONF" && pct reboot ${var.vmid}'
+    EOT
+  }
 }
 
 # Note: Ansible user creation is handled by Ansible's common role

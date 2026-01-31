@@ -1,7 +1,7 @@
 ---
 - name: Create config directory locally
   file:
-    path: "{{ playbook_dir }}/files/config/sabnzbd"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/sabnzbd"
     state: directory
     mode: '0755'
   delegate_to: 127.0.0.1
@@ -9,7 +9,7 @@
 
 - name: Check if environment file already exists
   stat:
-    path: "{{ playbook_dir }}/files/config/sabnzbd/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/sabnzbd/environment"
   register: sabnzbd_env_file
   delegate_to: 127.0.0.1
   become: false
@@ -17,7 +17,7 @@
 - name: Create environment file from template
   template:
     src: ../templates/environment.j2
-    dest: "{{ playbook_dir }}/files/config/sabnzbd/environment"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/sabnzbd/environment"
     mode: '0640'
   when: not sabnzbd_env_file.stat.exists
   delegate_to: 127.0.0.1
@@ -26,7 +26,7 @@
 - name: Display setup completion message
   debug:
     msg: |
-      Sabnzbd environment file created at: {{ playbook_dir }}/files/config/sabnzbd/environment
+      Sabnzbd environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/sabnzbd/environment
 
       Please review and update the following:
       - PUID/PGID if needed (default: 1001)

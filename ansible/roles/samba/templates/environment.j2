@@ -1,0 +1,26 @@
+# Samba Configuration
+# https://github.com/dperson/samba
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# User/Group IDs
+USERID={{ samba_puid | default('1001') }}
+GROUPID={{ samba_pgid | default('1001') }}
+
+# Share definitions
+# Format: name;path;browsable;readonly;guest;users;admins;writelist;comment
+# Example: MyShare;/data;yes;no;yes
+{% for share in samba_shares | default([]) %}
+{% if loop.first %}
+SHARE={{ share }}
+{% else %}
+SHARE{{ loop.index }}={{ share }}
+{% endif %}
+{% endfor %}
+
+# Workgroup (optional)
+# WORKGROUP=WORKGROUP
+
+# NMBD - enable NetBIOS name service (optional)
+# NMBD=true

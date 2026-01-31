@@ -1,0 +1,8 @@
+---
+samba_smb_port: 445
+samba_netbios_port: 139
+samba_nmbd_port_137: 137
+samba_nmbd_port_138: 138
+
+samba_puid: 1001
+samba_pgid: 1001

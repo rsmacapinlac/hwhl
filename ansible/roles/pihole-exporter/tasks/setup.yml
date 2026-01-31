@@ -2,7 +2,7 @@
 - name: Create config directory for pihole-exporter
   local_action:
     module: file
-    path: "{{ playbook_dir }}/files/config/pihole-exporter"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/pihole-exporter"
     state: directory
     mode: '0755'
 
@@ -10,12 +10,12 @@
   local_action:
     module: template
     src: "{{ playbook_dir }}/roles/pihole-exporter/templates/environment.j2"
-    dest: "{{ playbook_dir }}/files/config/pihole-exporter/environment"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/pihole-exporter/environment"
   register: env_created
 
 - name: Display setup instructions
   debug:
     msg: |
-      Environment file has been created at {{ playbook_dir }}/files/config/pihole-exporter/environment
+      Environment file has been created at {{ playbook_dir }}/../homelab_config/ansible/files/config/pihole-exporter/environment
       Please review and customize this file with your PiHole API token before running site.yml
       After customization, you can run site.yml to deploy the services.

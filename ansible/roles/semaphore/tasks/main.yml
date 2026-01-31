@@ -1,13 +1,13 @@
 - name: Check if environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/semaphore/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/semaphore/environment"
   register: env_file
 
 - name: Fail if environment file doesn't exist
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/files/config/semaphore/environment
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/semaphore/environment
       Please run site-setup.yml first to create the environment file.
   when: not env_file.stat.exists
 
@@ -41,7 +41,7 @@
 
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/files/config/semaphore/environment"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/semaphore/environment"
     dest: /data/services/semaphore/.env
     owner: ansible
     group: docker

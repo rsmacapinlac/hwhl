@@ -323,6 +323,15 @@
       run_once: true
       when: groups['radarr'] is defined and groups['radarr'] | length > 0
 
+- name: "Setup Samba"
+  hosts: samba
+  connection: local
+  tasks:
+    - name: "Run Samba setup if group exists"
+      include_tasks: roles/samba/tasks/setup.yml
+      run_once: true
+      when: groups['samba'] is defined and groups['samba'] | length > 0
+
 - name: "Setup BentoPDF"
   hosts: bentopdf
   connection: local

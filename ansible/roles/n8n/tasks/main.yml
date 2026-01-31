@@ -2,7 +2,7 @@
 # Environment file validation
 - name: Check if environment file exists
   stat:
-    path: "{{ playbook_dir }}/files/config/n8n/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/n8n/environment"
   register: n8n_env_file
   delegate_to: 127.0.0.1
   become: false
@@ -10,7 +10,7 @@
 - name: Fail if environment file doesn't exist
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/files/config/n8n/environment
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/n8n/environment
       Please run site-setup.yml first to create the environment file.
   when: not n8n_env_file.stat.exists
 
@@ -35,7 +35,7 @@
 # Environment file deployment
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/files/config/n8n/environment"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/n8n/environment"
     dest: /data/services/n8n/.env
     owner: ansible
     group: docker

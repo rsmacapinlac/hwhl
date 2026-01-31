@@ -2,14 +2,14 @@
 - name: Check if environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/bentopdf/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/bentopdf/environment"
   register: env_file
   become: false
 
 - name: Fail if environment file doesn't exist
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/files/config/bentopdf/environment
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/bentopdf/environment
       Please run site-setup.yml first to create the environment file.
   when: not env_file.stat.exists
 
@@ -31,7 +31,7 @@
 
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/files/config/bentopdf/environment"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/bentopdf/environment"
     dest: /data/services/bentopdf/.env
     owner: ansible
     group: docker

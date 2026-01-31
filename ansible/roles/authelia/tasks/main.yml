@@ -2,13 +2,13 @@
 - name: Check if environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/authelia/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/environment"
   register: env_file
 
 - name: Fail if environment file doesn't exist
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/files/config/authelia/environment
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/environment
       Please run site-setup.yml first to create the environment file.
   when: not env_file.stat.exists
 
@@ -99,7 +99,7 @@
 - name: Copy environment configuration
   become: true
   copy:
-    src: "{{ playbook_dir }}/files/config/authelia/environment"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/environment"
     dest: /data/services/authelia/.env
     owner: ansible
     group: docker
@@ -109,7 +109,7 @@
 - name: Copy Authelia configuration
   become: true
   copy:
-    src: "{{ playbook_dir }}/files/config/authelia/configuration.yml"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/configuration.yml"
     dest: /data/containers/authelia/configuration.yml
     owner: ansible
     group: docker
@@ -119,7 +119,7 @@
 - name: Copy users database
   become: true
   copy:
-    src: "{{ playbook_dir }}/files/config/authelia/users_database.yml"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/users_database.yml"
     dest: /data/containers/authelia/users_database.yml
     owner: ansible
     group: docker
@@ -129,7 +129,7 @@
 - name: Copy jwt_secret
   become: true
   copy:
-    src: "{{ playbook_dir }}/files/config/authelia/secrets/jwt_secret"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/secrets/jwt_secret"
     dest: /data/containers/authelia/secrets/jwt_secret
     owner: ansible
     group: docker
@@ -139,7 +139,7 @@
 - name: Copy storage_encryption_key
   become: true
   copy:
-    src: "{{ playbook_dir }}/files/config/authelia/secrets/storage_encryption_key"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/secrets/storage_encryption_key"
     dest: /data/containers/authelia/secrets/storage_encryption_key
     owner: ansible
     group: docker
@@ -149,7 +149,7 @@
 - name: Copy session_secret
   become: true
   copy:
-    src: "{{ playbook_dir }}/files/config/authelia/secrets/session_secret"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/secrets/session_secret"
     dest: /data/containers/authelia/secrets/session_secret
     owner: ansible
     group: docker

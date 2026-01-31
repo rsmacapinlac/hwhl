@@ -4,7 +4,7 @@
 
 - name: Create pihole config directory locally
   file:
-    path: "{{ playbook_dir }}/files/config/pihole"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/pihole"
     state: directory
     mode: '0755'
   delegate_to: 127.0.0.1
@@ -12,7 +12,7 @@
 
 - name: Check if environment file already exists
   stat:
-    path: "{{ playbook_dir }}/files/config/pihole/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/pihole/environment"
   register: pihole_env_file
   delegate_to: 127.0.0.1
   become: false
@@ -20,7 +20,7 @@
 - name: Create pihole environment file
   template:
     src: "{{ playbook_dir }}/roles/pihole/templates/environment.j2"
-    dest: "{{ playbook_dir }}/files/config/pihole/environment"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/pihole/environment"
     mode: '0640'
   when: not pihole_env_file.stat.exists
   delegate_to: 127.0.0.1
@@ -30,7 +30,7 @@
 - name: Display setup instructions
   debug:
     msg: |
-      PiHole environment file created at: {{ playbook_dir }}/files/config/pihole/environment
+      PiHole environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/pihole/environment
 
       Please review and customize this file with your desired configuration before running site.yml
       After customization, you can run site.yml to deploy the services.

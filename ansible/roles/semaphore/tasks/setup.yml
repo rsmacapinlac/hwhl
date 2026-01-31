@@ -2,7 +2,7 @@
 - name: Create config directory for semaphore
   local_action:
     module: file
-    path: "{{ playbook_dir }}/files/config/semaphore"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/semaphore"
     state: directory
     mode: '0755'
   become: false
@@ -10,7 +10,7 @@
 - name: Check if semaphore environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/semaphore/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/semaphore/environment"
   register: env_file_stat
   become: false
 
@@ -18,7 +18,7 @@
   local_action:
     module: template
     src: "{{ playbook_dir }}/roles/semaphore/templates/environment.j2"
-    dest: "{{ playbook_dir }}/files/config/semaphore/environment"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/semaphore/environment"
   when: not env_file_stat.stat.exists
   register: env_created
   become: false
@@ -27,10 +27,10 @@
   debug:
     msg: |
       {% if env_file_stat.stat.exists %}
-      Environment file already exists at {{ playbook_dir }}/files/config/semaphore/environment
+      Environment file already exists at {{ playbook_dir }}/../homelab_config/ansible/files/config/semaphore/environment
       Skipping creation to preserve your custom configuration.
       {% else %}
-      Environment file has been created at {{ playbook_dir }}/files/config/semaphore/environment
+      Environment file has been created at {{ playbook_dir }}/../homelab_config/ansible/files/config/semaphore/environment
       Please review and customize this file with your desired configuration before running site.yml
       {% endif %}
       After customization, you can run site.yml to deploy the services.

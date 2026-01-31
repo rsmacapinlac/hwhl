@@ -3,14 +3,14 @@
 - name: Check if environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/monica/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/monica/environment"
   register: env_file
   become: false
 
 - name: Fail if environment file doesn't exist
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/files/config/monica/environment
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/monica/environment
       Please run site-setup.yml first to create the environment file.
   when: not env_file.stat.exists
 
@@ -49,7 +49,7 @@
 # Environment file deployment
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/files/config/monica/environment"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/monica/environment"
     dest: /data/services/monica/.env
     owner: ansible
     group: docker

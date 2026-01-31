@@ -3,14 +3,14 @@
 - name: Check if environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/kavita/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/kavita/environment"
   register: env_file
   become: false
 
 - name: Fail if environment file doesn't exist
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/files/config/kavita/environment
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/kavita/environment
       Please run site-setup.yml first to create the environment file.
   when: not env_file.stat.exists
 
@@ -35,7 +35,7 @@
 # Environment file deployment
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/files/config/kavita/environment"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/kavita/environment"
     dest: /data/services/kavita/.env
     owner: ansible
     group: docker

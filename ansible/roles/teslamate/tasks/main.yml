@@ -15,7 +15,7 @@
 
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/files/config/teslamate/environment"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/teslamate/environment"
     dest: /data/services/teslamate/.env
     owner: ansible
     group: docker

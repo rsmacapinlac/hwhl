@@ -1,0 +1,58 @@
+---
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/samba/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/samba/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+- name: Check if samba container exists
+  community.docker.docker_container_info:
+    name: samba
+  register: samba_container
+  ignore_errors: true
+
+- name: Create services folder
+  become: true
+  file:
+    path: /data/services/samba
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not samba_container.container.State.Running | default(false)
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/samba/environment"
+    dest: /data/services/samba/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart samba
+
+- name: Setup docker compose file for samba
+  template:
+    src: docker-compose.j2
+    dest: /data/services/samba/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart samba
+
+- name: Run samba container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/samba
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not samba_container.container.State.Running | default(false)
+  notify: restart samba

@@ -2,21 +2,21 @@
 - name: Create config directory for plex
   local_action:
     module: file
-    path: "{{ playbook_dir }}/files/config/plex"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/plex"
     state: directory
     mode: '0755'
 
 - name: Check if plex environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/plex/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/plex/environment"
   register: env_file_stat
 
 - name: Create plex environment file
   local_action:
     module: template
     src: "{{ playbook_dir }}/roles/plex/templates/environment.j2"
-    dest: "{{ playbook_dir }}/files/config/plex/environment"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/plex/environment"
   when: not env_file_stat.stat.exists
   register: env_created
 
@@ -24,10 +24,10 @@
   debug:
     msg: |
       {% if env_file_stat.stat.exists %}
-      Environment file already exists at {{ playbook_dir }}/files/config/plex/environment
+      Environment file already exists at {{ playbook_dir }}/../homelab_config/ansible/files/config/plex/environment
       Skipping creation to preserve your custom configuration.
       {% else %}
-      Environment file has been created at {{ playbook_dir }}/files/config/plex/environment
+      Environment file has been created at {{ playbook_dir }}/../homelab_config/ansible/files/config/plex/environment
       Please review and customize this file with your desired configuration before running site.yml
       {% endif %}
       After customization, you can run site.yml to deploy the services. 

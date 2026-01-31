@@ -1,14 +1,14 @@
 ---
 - name: Create obsidian config directory locally
   file:
-    path: "{{ playbook_dir }}/files/config/obsidian"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/obsidian"
     state: directory
   delegate_to: 127.0.0.1
   become: false
 
 - name: Check if obsidian environment file exists
   stat:
-    path: "{{ playbook_dir }}/files/config/obsidian/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/obsidian/environment"
   register: env_file_stat
   delegate_to: 127.0.0.1
   become: false
@@ -16,7 +16,7 @@
 - name: Create obsidian environment file from template
   template:
     src: "{{ playbook_dir }}/roles/obsidian/templates/environment.j2"
-    dest: "{{ playbook_dir }}/files/config/obsidian/environment"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/obsidian/environment"
     mode: '0640'
   delegate_to: 127.0.0.1
   become: false

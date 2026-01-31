@@ -1,7 +1,7 @@
 ---
 - name: Create blinko config directory locally
   file:
-    path: "{{ playbook_dir }}/files/config/blinko"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/blinko"
     state: directory
     mode: '0755'
   delegate_to: 127.0.0.1
@@ -9,7 +9,7 @@
 
 - name: Check if environment file already exists
   stat:
-    path: "{{ playbook_dir }}/files/config/blinko/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/blinko/environment"
   register: blinko_env_file
   delegate_to: 127.0.0.1
   become: false
@@ -17,7 +17,7 @@
 - name: Create environment file from template
   template:
     src: ../templates/environment.j2
-    dest: "{{ playbook_dir }}/files/config/blinko/environment"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/blinko/environment"
     mode: '0640'
   when: not blinko_env_file.stat.exists
   delegate_to: 127.0.0.1
@@ -26,7 +26,7 @@
 - name: Display setup instructions
   debug:
     msg: |
-      Blinko environment file created at: {{ playbook_dir }}/files/config/blinko/environment
+      Blinko environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/blinko/environment
 
       CRITICAL SECURITY SETTINGS - MUST BE CHANGED:
       - NEXTAUTH_SECRET: Generate a secure random string (use: openssl rand -base64 32)

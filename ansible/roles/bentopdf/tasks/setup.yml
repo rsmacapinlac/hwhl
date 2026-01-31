@@ -1,7 +1,7 @@
 ---
 - name: Create bentopdf config directory
   file:
-    path: "{{ playbook_dir }}/files/config/bentopdf"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/bentopdf"
     state: directory
     mode: '0755'
   delegate_to: 127.0.0.1
@@ -9,7 +9,7 @@
 
 - name: Check if environment file already exists
   stat:
-    path: "{{ playbook_dir }}/files/config/bentopdf/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/bentopdf/environment"
   register: bentopdf_env_file
   delegate_to: 127.0.0.1
   become: false
@@ -17,7 +17,7 @@
 - name: Create environment file from template
   template:
     src: "{{ playbook_dir }}/roles/bentopdf/templates/environment.j2"
-    dest: "{{ playbook_dir }}/files/config/bentopdf/environment"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/bentopdf/environment"
     mode: '0640'
   when: not bentopdf_env_file.stat.exists
   delegate_to: 127.0.0.1

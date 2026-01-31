@@ -4,7 +4,7 @@
 
 - name: Create authelia config directory locally
   file:
-    path: "{{ playbook_dir }}/files/config/authelia"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia"
     state: directory
     mode: '0755'
   delegate_to: 127.0.0.1
@@ -12,7 +12,7 @@
 
 - name: Create authelia secrets directory locally
   file:
-    path: "{{ playbook_dir }}/files/config/authelia/secrets"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/secrets"
     state: directory
     mode: '0700'
   delegate_to: 127.0.0.1
@@ -20,7 +20,7 @@
 
 - name: Check if environment file already exists
   stat:
-    path: "{{ playbook_dir }}/files/config/authelia/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/environment"
   register: authelia_env_file
   delegate_to: 127.0.0.1
   become: false
@@ -28,7 +28,7 @@
 - name: Create authelia environment file
   template:
     src: "{{ playbook_dir }}/roles/authelia/templates/environment.j2"
-    dest: "{{ playbook_dir }}/files/config/authelia/environment"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/environment"
     mode: '0640'
   when: not authelia_env_file.stat.exists
   delegate_to: 127.0.0.1
@@ -36,7 +36,7 @@
 
 - name: Check if configuration.yml already exists
   stat:
-    path: "{{ playbook_dir }}/files/config/authelia/configuration.yml"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/configuration.yml"
   register: authelia_config_file
   delegate_to: 127.0.0.1
   become: false
@@ -44,7 +44,7 @@
 - name: Create authelia configuration.yml
   template:
     src: "{{ playbook_dir }}/roles/authelia/templates/configuration.j2"
-    dest: "{{ playbook_dir }}/files/config/authelia/configuration.yml"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/configuration.yml"
     mode: '0640'
   when: not authelia_config_file.stat.exists
   delegate_to: 127.0.0.1
@@ -52,7 +52,7 @@
 
 - name: Check if users_database.yml already exists
   stat:
-    path: "{{ playbook_dir }}/files/config/authelia/users_database.yml"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/users_database.yml"
   register: authelia_users_file
   delegate_to: 127.0.0.1
   become: false
@@ -60,7 +60,7 @@
 - name: Copy users_database.yml to config directory
   copy:
     src: "{{ playbook_dir }}/roles/authelia/files/users_database.yml"
-    dest: "{{ playbook_dir }}/files/config/authelia/users_database.yml"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/users_database.yml"
     mode: '0640'
   when: not authelia_users_file.stat.exists
   delegate_to: 127.0.0.1
@@ -69,7 +69,7 @@
 # Create secret files
 - name: Check if jwt_secret already exists
   stat:
-    path: "{{ playbook_dir }}/files/config/authelia/secrets/jwt_secret"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/secrets/jwt_secret"
   register: authelia_jwt_secret_file
   delegate_to: 127.0.0.1
   become: false
@@ -77,7 +77,7 @@
 - name: Create jwt_secret file
   copy:
     content: "{{ authelia_jwt_secret }}"
-    dest: "{{ playbook_dir }}/files/config/authelia/secrets/jwt_secret"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/secrets/jwt_secret"
     mode: '0600'
   when: not authelia_jwt_secret_file.stat.exists
   delegate_to: 127.0.0.1
@@ -85,7 +85,7 @@
 
 - name: Check if storage_encryption_key already exists
   stat:
-    path: "{{ playbook_dir }}/files/config/authelia/secrets/storage_encryption_key"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/secrets/storage_encryption_key"
   register: authelia_storage_key_file
   delegate_to: 127.0.0.1
   become: false
@@ -93,7 +93,7 @@
 - name: Create storage_encryption_key file
   copy:
     content: "{{ authelia_storage_encryption }}"
-    dest: "{{ playbook_dir }}/files/config/authelia/secrets/storage_encryption_key"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/secrets/storage_encryption_key"
     mode: '0600'
   when: not authelia_storage_key_file.stat.exists
   delegate_to: 127.0.0.1
@@ -101,7 +101,7 @@
 
 - name: Check if session_secret already exists
   stat:
-    path: "{{ playbook_dir }}/files/config/authelia/secrets/session_secret"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/secrets/session_secret"
   register: authelia_session_secret_file
   delegate_to: 127.0.0.1
   become: false
@@ -109,7 +109,7 @@
 - name: Generate session_secret file
   copy:
     content: "{{ lookup('password', '/dev/null length=64 chars=ascii_letters,digits') }}"
-    dest: "{{ playbook_dir }}/files/config/authelia/secrets/session_secret"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/secrets/session_secret"
     mode: '0600'
   when: not authelia_session_secret_file.stat.exists
   delegate_to: 127.0.0.1
@@ -118,7 +118,7 @@
 - name: Display setup instructions
   debug:
     msg: |
-      Authelia configuration files created at: {{ playbook_dir }}/files/config/authelia/
+      Authelia configuration files created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/authelia/
 
       Files created:
         - environment (Docker environment variables)

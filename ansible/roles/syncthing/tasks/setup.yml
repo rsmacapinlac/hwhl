@@ -4,7 +4,7 @@
 
 - name: Create syncthing config directory locally
   file:
-    path: "{{ playbook_dir }}/files/config/syncthing"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/syncthing"
     state: directory
     mode: '0755'
   delegate_to: 127.0.0.1
@@ -12,7 +12,7 @@
 
 - name: Check if environment file already exists
   stat:
-    path: "{{ playbook_dir }}/files/config/syncthing/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/syncthing/environment"
   register: syncthing_env_file
   delegate_to: 127.0.0.1
   become: false
@@ -20,7 +20,7 @@
 - name: Create environment file from template
   template:
     src: ../templates/environment.j2
-    dest: "{{ playbook_dir }}/files/config/syncthing/environment"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/syncthing/environment"
     mode: '0640'
   when: not syncthing_env_file.stat.exists
   delegate_to: 127.0.0.1
@@ -29,7 +29,7 @@
 - name: Display setup instructions
   debug:
     msg: |
-      Syncthing environment file created at: {{ playbook_dir }}/files/config/syncthing/environment
+      Syncthing environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/syncthing/environment
 
       Please review and update the following settings:
       - PUID/PGID: User and group IDs for container permissions

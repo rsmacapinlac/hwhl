@@ -124,4 +124,5 @@ module "services_containers" {
   startup_order  = 4
   tags           = concat(local.common_tags, ["services"], each.value.extra_tags)
   mount_points   = each.value.mount_points
+  tun_device     = each.value.tun_device
 }

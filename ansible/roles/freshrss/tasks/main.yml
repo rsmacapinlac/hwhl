@@ -3,14 +3,14 @@
 - name: Check if environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/files/config/freshrss/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/freshrss/environment"
   register: env_file
   become: false
 
 - name: Fail if environment file doesn't exist
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/files/config/freshrss/environment
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/freshrss/environment
       Please run site-setup.yml first to create the environment file.
   when: not env_file.stat.exists
 
@@ -34,7 +34,7 @@
 # Environment file deployment (triggers handler when changed)
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/files/config/freshrss/environment"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/freshrss/environment"
     dest: /data/services/freshrss/.env
     owner: ansible
     group: docker

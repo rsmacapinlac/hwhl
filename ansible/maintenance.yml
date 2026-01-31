@@ -248,6 +248,13 @@
         - radarr
         - arrs
 
+- hosts: "samba"
+  remote_user: ansible
+  tasks:
+    - name: "Update Samba"
+      include_tasks: roles/samba/tasks/update.yml
+      when: groups['samba'] is defined and groups['samba'] | length > 0
+
 - hosts: "bentopdf"
   remote_user: ansible
   tasks:

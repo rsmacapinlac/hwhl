@@ -1,0 +1,21 @@
+---
+services:
+  samba:
+    container_name: samba
+    image: dperson/samba
+    ports:
+      - {{ samba_smb_port }}:445
+      - {{ samba_netbios_port }}:139
+      - {{ samba_nmbd_port_137 }}:137/udp
+      - {{ samba_nmbd_port_138 }}:138/udp
+    env_file:
+      - .env
+    tmpfs:
+      - /tmp
+    volumes:
+{% for item in samba_volumes | default([]) %}
+      - {{ item.host_folder }}:{{ item.container }}
+{% endfor %}
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"

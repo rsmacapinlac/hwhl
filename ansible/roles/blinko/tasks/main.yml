@@ -1,7 +1,7 @@
 ---
 - name: Check if environment file exists
   stat:
-    path: "{{ playbook_dir }}/files/config/blinko/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/blinko/environment"
   register: blinko_env_file
   delegate_to: 127.0.0.1
   become: false
@@ -9,7 +9,7 @@
 - name: Fail if environment file doesn't exist
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/files/config/blinko/environment
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/blinko/environment
       Please run site-setup.yml first to create the environment file.
   when: not blinko_env_file.stat.exists
 
@@ -31,7 +31,7 @@
 
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/files/config/blinko/environment"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/blinko/environment"
     dest: /data/services/blinko/.env
     owner: ansible
     group: docker

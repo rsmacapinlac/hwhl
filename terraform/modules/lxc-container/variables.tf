@@ -129,3 +129,9 @@ variable "mount_points" {
   }))
   default = []
 }
+
+variable "tun_device" {
+  description = "Enable /dev/net/tun passthrough (required for VPN containers like transmission-openvpn)"
+  type        = bool
+  default     = false
+}

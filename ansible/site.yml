@@ -36,7 +36,6 @@
 - hosts: "bazarr"
   remote_user: ansible
   roles:
-    - role: shares
     - role: bazarr
       tags:
         - bazarr
@@ -45,7 +44,6 @@
 - hosts: "lidarr"
   remote_user: ansible
   roles:
-    - role: shares
     - role: lidarr
       tags:
         - lidarr
@@ -54,7 +52,6 @@
 - hosts: "sonarr"
   remote_user: ansible
   roles:
-    - role: shares
     - role: sonarr
       tags:
         - sonarr
@@ -63,7 +60,6 @@
 - hosts: "radarr"
   remote_user: ansible
   roles:
-    - role: shares
     - role: radarr
       tags:
         - radarr
@@ -89,7 +85,6 @@
 - hosts: "whisparr"
   remote_user: ansible
   roles:
-    - role: shares
     - role: whisparr
       tags:
         - whisparr
@@ -97,7 +92,6 @@
 - hosts: "mylar3"
   remote_user: ansible
   roles:
-    - role: shares
     - role: mylar3
       tags:
         - mylar3
@@ -421,6 +415,13 @@
     - role: outline
       tags:
         - outline
+
+- hosts: "samba"
+  remote_user: ansible
+  roles:
+    - role: samba
+      tags:
+        - samba
 
 - hosts: "bentopdf"
   remote_user: ansible
