@@ -45,6 +45,11 @@ ${name}.int.${var.homelab_domain} ansible_host=${split("/", container.ip_address
 ${name}.int.${var.homelab_domain}
 %{endfor~}
 %{endfor~}
+
+[proxmox_control_node_by_ip]
+%{for name, ip in var.proxmox_node_ips~}
+${ip}
+%{endfor~}
 EOT
 }
 

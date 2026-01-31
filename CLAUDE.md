@@ -65,6 +65,24 @@ ansible-playbook site.yml --check
 ansible-playbook maintenance.yml
 ```
 
+### Remote Host Management (Ad-Hoc Commands)
+Use `ansible` ad-hoc commands to run shell commands on remote LXC hosts. This avoids SSH key/config issues by leveraging the Ansible inventory and connection settings already configured for the project.
+
+```bash
+# Run a command on a specific host
+ansible <hostname> -m shell -a "<command>"
+
+# Examples:
+ansible media.int.macapinlac.network -m shell -a "docker ps -a"
+ansible media.int.macapinlac.network -m shell -a "ls -la /data/containers/"
+ansible media.int.macapinlac.network -m shell -a "docker exec borgbackup borgmatic list"
+```
+
+**Note:** When using `docker ps --format` with ansible ad-hoc commands, Go template braces conflict with Jinja2. Use `{% raw %}...{% endraw %}` to escape:
+```bash
+ansible <host> -m shell -a 'docker ps --format "table {% raw %}{{.Names}}\t{{.Status}}{% endraw %}"'
+```
+
 ### Key Files
 - `ansible/ansible.cfg`: Ansible configuration (inventory points to ansible + homelab_config)
 - `ansible/inventory/`: Group hierarchy (e.g. groups.yml)

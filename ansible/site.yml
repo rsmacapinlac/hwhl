@@ -148,19 +148,16 @@
 - hosts: "jellyfin"
   remote_user: ansible
   roles:
-    - role: shares
     - role: jellyfin
 
 - hosts: "plex"
   remote_user: ansible
   roles:
-    - role: shares
     - role: plex
 
 - hosts: "tdarr"
   remote_user: ansible
   roles:
-    - role: shares
     - role: tdarr
       tags:
         - tdarr
@@ -209,7 +206,6 @@
 - hosts: "kavita"
   remote_user: ansible
   roles:
-    - role: shares
     - role: kavita
       tags:
         - kavita
@@ -217,7 +213,6 @@
 - hosts: "audiobookshelf"
   remote_user: ansible
   roles:
-    - role: shares
     - role: audiobookshelf
       tags:
         - audiobookshelf
@@ -328,13 +323,11 @@
 - hosts: "photoprism"
   remote_user: ansible
   roles:
-    - role: shares
     - role: photoprism
 
 - hosts: "paperless-ng"
   remote_user: ansible
   roles:
-    - role: shares
     - role: paperless-ng
 
 - hosts: "homepage"
