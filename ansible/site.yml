@@ -422,3 +422,10 @@
     - role: bentopdf
       tags:
         - bentopdf
+
+- hosts: "openclaw"
+  remote_user: ansible
+  roles:
+    - role: openclaw
+      tags:
+        - openclaw

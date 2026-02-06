@@ -1,0 +1,41 @@
+---
+- name: Create openclaw config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if openclaw.json already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/openclaw.json"
+  register: openclaw_json_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create openclaw.json from template
+  template:
+    src: "{{ playbook_dir }}/roles/openclaw/templates/openclaw.json.j2"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/openclaw.json"
+    mode: '0640'
+  when: not openclaw_json_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if openclaw SSH private key already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/openclaw_bot_ed25519"
+  register: openclaw_ssh_key
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Generate openclaw SSH keypair
+  community.crypto.openssh_keypair:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/openclaw_bot_ed25519"
+    type: ed25519
+    comment: "openclaw"
+    mode: '0600'
+  when: not openclaw_ssh_key.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

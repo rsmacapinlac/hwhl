@@ -1,0 +1,145 @@
+---
+# Build custom sandbox image
+- name: Create sandbox build directory
+  become: true
+  become_user: ansible
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.openclaw/sandbox-build"
+    state: directory
+    owner: "ansible"
+    group: "ansible"
+    mode: '0755'
+
+- name: Copy custom sandbox Dockerfile
+  become: true
+  become_user: ansible
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/custom-image/Dockerfile.sandbox-custom"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.openclaw/sandbox-build/Dockerfile"
+    owner: "ansible"
+    group: "ansible"
+    mode: '0644'
+  register: sandbox_dockerfile
+
+- name: Check if custom sandbox image exists
+  become: true
+  become_user: ansible
+  community.docker.docker_image_info:
+    name: openclaw-sandbox-custom:latest
+  register: sandbox_image_info
+
+- name: Build custom sandbox image
+  become: true
+  become_user: ansible
+  community.docker.docker_image:
+    name: openclaw-sandbox-custom
+    tag: latest
+    source: build
+    build:
+      path: "{{ ansible_facts['env']['HOME'] }}/.openclaw/sandbox-build"
+      dockerfile: Dockerfile
+      pull: false
+    force_source: "{{ sandbox_dockerfile.changed }}"
+  when: sandbox_dockerfile.changed or sandbox_image_info.images | length == 0
+  register: sandbox_image
+
+- name: Recreate all openclaw sandboxes
+  become: true
+  become_user: ansible
+  command: /home/ansible/.npm-global/bin/openclaw sandbox recreate --all --force
+  when: sandbox_image.changed | default(false)
+
+- name: Create openclaw config directory
+  become: true
+  become_user: ansible
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.openclaw"
+    state: directory
+    owner: "ansible"
+    group: "ansible"
+    mode: '0700'
+
+- name: Copy user config files to .config directory
+  become: true
+  become_user: ansible
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/config/"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/"
+    owner: "ansible"
+    group: "ansible"
+    mode: preserve
+
+- name: Copy openclaw.json to host
+  become: true
+  become_user: ansible
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/openclaw.json"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.openclaw/openclaw.json"
+    mode: '0600'
+  notify: Restart openclaw gateway
+
+- name: Ensure .ssh directory exists
+  become: true
+  become_user: ansible
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.ssh"
+    state: directory
+    owner: "ansible"
+    group: "ansible"
+    mode: '0700'
+
+- name: Copy openclaw SSH private key to host
+  become: true
+  become_user: ansible
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/openclaw_bot_ed25519"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.ssh/openclaw_bot_ed25519"
+    owner: "ansible"
+    group: "ansible"
+    mode: '0600'
+
+- name: Copy openclaw SSH public key to host
+  become: true
+  become_user: ansible
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/openclaw_bot_ed25519.pub"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.ssh/openclaw_bot_ed25519.pub"
+    owner: "ansible"
+    group: "ansible"
+    mode: '0644'
+
+- name: Configure SSH to use openclaw key for GitHub
+  become: true
+  become_user: ansible
+  blockinfile:
+    path: "{{ ansible_facts['env']['HOME'] }}/.ssh/config"
+    create: true
+    mode: '0600'
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - openclaw"
+    block: |
+      Host github.com
+          IdentityFile ~/.ssh/openclaw_bot_ed25519
+          IdentitiesOnly yes
+
+- name: Clone workspace repository
+  become: true
+  become_user: ansible
+  git:
+    repo: "{{ workspace_repository }}"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.openclaw/workspace"
+    key_file: "{{ ansible_facts['env']['HOME'] }}/.ssh/openclaw_bot_ed25519"
+    accept_hostkey: true
+    update: false
+  ignore_errors: true
+
+- name: Prune dangling Docker images
+  become: true
+  become_user: ansible
+  community.docker.docker_prune:
+    images: true
+    images_filters:
+      dangling: true
+
+- name: Configure traefik for openclaw
+  include_tasks: traefik.yml
+  when: "'containers' in group_names or 'edge' in group_names"

@@ -1,0 +1,176 @@
+{
+  "meta": {
+    "lastTouchedVersion": "",
+    "lastTouchedAt": ""
+  },
+  "env": {
+    "GOG_ACCOUNT": "CHANGEME",
+    "GOG_KEYRING_PASSWORD": "CHANGEME",
+    "TODOIST_API_TOKEN": "CHANGEME",
+    "NEXTCLOUD_URL": "https://nc.{{ homelab_domain }}",
+    "NEXTCLOUD_USERNAME": "CHANGEME",
+    "NEXTCLOUD_PASSWORD": "CHANGEME"
+  },
+  "wizard": {
+    "lastRunAt": "",
+    "lastRunVersion": "",
+    "lastRunCommand": "onboard",
+    "lastRunMode": "local"
+  },
+  "browser": {
+    "enabled": true,
+    "executablePath": "/usr/bin/chromium",
+    "headless": true,
+    "noSandbox": true
+  },
+  "auth": {
+    "profiles": {
+      "anthropic:default": {
+        "provider": "anthropic",
+        "mode": "api_key"
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "anthropic/claude-sonnet-4-5"
+      },
+      "models": {
+        "anthropic/claude-sonnet-4-5": {
+          "alias": "sonnet"
+        }
+      },
+      "workspace": "/home/ansible/.openclaw/workspace",
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      },
+      "sandbox": {
+        "mode": "non-main",
+        "workspaceAccess": "ro",
+        "scope": "agent",
+        "workspaceRoot": "/home/ansible/.openclaw/sandboxes",
+        "docker": {
+          "image": "openclaw-sandbox:bookworm-slim",
+          "workdir": "/workspace",
+          "readOnlyRoot": true,
+          "tmpfs": [
+            "/tmp",
+            "/var/tmp",
+            "/run"
+          ],
+          "network": "none",
+          "user": "1000:1000",
+          "capDrop": [
+            "ALL"
+          ],
+          "env": {
+            "LANG": "C.UTF-8",
+            "LC_ALL": "C.UTF-8"
+          },
+          "pidsLimit": 256,
+          "memory": "512m",
+          "memorySwap": "1g",
+          "cpus": 1,
+          "ulimits": {
+            "nofile": {
+              "soft": 1024,
+              "hard": 2048
+            },
+            "nproc": 256
+          },
+          "seccompProfile": "/home/ansible/.openclaw/workspace/sandbox/seccomp-profile.json"
+        },
+        "prune": {
+          "idleHours": 24,
+          "maxAgeDays": 7
+        }
+      }
+    }
+  },
+  "tools": {
+    "sandbox": {
+      "tools": {
+        "allow": [
+          "exec",
+          "process",
+          "read",
+          "write",
+          "edit",
+          "sessions_list",
+          "sessions_history",
+          "sessions_send",
+          "sessions_spawn",
+          "session_status",
+          "web_search",
+          "web_fetch",
+          "browser",
+          "memory_search",
+          "memory_get"
+        ],
+        "deny": [
+          "canvas",
+          "nodes",
+          "cron",
+          "message",
+          "gateway"
+        ]
+      }
+    }
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto"
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "session-memory": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "botToken": "CHANGEME",
+      "groupPolicy": "allowlist",
+      "streamMode": "partial"
+    }
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "loopback",
+    "auth": {
+      "mode": "token",
+      "token": "CHANGEME"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    }
+  },
+  "skills": {
+    "install": {
+      "nodeManager": "npm"
+    }
+  },
+  "plugins": {
+    "entries": {
+      "telegram": {
+        "enabled": true
+      }
+    }
+  }
+}

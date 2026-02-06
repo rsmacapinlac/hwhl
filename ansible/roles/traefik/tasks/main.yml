@@ -6,6 +6,14 @@
     owner: ansible
     group: docker
 
+- name: Traefik config.d directory
+  become: true
+  ansible.builtin.file:
+    path: /data/containers/traefik/config.d
+    state: directory
+    owner: ansible
+    group: docker
+
 - name: Traefik config
   become: true
   template:
@@ -19,7 +27,7 @@
   become: true
   template:
     src: routes.yml.j2
-    dest: /data/containers/traefik/config.yml
+    dest: /data/containers/traefik/config.d/middlewares.yml
     owner: ansible
     group: docker
   notify: restart traefik

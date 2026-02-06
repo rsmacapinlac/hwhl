@@ -1,10 +1,10 @@
+---
+- name: Restart openclaw gateway
+  become: true
+  become_user: ansible
+  command: /home/ansible/.npm-global/bin/openclaw gateway restart
 
-- name: Traefik routes
-  copy:
-    src: "{{ playbook_dir }}/files/traefik/config.yml"
-    dest: "/data/containers/traefik/config.d/external.yml"
-
-- name: Restart traefik
+- name: restart traefik
   become: true
   community.docker.docker_compose_v2:
     project_src: /data/services/traefik
@@ -13,3 +13,4 @@
     state: present
     recreate: always
     remove_orphans: false
+  ignore_errors: true

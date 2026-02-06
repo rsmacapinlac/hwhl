@@ -1,0 +1,17 @@
+---
+- name: Ensure traefik config.d directory exists
+  become: true
+  ansible.builtin.file:
+    path: /data/containers/traefik/config.d
+    state: directory
+    owner: ansible
+    group: docker
+
+- name: Deploy openclaw traefik config
+  become: true
+  template:
+    src: traefik-openclaw.yml.j2
+    dest: /data/containers/traefik/config.d/openclaw.yml
+    owner: ansible
+    group: docker
+  notify: restart traefik

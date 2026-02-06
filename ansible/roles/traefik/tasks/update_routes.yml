@@ -3,7 +3,7 @@
   become: true
   template:
     src: routes.yml.j2
-    dest: /data/containers/traefik/config.yml
+    dest: /data/containers/traefik/config.d/middlewares.yml
     owner: ansible
     group: docker
 

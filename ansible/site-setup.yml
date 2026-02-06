@@ -349,3 +349,12 @@
       include_tasks: roles/tdarr/tasks/setup.yml
       run_once: true
       when: groups['tdarr'] is defined and groups['tdarr'] | length > 0
+
+- name: "Setup OpenClaw"
+  hosts: openclaw
+  connection: local
+  tasks:
+    - name: "Run OpenClaw setup if group exists"
+      include_tasks: roles/openclaw/tasks/setup.yml
+      run_once: true
+      when: groups['openclaw'] is defined and groups['openclaw'] | length > 0
