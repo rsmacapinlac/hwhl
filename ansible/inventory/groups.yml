@@ -54,3 +54,4 @@ managed_hosts:
     samba:
     diun:
     openclaw:
+    ollama:
