@@ -1,0 +1,35 @@
+# Vaultwarden Configuration
+# Documentation: https://github.com/dani-garcia/vaultwarden/wiki
+
+# Domain configuration - REQUIRED for proper operation
+# This should match your primary access URL (HTTPS)
+DOMAIN=https://vaultwarden.family.{{ homelab_domain | default('macapinlac.network') }}
+
+# Admin panel - set a secure token to enable admin interface
+# Generate with: openssl rand -base64 48
+# Leave empty to disable admin panel
+ADMIN_TOKEN=changeme_generate_secure_token
+
+# Signups - set to false after initial setup
+SIGNUPS_ALLOWED=true
+
+# Invitations - allow existing users to invite others
+INVITATIONS_ALLOWED=true
+
+# Show password hints (can be a security risk)
+SHOW_PASSWORD_HINT=false
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# Logging
+LOG_LEVEL=info
+
+# Optional: SMTP configuration for email notifications
+# Uncomment and configure if you want email features
+# SMTP_HOST=smtp.example.com
+# SMTP_FROM=vaultwarden@example.com
+# SMTP_PORT=587
+# SMTP_SECURITY=starttls
+# SMTP_USERNAME=username
+# SMTP_PASSWORD=password

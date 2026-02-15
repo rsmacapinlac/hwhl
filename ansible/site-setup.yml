@@ -412,3 +412,12 @@
       include_tasks: roles/homepage/tasks/setup.yml
       run_once: true
       when: groups['homepage'] is defined and groups['homepage'] | length > 0
+
+- name: "Setup Vaultwarden"
+  hosts: vaultwarden
+  connection: local
+  tasks:
+    - name: "Run Vaultwarden setup if group exists"
+      include_tasks: roles/vaultwarden/tasks/setup.yml
+      run_once: true
+      when: groups['vaultwarden'] is defined and groups['vaultwarden'] | length > 0

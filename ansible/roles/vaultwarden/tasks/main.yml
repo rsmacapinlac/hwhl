@@ -1,0 +1,75 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/vaultwarden/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/vaultwarden/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if vaultwarden container exists
+  community.docker.docker_container_info:
+    name: vaultwarden
+  register: vaultwarden_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create services folder
+  become: true
+  file:
+    path: /data/services/vaultwarden
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not vaultwarden_container.container.State.Running | default(false)
+
+# Create data directory for persistent storage
+- name: Create vaultwarden data directory
+  become: true
+  file:
+    path: /data/services/vaultwarden/data
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not vaultwarden_container.container.State.Running | default(false)
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/vaultwarden/environment"
+    dest: /data/services/vaultwarden/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart vaultwarden
+
+# Docker Compose deployment
+- name: Setup docker compose file for vaultwarden
+  template:
+    src: docker-compose.j2
+    dest: /data/services/vaultwarden/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart vaultwarden
+
+# Container deployment using docker_compose_v2
+- name: Run vaultwarden container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/vaultwarden
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not vaultwarden_container.container.State.Running | default(false)
+  notify: restart vaultwarden

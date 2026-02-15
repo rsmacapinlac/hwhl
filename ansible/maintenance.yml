@@ -319,6 +319,14 @@
       tags:
         - homepage
 
+- hosts: "vaultwarden"
+  remote_user: ansible
+  tasks:
+    - name: "Update Vaultwarden"
+      include_tasks: roles/vaultwarden/tasks/update.yml
+      tags:
+        - vaultwarden
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:
