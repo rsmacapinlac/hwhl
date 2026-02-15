@@ -1,53 +1,113 @@
 ---
-# Build custom sandbox image
-- name: Create sandbox build directory
-  become: true
-  become_user: ansible
-  file:
-    path: "{{ ansible_facts['env']['HOME'] }}/.openclaw/sandbox-build"
-    state: directory
-    owner: "ansible"
-    group: "ansible"
-    mode: '0755'
 
-- name: Copy custom sandbox Dockerfile
+- name: Install Chromium and headless dependencies
+  become: true
+  apt:
+    name:
+      - chromium
+      - fonts-liberation
+      - libasound2
+      - libatk-bridge2.0-0
+      - libatk1.0-0
+      - libcups2
+      - libdbus-1-3
+      - libdrm2
+      - libgbm1
+      - libgtk-3-0
+      - libnspr4
+      - libnss3
+      - libxcomposite1
+      - libxdamage1
+      - libxfixes3
+      - libxkbcommon0
+      - libxrandr2
+      - xdg-utils
+    state: present
+    update_cache: true
+
+- name: Install openclaw
   become: true
   become_user: ansible
+  shell: |
+    curl -fsSL https://openclaw.ai/install.sh | bash -s -- --no-onboard
+  args:
+    creates: "{{ ansible_facts['env']['HOME'] }}/.local/bin/openclaw"
+
+- name: Install gogcli (Google Suite CLI)
+  become: true
+  become_user: ansible
+  block:
+    - name: Create temp directory for gogcli
+      tempfile:
+        state: directory
+        suffix: gogcli
+      register: gogcli_temp
+
+    - name: Download gogcli
+      get_url:
+        url: "https://github.com/steipete/gogcli/releases/download/v0.9.0/gogcli_0.9.0_linux_amd64.tar.gz"
+        dest: "{{ gogcli_temp.path }}/gogcli.tar.gz"
+        mode: '0644'
+
+    - name: Extract gogcli
+      unarchive:
+        src: "{{ gogcli_temp.path }}/gogcli.tar.gz"
+        dest: "{{ gogcli_temp.path }}"
+        remote_src: true
+
+    - name: Install gogcli binary
+      copy:
+        src: "{{ gogcli_temp.path }}/gog"
+        dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/gog"
+        remote_src: true
+        mode: '0755'
+
+    - name: Cleanup gogcli temp directory
+      file:
+        path: "{{ gogcli_temp.path }}"
+        state: absent
+
+- name: Install himalaya (email CLI)
+  become: true
+  become_user: ansible
+  block:
+    - name: Create temp directory for himalaya
+      tempfile:
+        state: directory
+        suffix: himalaya
+      register: himalaya_temp
+
+    - name: Download himalaya
+      get_url:
+        url: "https://github.com/pimalaya/himalaya/releases/download/v1.1.0/himalaya.x86_64-linux.tgz"
+        dest: "{{ himalaya_temp.path }}/himalaya.tgz"
+        mode: '0644'
+
+    - name: Extract himalaya
+      unarchive:
+        src: "{{ himalaya_temp.path }}/himalaya.tgz"
+        dest: "{{ himalaya_temp.path }}"
+        remote_src: true
+
+    - name: Install himalaya binary
+      copy:
+        src: "{{ himalaya_temp.path }}/himalaya"
+        dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/himalaya"
+        remote_src: true
+        mode: '0755'
+
+    - name: Cleanup himalaya temp directory
+      file:
+        path: "{{ himalaya_temp.path }}"
+        state: absent
+
+- name: Enable linger for ansible user
   copy:
-    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/custom-image/Dockerfile.sandbox-custom"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.openclaw/sandbox-build/Dockerfile"
-    owner: "ansible"
-    group: "ansible"
+    content: ""
+    dest: /var/lib/systemd/linger/ansible
+    owner: root
+    group: root
     mode: '0644'
-  register: sandbox_dockerfile
-
-- name: Check if custom sandbox image exists
-  become: true
-  become_user: ansible
-  community.docker.docker_image_info:
-    name: openclaw-sandbox-custom:latest
-  register: sandbox_image_info
-
-- name: Build custom sandbox image
-  become: true
-  become_user: ansible
-  community.docker.docker_image:
-    name: openclaw-sandbox-custom
-    tag: latest
-    source: build
-    build:
-      path: "{{ ansible_facts['env']['HOME'] }}/.openclaw/sandbox-build"
-      dockerfile: Dockerfile
-      pull: false
-    force_source: "{{ sandbox_dockerfile.changed }}"
-  when: sandbox_dockerfile.changed or sandbox_image_info.images | length == 0
-  register: sandbox_image
-
-- name: Recreate all openclaw sandboxes
-  become: true
-  become_user: ansible
-  command: /home/ansible/.npm-global/bin/openclaw sandbox recreate --all --force
-  when: sandbox_image.changed | default(false)
 
 - name: Create openclaw config directory
   become: true
@@ -59,12 +119,22 @@
     group: "ansible"
     mode: '0700'
 
+- name: Ensure openclaw credentials directory exists 
+  become: true
+  become_user: ansible
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.openclaw/credentials"
+    state: directory
+    owner: "ansible"
+    group: "ansible"
+    mode: '0700'
+
 - name: Copy user config files to .config directory
   become: true
   become_user: ansible
   copy:
     src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/config/"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.config/"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.openclaw/credentials/"
     owner: "ansible"
     group: "ansible"
     mode: preserve
@@ -77,6 +147,24 @@
     dest: "{{ ansible_facts['env']['HOME'] }}/.openclaw/openclaw.json"
     mode: '0600'
   notify: Restart openclaw gateway
+
+- name: Ensure openclaw agent directory exists
+  become: true
+  become_user: ansible
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.openclaw/agents/main/agent"
+    state: directory
+    owner: "ansible"
+    group: "ansible"
+    mode: '0700'
+
+- name: Copy auth-profiles.json to host
+  become: true
+  become_user: ansible
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/auth-profiles.json"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.openclaw/agents/main/agent/auth-profiles.json"
+    mode: '0600'
 
 - name: Ensure .ssh directory exists
   become: true
@@ -131,14 +219,6 @@
     accept_hostkey: true
     update: false
   ignore_errors: true
-
-- name: Prune dangling Docker images
-  become: true
-  become_user: ansible
-  community.docker.docker_prune:
-    images: true
-    images_filters:
-      dangling: true
 
 - name: Configure traefik for openclaw
   include_tasks: traefik.yml

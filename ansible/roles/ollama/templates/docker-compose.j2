@@ -1,0 +1,18 @@
+---
+services:
+  ollama:
+    container_name: ollama
+    image: ollama/ollama:latest
+    ports:
+      - {{ ollama_port }}:11434
+    env_file:
+      - .env
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+volumes:
+  ollama-data:
+    driver: local

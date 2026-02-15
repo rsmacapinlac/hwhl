@@ -1,0 +1,9 @@
+---
+# Paperless-ngx default configuration variables
+
+# Port configuration
+paperless_ngx_port: 8001
+
+# Storage paths
+paperless_ngx_data_path: /data/containers/paperless-ngx
+paperless_ngx_documents_path: /data/Documents

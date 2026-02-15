@@ -1,0 +1,12 @@
+# Paperless-ng Environment Configuration
+
+# User/Group IDs
+PUID=1001
+PGID=1001
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# Paperless Configuration
+PAPERLESS_ENABLE_HTTP_REMOTE_USER=true
+PAPERLESS_LOGOUT_REDIRECT_URL=https://auth.{{ homelab_domain | default('macapinlac.network') }}/logout

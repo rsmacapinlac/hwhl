@@ -1,0 +1,74 @@
+services:
+  broker:
+    container_name: paperless-ngx-redis
+    image: docker.io/library/redis:8
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    networks:
+      - paperless-internal
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  db:
+    container_name: paperless-ngx-db
+    image: docker.io/library/postgres:16
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file: .env
+    networks:
+      - paperless-internal
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  webserver:
+    container_name: paperless-ngx
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+      - broker
+    ports:
+      - '{{ paperless_ngx_port }}:8000'
+    volumes:
+      - {{ paperless_ngx_data_path }}/data:/usr/src/paperless/data
+      - {{ paperless_ngx_documents_path }}:/usr/src/paperless/media
+      - {{ paperless_ngx_data_path }}/export:/usr/src/paperless/export
+      - {{ paperless_ngx_data_path }}/consume:/usr/src/paperless/consume
+    env_file: .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - paperless-internal
+      - proxy
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.paperless-ngx.entrypoints=http"
+      - "traefik.http.routers.paperless-ngx.rule=Host(`paperless-ngx.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
+
+      - "traefik.http.middlewares.paperless-ngx-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.paperless-ngx.middlewares=paperless-ngx-https-redirect"
+
+      - "traefik.http.routers.paperless-ngx-secure.entrypoints=https"
+      - "traefik.http.routers.paperless-ngx-secure.rule=Host(`paperless-ngx.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.paperless-ngx-secure.tls=true"
+      - "traefik.http.routers.paperless-ngx-secure.service=paperless-ngx"
+
+      - "traefik.http.services.paperless-ngx.loadbalancer.server.port=8000"
+      - "traefik.docker.network=proxy"
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  paperless-internal:
+    name: paperless-internal
+  proxy:
+    name: proxy
+    external: true

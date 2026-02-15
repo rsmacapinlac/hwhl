@@ -26,6 +26,15 @@
       run_once: true
       when: groups['nebula-sync'] is defined and groups['nebula-sync'] | length > 0
 
+- name: "Setup Nextcloud"
+  hosts: nextcloud
+  connection: local
+  tasks:
+    - name: "Run Nextcloud setup if group exists"
+      include_tasks: roles/nextcloud/tasks/setup.yml
+      run_once: true
+      when: groups['nextcloud'] is defined and groups['nextcloud'] | length > 0
+
 - name: "Setup N8N"
   hosts: n8n
   connection: local
@@ -358,3 +367,48 @@
       include_tasks: roles/openclaw/tasks/setup.yml
       run_once: true
       when: groups['openclaw'] is defined and groups['openclaw'] | length > 0
+
+- name: "Setup Ollama"
+  hosts: ollama
+  connection: local
+  tasks:
+    - name: "Run Ollama setup if group exists"
+      include_tasks: roles/ollama/tasks/setup.yml
+      run_once: true
+      when: groups['ollama'] is defined and groups['ollama'] | length > 0
+
+- name: "Setup Linkding"
+  hosts: linkding
+  connection: local
+  tasks:
+    - name: "Run Linkding setup if group exists"
+      include_tasks: roles/linkding/tasks/setup.yml
+      run_once: true
+      when: groups['linkding'] is defined and groups['linkding'] | length > 0
+
+- name: "Setup Paperless-ng"
+  hosts: paperless-ng
+  connection: local
+  tasks:
+    - name: "Run Paperless-ng setup if group exists"
+      include_tasks: roles/paperless-ng/tasks/setup.yml
+      run_once: true
+      when: groups['paperless-ng'] is defined and groups['paperless-ng'] | length > 0
+
+- name: "Setup Paperless-ngx"
+  hosts: paperless-ngx
+  connection: local
+  tasks:
+    - name: "Run Paperless-ngx setup if group exists"
+      include_tasks: roles/paperless-ngx/tasks/setup.yml
+      run_once: true
+      when: groups['paperless-ngx'] is defined and groups['paperless-ngx'] | length > 0
+
+- name: "Setup Homepage"
+  hosts: homepage
+  connection: local
+  tasks:
+    - name: "Run Homepage setup if group exists"
+      include_tasks: roles/homepage/tasks/setup.yml
+      run_once: true
+      when: groups['homepage'] is defined and groups['homepage'] | length > 0

@@ -1,0 +1,41 @@
+---
+# Setup tasks for Linkding environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create linkding config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/linkding"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/linkding/environment"
+  register: linkding_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/linkding/environment"
+    mode: '0640'
+  when: not linkding_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Linkding environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/linkding/environment
+
+      Please review and update the following settings:
+      - TZ: Timezone for the service
+      - LD_DISABLE_URL_VALIDATION: URL validation setting
+
+      After configuration, deploy with: ansible-playbook site.yml --limit linkding
+  when: not linkding_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

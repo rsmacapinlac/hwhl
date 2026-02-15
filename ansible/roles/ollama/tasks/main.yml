@@ -1,0 +1,72 @@
+---
+- name: Check if environment file exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/ollama/environment"
+  delegate_to: 127.0.0.1
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/ollama/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+- name: Check if ollama container exists
+  community.docker.docker_container_info:
+    name: ollama
+  register: ollama_container
+  ignore_errors: true
+
+- name: Create services folder
+  become: true
+  file:
+    path: /data/services/ollama
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not ollama_container.container.State.Running | default(false)
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/ollama/environment"
+    dest: /data/services/ollama/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart ollama
+
+- name: Setup docker compose file for ollama
+  template:
+    src: docker-compose.j2
+    dest: /data/services/ollama/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart ollama
+
+- name: Run ollama container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/ollama
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not ollama_container.container.State.Running | default(false)
+  notify: restart ollama
+
+- name: Wait for ollama container to be ready
+  community.docker.docker_container_info:
+    name: ollama
+  register: ollama_ready
+  until: ollama_ready.container.State.Running | default(false)
+  retries: 10
+  delay: 3
+
+- name: Pull default model (llama3.2:3b)
+  command: docker exec ollama ollama pull llama3.2:3b
+  register: model_pull
+  changed_when: "'success' in model_pull.stdout or 'pulling' in model_pull.stdout"
+  when: ollama_pull_default_model | default(true)

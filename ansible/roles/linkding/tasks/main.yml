@@ -1,3 +1,27 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/linkding/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/linkding/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if linkding container exists
+  community.docker.docker_container_info:
+    name: linkding
+  register: service_container
+  ignore_errors: true
+
+# Directory creation with proper permissions (MUST run unconditionally)
 - name: Create services folder
   become: true
   ansible.builtin.file:
@@ -5,14 +29,35 @@
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
 
-- name: Setup docker compose file for LinkDing stack
-  template:
-    src: docker-compose.j2
-    dest: /data/services/linkding/docker-compose.yml
+# Environment file deployment (triggers handler when changed)
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/linkding/environment"
+    dest: /data/services/linkding/.env
     owner: ansible
     group: docker
+    mode: '0640'
+  notify: restart linkding
 
-- name: Run container
-  shell:
-    cmd: "docker compose -f /data/services/linkding/docker-compose.yml up -d"
+# Docker Compose deployment (MUST run unconditionally for handlers to work)
+- name: Setup docker compose file for Linkding stack
+  template:
+    src: docker-compose.j2
+    dest: /data/services/linkding/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart linkding
+
+# Container deployment using docker_compose_v2 (ONLY this task is conditional)
+- name: Run linkding container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/linkding
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not service_container.container.State.Running | default(false)
+  notify: restart linkding

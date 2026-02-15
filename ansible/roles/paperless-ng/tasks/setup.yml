@@ -1,0 +1,43 @@
+---
+# Setup tasks for Paperless-ng environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create paperless-ng config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ng"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ng/environment"
+  register: paperless_ng_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ng/environment"
+    mode: '0640'
+  when: not paperless_ng_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Paperless-ng environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ng/environment
+
+      Please review and update the following settings:
+      - PUID/PGID: User/Group IDs for file permissions
+      - TZ: Timezone for the service
+      - PAPERLESS_ENABLE_HTTP_REMOTE_USER: HTTP remote user authentication
+      - PAPERLESS_LOGOUT_REDIRECT_URL: Logout redirect URL for Authelia
+
+      After configuration, deploy with: ansible-playbook site.yml --limit paperless-ng
+  when: not paperless_ng_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

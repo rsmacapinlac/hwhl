@@ -127,6 +127,8 @@
   remote_user: ansible
   roles:
     - role: linkding
+      tags:
+        - linkding
 
 - hosts: tautulli
   remote_user: ansible
@@ -329,16 +331,29 @@
   remote_user: ansible
   roles:
     - role: paperless-ng
+      tags:
+        - paperless-ng
+
+- hosts: "paperless-ngx"
+  remote_user: ansible
+  roles:
+    - role: paperless-ngx
+      tags:
+        - paperless-ngx
 
 - hosts: "homepage"
   remote_user: ansible
   roles:
     - role: homepage
+      tags:
+        - homepage
 
 - hosts: "nextcloud"
   remote_user: ansible
   roles:
     - role: nextcloud
+      tags:
+        - nextcloud
 
 - hosts: "baserow"
   remote_user: ansible
@@ -389,6 +404,8 @@
   remote_user: ansible
   roles:
     - role: immich
+      tags:
+        - immich
 
 - hosts: "kasm"
   remote_user: ansible
@@ -429,3 +446,10 @@
     - role: openclaw
       tags:
         - openclaw
+
+- hosts: "ollama"
+  remote_user: ansible
+  roles:
+    - role: ollama
+      tags:
+        - ollama

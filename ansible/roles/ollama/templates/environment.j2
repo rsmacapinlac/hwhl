@@ -1,0 +1,9 @@
+# Ollama Configuration
+# See https://docs.ollama.com/docker for all options
+
+# Performance tuning
+OLLAMA_NUM_PARALLEL={{ ollama_num_parallel | default('2') }}
+OLLAMA_MAX_LOADED_MODELS={{ ollama_max_loaded_models | default('1') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}

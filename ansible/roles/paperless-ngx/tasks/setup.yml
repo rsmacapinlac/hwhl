@@ -1,0 +1,44 @@
+---
+# Setup tasks for Paperless-ngx environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create paperless-ngx config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ngx"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ngx/environment"
+  register: paperless_ngx_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ngx/environment"
+    mode: '0640'
+  when: not paperless_ngx_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Paperless-ngx environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ngx/environment
+
+      IMPORTANT: Please update the following settings before deploying:
+      - POSTGRES_PASSWORD: Change to a secure database password
+      - PAPERLESS_SECRET_KEY: Change to a random secret string
+      - PAPERLESS_ADMIN_USER: Admin username for initial setup
+      - PAPERLESS_ADMIN_PASSWORD: Admin password for initial setup
+      - USERMAP_UID/USERMAP_GID: Match your host system user IDs
+
+      After configuration, deploy with: ansible-playbook site.yml --limit paperless-ngx
+  when: not paperless_ngx_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

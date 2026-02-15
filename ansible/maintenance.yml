@@ -34,6 +34,14 @@
     - name: "Update Nebula Sync"
       include_tasks: roles/nebula-sync/tasks/update.yml
 
+- hosts: "nextcloud"
+  remote_user: ansible
+  tasks:
+    - name: "Update Nextcloud"
+      include_tasks: roles/nextcloud/tasks/update.yml
+      tags:
+        - nextcloud
+
 - hosts: "n8n"
   remote_user: ansible
   tasks:
@@ -270,6 +278,46 @@
       include_tasks: roles/tdarr/tasks/update.yml
       tags:
         - tdarr
+
+- hosts: "ollama"
+  remote_user: ansible
+  tasks:
+    - name: "Update Ollama"
+      include_tasks: roles/ollama/tasks/update.yml
+      tags:
+        - ollama
+
+- hosts: "linkding"
+  remote_user: ansible
+  tasks:
+    - name: "Update Linkding"
+      include_tasks: roles/linkding/tasks/update.yml
+      tags:
+        - linkding
+
+- hosts: "paperless-ng"
+  remote_user: ansible
+  tasks:
+    - name: "Update Paperless-ng"
+      include_tasks: roles/paperless-ng/tasks/update.yml
+      tags:
+        - paperless-ng
+
+- hosts: "paperless-ngx"
+  remote_user: ansible
+  tasks:
+    - name: "Update Paperless-ngx"
+      include_tasks: roles/paperless-ngx/tasks/update.yml
+      tags:
+        - paperless-ngx
+
+- hosts: "homepage"
+  remote_user: ansible
+  tasks:
+    - name: "Update Homepage"
+      include_tasks: roles/homepage/tasks/update.yml
+      tags:
+        - homepage
 
 #- hosts: 'managed_hosts'
 #  remote_user: ansible

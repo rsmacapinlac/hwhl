@@ -1,32 +1,63 @@
-- name: "Mount NextCloud share"
-  include_tasks: roles/shares/tasks/single_share.yml
-  vars:
-    type: "{{ named_shares['nextcloud']['type'] }}"
-    destination: "{{ named_shares['nextcloud']['destination'] }}"
-    source: "{{ named_shares['nextcloud']['source'] }}"
-    options: "{{ named_shares['nextcloud']['options'] }}"
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/nextcloud/environment"
+  register: env_file
+  become: false
 
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/nextcloud/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking (Nextcloud AIO uses specific container name)
+- name: Check if nextcloud-aio-mastercontainer exists
+  community.docker.docker_container_info:
+    name: nextcloud-aio-mastercontainer
+  register: service_container
+  ignore_errors: true
+
+# Directory creation with proper permissions (MUST run unconditionally)
 - name: Create services folder
+  become: true
   ansible.builtin.file:
-    path: /data/services/
+    path: /data/services/nextcloud
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
 
-- name: Create data folder
-  ansible.builtin.file:
-    path: /data/containers/
-    state: directory
+# Environment file deployment (triggers handler when changed)
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/nextcloud/environment"
+    dest: /data/services/nextcloud/.env
     owner: ansible
     group: docker
+    mode: '0640'
+  notify: restart nextcloud
 
-- name: Setup docker compose file for NextCloud
+# Docker Compose deployment (MUST run unconditionally for handlers to work)
+- name: Setup docker compose file for Nextcloud AIO
   template:
     src: docker-compose.j2
-    dest: /data/services/nextcloud.yml
+    dest: /data/services/nextcloud/compose.yml
     owner: ansible
     group: docker
+    mode: '0644'
+  notify: restart nextcloud
 
-- name: Run container
-  shell:
-    cmd: "docker compose -f /data/services/nextcloud.yml up -d"
+# Container deployment using docker_compose_v2 (ONLY this task is conditional)
+- name: Run nextcloud container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/nextcloud
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not service_container.container.State.Running | default(false)
+  notify: restart nextcloud

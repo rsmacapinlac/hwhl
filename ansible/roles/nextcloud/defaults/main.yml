@@ -1,0 +1,12 @@
+---
+# Default variables for Nextcloud AIO
+# Can be overridden in host_vars or group_vars
+
+# Data directory for Nextcloud
+nextcloud_data_dir: /data/NextCloud
+
+# Master container port (AIO management interface)
+nextcloud_port: 8080
+
+# Apache port (internal reverse proxy port)
+nextcloud_apache_port: 11000

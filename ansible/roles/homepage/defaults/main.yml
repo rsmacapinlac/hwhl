@@ -1,0 +1,12 @@
+---
+# Homepage default configuration variables
+
+# Port configuration
+homepage_port: 3000
+
+# User/Group IDs
+homepage_puid: 1001
+homepage_pgid: 1001
+
+# Allowed hosts
+homepage_allowed_hosts: "*"

@@ -1,0 +1,11 @@
+# Homepage Environment Configuration
+
+# User/Group Configuration
+PUID={{ homepage_puid | default('1001') }}
+PGID={{ homepage_pgid | default('1001') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# Allowed hosts configuration
+HOMEPAGE_ALLOWED_HOSTS={{ homepage_allowed_hosts | default('*') }}

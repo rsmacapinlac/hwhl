@@ -1,30 +1,25 @@
-version: '3.5'
 services:
   linkding:
     container_name: linkding
     image: sissbruecker/linkding:latest-plus
     restart: unless-stopped
-    environment:
-      #- LD_ENABLE_AUTH_PROXY=True
-      #- LD_AUTH_PROXY_USERNAME_HEADER=HTTP_REMOTE_USER
-      #- LD_AUTH_PROXY_LOGOUT_URL=https://auth.macapinlac.network/logout
-      - LD_DISABLE_URL_VALIDATION=True
+    env_file: .env
     ports:
-      - '9090:9090'
+      - '{{ linkding_port }}:9090'
     volumes:
       - /data/containers/linkding:/etc/linkding/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.linkding-by-hostname.entrypoints=http"
-      - "traefik.http.routers.linkding-by-hostname.rule=Host(`linkding.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.linkding.entrypoints=http"
+      - "traefik.http.routers.linkding.rule=Host(`linkding.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
 
-      - "traefik.http.middlewares.linkding-by-hostname-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.linkding-by-hostname.middlewares=linkding-by-hostname-https-redirect"
+      - "traefik.http.middlewares.linkding-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.linkding.middlewares=linkding-https-redirect"
 
-      - "traefik.http.routers.linkding-by-hostname-secure.entrypoints=https"
-      - "traefik.http.routers.linkding-by-hostname-secure.rule=Host(`linkding.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-      - "traefik.http.routers.linkding-by-hostname-secure.tls=true"
-      - "traefik.http.routers.linkding-by-hostname-secure.service=linkding"
+      - "traefik.http.routers.linkding-secure.entrypoints=https"
+      - "traefik.http.routers.linkding-secure.rule=Host(`linkding.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.linkding-secure.tls=true"
+      - "traefik.http.routers.linkding-secure.service=linkding"
 
       - "traefik.http.services.linkding.loadbalancer.server.port=9090"
       - "traefik.docker.network=proxy"

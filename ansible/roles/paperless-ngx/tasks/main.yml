@@ -3,21 +3,21 @@
 - name: Check if environment file exists
   local_action:
     module: stat
-    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ng/environment"
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ngx/environment"
   register: env_file
   become: false
 
 - name: Fail if environment file doesn't exist
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ng/environment
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ngx/environment
       Please run site-setup.yml first to create the environment file.
   when: not env_file.stat.exists
 
 # Container status checking
-- name: Check if paperless-ng container exists
+- name: Check if paperless-ngx container exists
   community.docker.docker_container_info:
-    name: paperless-ng
+    name: paperless-ngx
   register: service_container
   ignore_errors: true
 
@@ -25,39 +25,53 @@
 - name: Create services folder
   become: true
   ansible.builtin.file:
-    path: /data/services/paperless-ng
+    path: /data/services/paperless-ngx
     state: directory
     owner: ansible
     group: docker
     mode: '0755'
 
+# Create container data directories
+- name: Create paperless-ngx data directories
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  loop:
+    - /data/containers/paperless-ngx
+    - /data/containers/paperless-ngx/export
+    - /data/containers/paperless-ngx/consume
+
 # Environment file deployment (triggers handler when changed)
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ng/environment"
-    dest: /data/services/paperless-ng/.env
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/paperless-ngx/environment"
+    dest: /data/services/paperless-ngx/.env
     owner: ansible
     group: docker
     mode: '0640'
-  notify: restart paperless-ng
+  notify: restart paperless-ngx
 
 # Docker Compose deployment (MUST run unconditionally for handlers to work)
-- name: Setup docker compose file for paperless-ng
+- name: Setup docker compose file for paperless-ngx
   template:
     src: docker-compose.j2
-    dest: /data/services/paperless-ng/compose.yml
+    dest: /data/services/paperless-ngx/compose.yml
     owner: ansible
     group: docker
     mode: '0644'
-  notify: restart paperless-ng
+  notify: restart paperless-ngx
 
 # Container deployment using docker_compose_v2 (ONLY this task is conditional)
-- name: Run paperless-ng container
+- name: Run paperless-ngx container
   community.docker.docker_compose_v2:
-    project_src: /data/services/paperless-ng
+    project_src: /data/services/paperless-ngx
     files:
       - compose.yml
     state: present
     remove_orphans: false
   when: not service_container.container.State.Running | default(false)
-  notify: restart paperless-ng
+  notify: restart paperless-ngx

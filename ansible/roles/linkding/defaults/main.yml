@@ -1,0 +1,8 @@
+---
+# Linkding default configuration variables
+
+# Port configuration
+linkding_port: 9090
+
+# Linkding settings
+linkding_disable_url_validation: true

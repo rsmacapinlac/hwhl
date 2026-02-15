@@ -1,0 +1,3 @@
+---
+ollama_port: 11434
+ollama_pull_default_model: true

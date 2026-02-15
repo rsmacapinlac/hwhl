@@ -1,0 +1,17 @@
+---
+- name: Create ollama config directory
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/ollama"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create ollama environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/ollama/environment"
+    mode: '0640'
+    force: false
+  delegate_to: 127.0.0.1
+  become: false

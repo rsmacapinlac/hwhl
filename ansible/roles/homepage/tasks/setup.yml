@@ -1,0 +1,42 @@
+---
+# Setup tasks for Homepage environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create homepage config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/homepage"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/homepage/environment"
+  register: homepage_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/homepage/environment"
+    mode: '0640'
+  when: not homepage_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Homepage environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/homepage/environment
+
+      Please review and update the following settings:
+      - TZ: Timezone for the service
+      - PUID/PGID: User/Group IDs
+      - HOMEPAGE_ALLOWED_HOSTS: Allowed hosts configuration
+
+      After configuration, deploy with: ansible-playbook site.yml --limit homepage
+  when: not homepage_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

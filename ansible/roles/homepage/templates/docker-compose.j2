@@ -4,29 +4,28 @@ services:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     ports:
-      - 3000:3000
+      - {{ homepage_port | default('3000') }}:3000
     volumes:
       - /data/containers/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      PUID: 1001
-      PGID: 1001
-      HOMEPAGE_ALLOWED_HOSTS: "*"
+    env_file:
+      - .env
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.homepage-by-hostname.entrypoints=http"
-      - "traefik.http.routers.homepage-by-hostname.rule=Host(`homepage.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.homepage-by-hostname.rule=Host(`homepage.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
 
       - "traefik.http.middlewares.homepage-by-hostname-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.homepage-by-hostname.middlewares=homepage-by-hostname-https-redirect"
 
       - "traefik.http.routers.homepage-by-hostname-secure.entrypoints=https"
-      - "traefik.http.routers.homepage-by-hostname-secure.rule=Host(`homepage.{{ ansible_hostname }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.homepage-by-hostname-secure.rule=Host(`homepage.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}`)"
       - "traefik.http.routers.homepage-by-hostname-secure.tls=true"
       - "traefik.http.routers.homepage-by-hostname-secure.service=homepage"
 
       - "traefik.http.services.homepage.loadbalancer.server.port=3000"
       - "traefik.docker.network=proxy"
+      - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - proxy
 

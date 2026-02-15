@@ -1,16 +1,35 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  local_action:
+    module: stat
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/homepage/environment"
+  register: env_file
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/homepage/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if homepage container exists
+  community.docker.docker_container_info:
+    name: homepage
+  register: service_container
+  ignore_errors: true
+
+# Directory creation with proper permissions (MUST run unconditionally)
 - name: Create services folder
+  become: true
   ansible.builtin.file:
     path: /data/services/homepage
     state: directory
     owner: ansible
     group: docker
-
-- name: Setup docker compose file for homepage
-  template:
-    src: docker-compose.j2
-    dest: /data/services/homepage/docker-compose.yml
-    owner: ansible
-    group: docker
+    mode: '0755'
 
 - name: Create homepage data folder
   become: true
@@ -19,22 +38,71 @@
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
 
-- name: Setup setttings for homepage
+# Environment file deployment (triggers handler when changed)
+- name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/files/homepage/settings.yaml"
-    dest: /data/containers/homepage/settings.yaml
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/homepage/environment"
+    dest: /data/services/homepage/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart homepage
 
-- name: Setup services for homepage
+# Docker Compose deployment (MUST run unconditionally for handlers to work)
+- name: Setup docker compose file for Homepage
+  template:
+    src: docker-compose.j2
+    dest: /data/services/homepage/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart homepage
+
+# Homepage configuration files deployment
+- name: Setup files for homepage
   copy:
-    src: "{{ playbook_dir }}/files/homepage/services.yaml"
-    dest: /data/containers/homepage/services.yaml
+    src: "{{ item.src }}"
+    dest: "/data/containers/homepage/{{ item.dest }}"
+    owner: ansible
+    group: docker
+    mode: '0644'
+  loop:
+    - { src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/homepage/settings.yaml", dest: 'settings.yaml' }
+    - { src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/homepage/bookmarks.yaml", dest: 'bookmarks.yaml' }
+    - { src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/homepage/widgets.yaml", dest: 'widgets.yaml' }
+    - { src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/homepage/custom.css", dest: 'custom.css' }
+    - { src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/homepage/custom.js", dest: 'custom.js' }
+  notify: restart homepage
 
-- name: Setup bookmarks for homepage
+- name: Setup docker config for homepage
   copy:
-    src: "{{ playbook_dir }}/files/homepage/bookmarks.yaml"
-    dest: /data/containers/homepage/bookmarks.yaml
+    src: "{{ playbook_dir }}/files/homepage/docker.yaml"
+    dest: /data/containers/homepage/docker.yaml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart homepage
+  ignore_errors: true
 
-- name: Run container
-  shell:
-    cmd: "docker compose -f /data/services/homepage/docker-compose.yml up -d"
+- name: Setup kubernetes config for homepage
+  copy:
+    src: "{{ playbook_dir }}/files/homepage/kubernetes.yaml"
+    dest: /data/containers/homepage/kubernetes.yaml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart homepage
+  ignore_errors: true
+
+# Container deployment using docker_compose_v2 (ONLY this task is conditional)
+- name: Run homepage container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/homepage
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not service_container.container.State.Running | default(false)
+  notify: restart homepage
