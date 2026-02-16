@@ -279,14 +279,6 @@
       tags:
         - tdarr
 
-- hosts: "ollama"
-  remote_user: ansible
-  tasks:
-    - name: "Update Ollama"
-      include_tasks: roles/ollama/tasks/update.yml
-      tags:
-        - ollama
-
 - hosts: "linkding"
   remote_user: ansible
   tasks:

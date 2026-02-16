@@ -447,13 +447,6 @@
       tags:
         - openclaw
 
-- hosts: "ollama"
-  remote_user: ansible
-  roles:
-    - role: ollama
-      tags:
-        - ollama
-
 - hosts: "vaultwarden"
   remote_user: ansible
   roles:

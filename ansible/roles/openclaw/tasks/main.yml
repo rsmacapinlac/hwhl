@@ -5,6 +5,10 @@
   apt:
     name:
       - chromium
+      - jq
+      - unzip
+      - build-essential
+      - cmake
       - fonts-liberation
       - libasound2
       - libatk-bridge2.0-0
@@ -32,6 +36,14 @@
     curl -fsSL https://openclaw.ai/install.sh | bash -s -- --no-onboard
   args:
     creates: "{{ ansible_facts['env']['HOME'] }}/.local/bin/openclaw"
+
+- name: Install QMD (memory search backend)
+  become: true
+  become_user: ansible
+  community.general.npm:
+    name: "@tobilu/qmd"
+    global: true
+    state: present
 
 - name: Install gogcli (Google Suite CLI)
   become: true
@@ -219,6 +231,25 @@
     accept_hostkey: true
     update: false
   ignore_errors: true
+
+- name: Create systemd override directory for openclaw-gateway
+  become: true
+  become_user: ansible
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/systemd/user/openclaw-gateway.service.d"
+    state: directory
+    mode: '0755'
+
+- name: Add NODE_LLAMA_CPP_GPU=false override for openclaw-gateway
+  become: true
+  become_user: ansible
+  copy:
+    content: |
+      [Service]
+      Environment=NODE_LLAMA_CPP_GPU=false
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/systemd/user/openclaw-gateway.service.d/no-cuda.conf"
+    mode: '0644'
+  notify: Restart openclaw gateway
 
 - name: Configure traefik for openclaw
   include_tasks: traefik.yml

@@ -368,15 +368,6 @@
       run_once: true
       when: groups['openclaw'] is defined and groups['openclaw'] | length > 0
 
-- name: "Setup Ollama"
-  hosts: ollama
-  connection: local
-  tasks:
-    - name: "Run Ollama setup if group exists"
-      include_tasks: roles/ollama/tasks/setup.yml
-      run_once: true
-      when: groups['ollama'] is defined and groups['ollama'] | length > 0
-
 - name: "Setup Linkding"
   hosts: linkding
   connection: local
