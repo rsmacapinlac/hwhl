@@ -453,3 +453,10 @@
     - role: vaultwarden
       tags:
         - vaultwarden
+
+- hosts: "searxng"
+  remote_user: ansible
+  roles:
+    - role: searxng
+      tags:
+        - searxng

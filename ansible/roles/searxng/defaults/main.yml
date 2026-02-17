@@ -1,0 +1,5 @@
+---
+# SearXNG default configuration variables
+
+# Port configuration
+searxng_port: 8888

@@ -1,0 +1,41 @@
+---
+# Setup tasks for SearXNG environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create searxng config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/searxng"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/searxng/environment"
+  register: searxng_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: "{{ playbook_dir }}/roles/searxng/templates/environment.j2"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/searxng/environment"
+    mode: '0640'
+  when: not searxng_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      SearXNG environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/searxng/environment
+
+      Please review and update the following settings:
+      - SEARXNG_SECRET: Secret key for SearXNG (auto-generated)
+      - TZ: Timezone for the service
+
+      After configuration, deploy with: ansible-playbook site.yml --limit searxng
+  when: not searxng_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

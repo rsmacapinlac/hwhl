@@ -1,0 +1,16 @@
+# SearXNG Settings
+# Only overrides need to be specified here - SearXNG merges with defaults
+# See: https://docs.searxng.org/admin/settings/settings.html
+
+use_default_settings: true
+
+search:
+  formats:
+    - html
+    - json
+
+server:
+  # Overwritten at runtime by ${SEARXNG_SECRET} env var
+  secret_key: "ultrasecretkey"
+  limiter: true
+  image_proxy: true

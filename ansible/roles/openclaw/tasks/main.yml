@@ -141,11 +141,11 @@
     group: "ansible"
     mode: '0700'
 
-- name: Copy user config files to .config directory
+- name: Copy user config files to credentials directory
   become: true
   become_user: ansible
   copy:
-    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/config/"
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/credentials/"
     dest: "{{ ansible_facts['env']['HOME'] }}/.openclaw/credentials/"
     owner: "ansible"
     group: "ansible"
