@@ -1,42 +1,42 @@
 ---
 - name: Create config directory for prometheus
-  local_action:
-    module: file
+  ansible.builtin.file:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus"
     state: directory
     mode: '0755'
+  delegate_to: localhost
   become: false
 
 - name: Check if prometheus environment file exists
-  local_action:
-    module: stat
+  ansible.builtin.stat:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/environment"
   register: env_file_stat
+  delegate_to: localhost
   become: false
 
 - name: Create prometheus environment file
-  local_action:
-    module: template
+  ansible.builtin.template:
     src: ../templates/environment.j2
     dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/environment"
   when: not env_file_stat.stat.exists
   register: env_created
+  delegate_to: localhost
   become: false
 
 - name: Check if prometheus.yml exists
-  local_action:
-    module: stat
+  ansible.builtin.stat:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/prometheus.yml"
   register: prom_config_stat
+  delegate_to: localhost
   become: false
 
 - name: Create default prometheus.yml
-  local_action:
-    module: template
+  ansible.builtin.template:
     src: ../templates/prometheus.yml.j2
     dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/prometheus.yml"
   when: not prom_config_stat.stat.exists
   register: prom_config_created
+  delegate_to: localhost
   become: false
 
 - name: Display setup instructions
@@ -56,4 +56,4 @@
       Default prometheus.yml has been created at {{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/prometheus.yml
       Please review and customize this file with your desired configuration before running site.yml
       {% endif %}
-      After customization, you can run site.yml to deploy the services. 
+      After customization, you can run site.yml to deploy the services.

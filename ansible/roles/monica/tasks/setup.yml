@@ -3,28 +3,28 @@
 # Run via: ansible-playbook site-setup.yml
 
 - name: Create config directory for monica
-  local_action:
-    module: file
+  ansible.builtin.file:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/monica"
     state: directory
     mode: '0755'
+  delegate_to: localhost
   become: false
 
 - name: Check if monica environment file exists
-  local_action:
-    module: stat
+  ansible.builtin.stat:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/monica/environment"
   register: env_file_stat
+  delegate_to: localhost
   become: false
 
 - name: Create monica environment file
-  local_action:
-    module: template
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/roles/monica/templates/environment.j2"
     dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/monica/environment"
     mode: '0640'
   when: not env_file_stat.stat.exists
   register: env_created
+  delegate_to: localhost
   become: false
 
 - name: Display setup instructions

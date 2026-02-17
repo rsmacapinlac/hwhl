@@ -1,10 +1,10 @@
 ---
 # Environment file validation
 - name: Check if environment file exists
-  local_action:
-    module: stat
+  ansible.builtin.stat:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/vaultwarden/environment"
   register: env_file
+  delegate_to: localhost
   become: false
 
 - name: Fail if environment file doesn't exist

@@ -9,22 +9,22 @@
       when: groups['pihole'] is defined and groups['pihole'] | length > 0
 
 - name: "Setup PiHole Exporter"
-  hosts: pihole-exporter
+  hosts: pihole_exporter
   connection: local
   tasks:
     - name: "Run PiHole Exporter setup if group exists"
       include_tasks: roles/pihole-exporter/tasks/setup.yml
       run_once: true
-      when: groups['pihole-exporter'] is defined and groups['pihole-exporter'] | length > 0
+      when: groups['pihole_exporter'] is defined and groups['pihole_exporter'] | length > 0
 
 - name: "Setup Nebula Sync"
-  hosts: nebula-sync
+  hosts: nebula_sync
   connection: local
   tasks:
     - name: "Run Nebula Sync setup if group exists"
       include_tasks: roles/nebula-sync/tasks/setup.yml
       run_once: true
-      when: groups['nebula-sync'] is defined and groups['nebula-sync'] | length > 0
+      when: groups['nebula_sync'] is defined and groups['nebula_sync'] | length > 0
 
 - name: "Setup Nextcloud"
   hosts: nextcloud
@@ -252,13 +252,13 @@
       when: groups['sabnzbd'] is defined and groups['sabnzbd'] | length > 0
 
 - name: "Setup Transmission-OpenVPN"
-  hosts: transmission-openvpn
+  hosts: transmission_openvpn
   connection: local
   tasks:
     - name: "Run Transmission-OpenVPN setup if group exists"
       include_tasks: roles/transmission-openvpn/tasks/setup.yml
       run_once: true
-      when: groups['transmission-openvpn'] is defined and groups['transmission-openvpn'] | length > 0
+      when: groups['transmission_openvpn'] is defined and groups['transmission_openvpn'] | length > 0
 
 - name: "Setup Mylar3"
   hosts: mylar3
@@ -378,22 +378,22 @@
       when: groups['linkding'] is defined and groups['linkding'] | length > 0
 
 - name: "Setup Paperless-ng"
-  hosts: paperless-ng
+  hosts: paperless_ng
   connection: local
   tasks:
     - name: "Run Paperless-ng setup if group exists"
       include_tasks: roles/paperless-ng/tasks/setup.yml
       run_once: true
-      when: groups['paperless-ng'] is defined and groups['paperless-ng'] | length > 0
+      when: groups['paperless_ng'] is defined and groups['paperless_ng'] | length > 0
 
 - name: "Setup Paperless-ngx"
-  hosts: paperless-ngx
+  hosts: paperless_ngx
   connection: local
   tasks:
     - name: "Run Paperless-ngx setup if group exists"
       include_tasks: roles/paperless-ngx/tasks/setup.yml
       run_once: true
-      when: groups['paperless-ngx'] is defined and groups['paperless-ngx'] | length > 0
+      when: groups['paperless_ngx'] is defined and groups['paperless_ngx'] | length > 0
 
 - name: "Setup Homepage"
   hosts: homepage

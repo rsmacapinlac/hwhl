@@ -16,7 +16,7 @@
     - name: "Update PiHole"
       include_tasks: roles/pihole/tasks/update.yml
 
-- hosts: 'pihole-exporter'
+- hosts: 'pihole_exporter'
   remote_user: ansible
   tasks:
     - name: "Update PiHole Exporter"
@@ -28,7 +28,7 @@
     - name: "Update Prometheus"
       include_tasks: roles/prometheus/tasks/update.yml
 
-- hosts: "nebula-sync"
+- hosts: "nebula_sync"
   remote_user: ansible
   tasks:
     - name: "Update Nebula Sync"
@@ -175,7 +175,7 @@
         - sabnzbd
         - arrs
 
-- hosts: "transmission-openvpn"
+- hosts: "transmission_openvpn"
   remote_user: ansible
   tasks:
     - name: "Update Transmission-OpenVPN"
@@ -287,7 +287,7 @@
       tags:
         - linkding
 
-- hosts: "paperless-ng"
+- hosts: "paperless_ng"
   remote_user: ansible
   tasks:
     - name: "Update Paperless-ng"
@@ -295,7 +295,7 @@
       tags:
         - paperless-ng
 
-- hosts: "paperless-ngx"
+- hosts: "paperless_ngx"
   remote_user: ansible
   tasks:
     - name: "Update Paperless-ngx"

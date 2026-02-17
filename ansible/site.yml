@@ -24,7 +24,7 @@
         - sabnzbd
         - arrs
 
-- hosts: "transmission-openvpn"
+- hosts: "transmission_openvpn"
   remote_user: ansible
   roles:
     - role: transmission-openvpn
@@ -130,16 +130,6 @@
       tags:
         - linkding
 
-- hosts: tautulli
-  remote_user: ansible
-  roles:
-    - role: tautulli
-
-- hosts: kometa
-  remote_user: ansible
-  roles:
-    - role: kometa
-
 - hosts: "navidrome"
   remote_user: ansible
   roles:
@@ -151,11 +141,6 @@
   remote_user: ansible
   roles:
     - role: jellyfin
-
-- hosts: "plex"
-  remote_user: ansible
-  roles:
-    - role: plex
 
 - hosts: "tdarr"
   remote_user: ansible
@@ -219,16 +204,6 @@
       tags:
         - audiobookshelf
 
-# Plan to deprecate this
-- hosts: "docker"
-  remote_user: ansible
-  roles:
-    - role: portainer
-      tags:
-        - portainer
-        - containers
- ####
-
 - hosts: "containers"
   remote_user: ansible
   roles:
@@ -273,7 +248,7 @@
         - pihole
 
 - name: "Deploy PiHole Exporter"
-  hosts: pihole-exporter
+  hosts: pihole_exporter
   remote_user: ansible
   roles:
     - role: pihole-exporter
@@ -282,7 +257,7 @@
         - monitoring
 
 - name: "Depoy Nebula Sync"
-  hosts: "nebula-sync"
+  hosts: "nebula_sync"
   remote_user: ansible
   roles:
     - role: nebula-sync
@@ -327,14 +302,14 @@
   roles:
     - role: photoprism
 
-- hosts: "paperless-ng"
+- hosts: "paperless_ng"
   remote_user: ansible
   roles:
     - role: paperless-ng
       tags:
         - paperless-ng
 
-- hosts: "paperless-ngx"
+- hosts: "paperless_ngx"
   remote_user: ansible
   roles:
     - role: paperless-ngx

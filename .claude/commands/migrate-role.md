@@ -83,6 +83,7 @@ Based on analysis, create a phased migration plan:
 - Add environment file deployment
 - Update template deployment to use compose.yml
 - Fix any deprecated Ansible facts (ansible_hostname → ansible_facts["hostname"])
+- Replace deprecated `local_action` mappings with `delegate_to: localhost` pattern
 - Add `become: false` to local tasks
 - Fix task naming issues
 - **Only the initial container start should be conditional** (when not already running)
@@ -244,10 +245,11 @@ TZ={{ timezone | default('America/Vancouver') }}
 ---
 # Environment file validation
 - name: Check if environment file exists
-  local_action:
-    module: stat
+  ansible.builtin.stat:
     path: "{{ playbook_dir }}/files/config/$ARGUMENTS/environment"
   register: env_file
+  delegate_to: localhost
+  become: false
 
 - name: Fail if environment file doesn't exist
   fail:
@@ -478,7 +480,7 @@ The role name should match the directory name in `roles/`.
 - Ensure quotes are balanced in labels
 
 **Permission errors:**
-- Add `become: false` to all local_action and delegate_to: 127.0.0.1 tasks
+- Add `become: false` to all `delegate_to: localhost` tasks
 - Verify file modes (640 for .env, 644 for compose.yml, 644 for templates)
 
 **Container deployment fails:**

@@ -1,24 +1,27 @@
 ---
 - name: Create config directory for immich
-  local_action:
-    module: file
+  ansible.builtin.file:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/immich"
     state: directory
     mode: '0755'
+  delegate_to: localhost
+  become: false
 
 - name: Check if immich environment file exists
-  local_action:
-    module: stat
+  ansible.builtin.stat:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/immich/environment"
   register: env_file_stat
+  delegate_to: localhost
+  become: false
 
 - name: Create immich environment file
-  local_action:
-    module: template
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/roles/immich/templates/environment.j2"
     dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/immich/environment"
   when: not env_file_stat.stat.exists
   register: env_created
+  delegate_to: localhost
+  become: false
 
 - name: Display setup instructions
   debug:
@@ -30,4 +33,4 @@
       Environment file has been created at {{ playbook_dir }}/../homelab_config/ansible/files/config/immich/environment
       Please review and customize this file with your desired configuration before running site.yml
       {% endif %}
-      After customization, you can run site.yml to deploy the services. 
+      After customization, you can run site.yml to deploy the services.

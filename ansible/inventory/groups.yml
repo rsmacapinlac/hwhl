@@ -12,7 +12,7 @@ managed_hosts:
     sonarr:
     radarr:
     homepage:
-    paperless-ng:
+    paperless_ng:
     photoprism:
     tubearchivist:
     nextcloud:
@@ -22,10 +22,10 @@ managed_hosts:
     homeassistant:
     # monitoring
     prometheus:
-    pihole-exporter:
+    pihole_exporter:
     docmost:
     # additional services
-    nebula-sync:
+    nebula_sync:
     portainer:
     teslamate:
     musicassistant:

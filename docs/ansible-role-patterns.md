@@ -46,10 +46,10 @@ roles/{service}/
 ```yaml
 # Environment file validation
 - name: Check if environment file exists
-  local_action:
-    module: stat
+  ansible.builtin.stat:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/{service}/environment"
   register: env_file
+  delegate_to: localhost
   become: false
 
 - name: Fail if environment file doesn't exist
@@ -429,7 +429,7 @@ volumes:
 
 ### 1. Privilege Escalation with Local Tasks
 
-**Problem:** Tasks delegated to localhost (using `delegate_to: 127.0.0.1` or `local_action`) inherit privilege escalation from the parent play, causing sudo password prompts on your local machine.
+**Problem:** Tasks delegated to localhost (using `delegate_to: localhost`) inherit privilege escalation from the parent play, causing sudo password prompts on your local machine.
 
 **Symptom:**
 ```
@@ -440,17 +440,17 @@ volumes:
 **Solution:** Explicitly disable privilege escalation for local tasks:
 ```yaml
 - name: Check if environment file exists
-  local_action:
-    module: stat
+  ansible.builtin.stat:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/{service}/environment"
   register: env_file
+  delegate_to: localhost
   become: false  # ← Critical for local tasks
 
 - name: Create config directory locally
-  file:
+  ansible.builtin.file:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/{service}"
     state: directory
-  delegate_to: 127.0.0.1
+  delegate_to: localhost
   become: false  # ← Critical for delegated local tasks
 ```
 
@@ -598,7 +598,7 @@ services:
 11. **Choose appropriate service patterns** based on service type (user-facing vs monitoring vs database)
 12. **Implement update tasks** for services requiring frequent updates
 13. **Add container health checks** when implementing update workflows
-14. **Always add `become: false`** to tasks using `local_action` or `delegate_to: 127.0.0.1`
+14. **Always add `become: false`** to tasks using `delegate_to: localhost`
 15. **Use modern `ansible_facts["fact_name"]` syntax** instead of deprecated `ansible_fact_name` variables
 16. **Compare Traefik labels** with working roles (kavita, semaphore, jellyfin) before deploying new services
 17. **Do NOT include DNS CNAME configuration tasks** - Traefik handles service discovery through Docker labels

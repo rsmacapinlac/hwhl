@@ -1,26 +1,26 @@
 ---
 - name: Create config directory for semaphore
-  local_action:
-    module: file
+  ansible.builtin.file:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/semaphore"
     state: directory
     mode: '0755'
+  delegate_to: localhost
   become: false
 
 - name: Check if semaphore environment file exists
-  local_action:
-    module: stat
+  ansible.builtin.stat:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/semaphore/environment"
   register: env_file_stat
+  delegate_to: localhost
   become: false
 
 - name: Create semaphore environment file
-  local_action:
-    module: template
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/roles/semaphore/templates/environment.j2"
     dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/semaphore/environment"
   when: not env_file_stat.stat.exists
   register: env_created
+  delegate_to: localhost
   become: false
 
 - name: Display setup instructions

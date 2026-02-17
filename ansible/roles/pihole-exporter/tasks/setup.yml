@@ -1,17 +1,19 @@
 ---
 - name: Create config directory for pihole-exporter
-  local_action:
-    module: file
+  ansible.builtin.file:
     path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/pihole-exporter"
     state: directory
     mode: '0755'
+  delegate_to: localhost
+  become: false
 
 - name: Create pihole-exporter environment file
-  local_action:
-    module: template
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/roles/pihole-exporter/templates/environment.j2"
     dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/pihole-exporter/environment"
   register: env_created
+  delegate_to: localhost
+  become: false
 
 - name: Display setup instructions
   debug:
