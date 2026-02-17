@@ -45,6 +45,14 @@
     global: true
     state: present
 
+- name: Install Bitwarden CLI
+  become: true
+  become_user: ansible
+  community.general.npm:
+    name: "@bitwarden/cli"
+    global: true
+    state: present
+
 - name: Install gogcli (Google Suite CLI)
   become: true
   become_user: ansible
