@@ -1,0 +1,25 @@
+# LiteLLM Environment Configuration
+
+# Master API Key (change this!)
+LITELLM_MASTER_KEY={{ litellm_master_key | default('sk-change-this-master-key') }}
+
+# Salt Key for hashing (change this!)
+LITELLM_SALT_KEY={{ litellm_salt_key | default('sk-change-this-salt-key') }}
+
+# Store models in database (allows adding models via UI)
+STORE_MODEL_IN_DB=True
+
+# Database Configuration
+POSTGRES_USER={{ litellm_postgres_user | default('litellm') }}
+POSTGRES_PASSWORD={{ litellm_postgres_password | default('change_this_postgres_password') }}
+POSTGRES_DB={{ litellm_postgres_db | default('litellm') }}
+DATABASE_URL=postgresql://{{ litellm_postgres_user | default('litellm') }}:{{ litellm_postgres_password | default('change_this_postgres_password') }}@litellm-db:5432/{{ litellm_postgres_db | default('litellm') }}
+
+# LLM Provider API Keys (uncomment and configure as needed)
+# OPENAI_API_KEY=sk-your-openai-key
+# ANTHROPIC_API_KEY=sk-ant-your-anthropic-key
+# AZURE_API_KEY=your-azure-key
+# AZURE_API_BASE=https://your-resource.openai.azure.com
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}

@@ -327,6 +327,14 @@
       tags:
         - searxng
 
+- hosts: "litellm"
+  remote_user: ansible
+  tasks:
+    - name: "Update LiteLLM"
+      include_tasks: roles/litellm/tasks/update.yml
+      tags:
+        - litellm
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

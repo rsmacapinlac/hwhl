@@ -1,0 +1,74 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/litellm/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/litellm/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if litellm container exists
+  community.docker.docker_container_info:
+    name: litellm
+  register: litellm_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create litellm service folder
+  become: true
+  file:
+    path: /data/services/litellm
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not litellm_container.container.State.Running | default(false)
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/litellm/environment"
+    dest: /data/services/litellm/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart litellm
+
+# LiteLLM config file deployment
+- name: Copy litellm config file
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/litellm/litellm-config.yaml"
+    dest: /data/services/litellm/litellm-config.yaml
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart litellm
+
+# Docker Compose deployment
+- name: Setup docker compose file for litellm
+  template:
+    src: docker-compose.j2
+    dest: /data/services/litellm/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart litellm
+
+# Container deployment using docker_compose_v2
+- name: Run litellm container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/litellm
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not litellm_container.container.State.Running | default(false)
+  notify: restart litellm

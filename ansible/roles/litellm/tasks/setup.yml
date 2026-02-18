@@ -1,0 +1,66 @@
+---
+# Setup tasks for LiteLLM environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create litellm config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/litellm"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/litellm/environment"
+  register: litellm_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: "{{ playbook_dir }}/roles/litellm/templates/environment.j2"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/litellm/environment"
+    mode: '0640'
+  when: not litellm_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if litellm config file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/litellm/litellm-config.yaml"
+  register: litellm_config_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create litellm config file from template
+  template:
+    src: "{{ playbook_dir }}/roles/litellm/templates/litellm-config.j2"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/litellm/litellm-config.yaml"
+    mode: '0640'
+  when: not litellm_config_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      LiteLLM environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/litellm/environment
+
+      Please review and update the following files:
+
+      1. Environment file: {{ playbook_dir }}/../homelab_config/ansible/files/config/litellm/environment
+         - LITELLM_MASTER_KEY: Master API key for accessing the proxy
+         - LITELLM_SALT_KEY: Salt key for hashing
+         - POSTGRES_PASSWORD: Database password
+         - API keys for your LLM providers (e.g., OPENAI_API_KEY, ANTHROPIC_API_KEY)
+
+      2. Config file: {{ playbook_dir }}/../homelab_config/ansible/files/config/litellm/litellm-config.yaml
+         - Add your model definitions under model_list
+         - Configure routing, fallbacks, and other proxy settings
+         - Docs: https://docs.litellm.ai/docs/proxy/configs
+
+      After configuration, deploy with: ansible-playbook site.yml --limit litellm
+  when: not litellm_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

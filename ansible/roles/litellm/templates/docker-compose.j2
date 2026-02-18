@@ -1,0 +1,63 @@
+---
+services:
+  litellm:
+    container_name: litellm
+    image: ghcr.io/berriai/litellm:main-stable
+    command: --config /app/config.yaml --port 4000
+    ports:
+      - {{ litellm_port }}:4000
+    env_file:
+      - .env
+    volumes:
+      - ./litellm-config.yaml:/app/config.yaml:ro
+    depends_on:
+      litellm-db:
+        condition: service_healthy
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.litellm.entrypoints=http"
+      - "traefik.http.routers.litellm.rule=Host(`litellm.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.litellm-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.litellm.middlewares=litellm-https-redirect"
+      - "traefik.http.routers.litellm-secure.entrypoints=https"
+      - "traefik.http.routers.litellm-secure.rule=Host(`litellm.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.litellm-secure.tls=true"
+      - "traefik.http.routers.litellm-secure.service=litellm"
+      - "traefik.http.services.litellm.loadbalancer.server.port=4000"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+      - litellm-internal
+
+  litellm-db:
+    container_name: litellm-db
+    image: postgres:16-alpine
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - litellm-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - litellm-internal
+
+volumes:
+  litellm-db-data:
+    driver: local
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+  litellm-internal:
+    driver: bridge

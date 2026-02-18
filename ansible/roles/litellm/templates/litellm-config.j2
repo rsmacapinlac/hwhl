@@ -1,0 +1,26 @@
+# LiteLLM Proxy Configuration
+# Docs: https://docs.litellm.ai/docs/proxy/configs
+
+model_list:
+  # Example: OpenAI models
+  # - model_name: gpt-4o
+  #   litellm_params:
+  #     model: openai/gpt-4o
+  #     api_key: os.environ/OPENAI_API_KEY
+
+  # Example: Anthropic models
+  # - model_name: claude-sonnet
+  #   litellm_params:
+  #     model: anthropic/claude-sonnet-4-5-20250929
+  #     api_key: os.environ/ANTHROPIC_API_KEY
+
+  # Example: Local Ollama models
+  # - model_name: llama3
+  #   litellm_params:
+  #     model: ollama/llama3
+  #     api_base: http://ollama-host:11434
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+  store_model_in_db: true

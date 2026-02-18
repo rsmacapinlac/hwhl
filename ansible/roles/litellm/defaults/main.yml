@@ -1,0 +1,5 @@
+---
+# LiteLLM default configuration variables
+
+# Port configuration
+litellm_port: 4000

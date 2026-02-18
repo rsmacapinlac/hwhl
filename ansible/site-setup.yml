@@ -421,3 +421,12 @@
       include_tasks: roles/searxng/tasks/setup.yml
       run_once: true
       when: groups['searxng'] is defined and groups['searxng'] | length > 0
+
+- name: "Setup LiteLLM"
+  hosts: litellm
+  connection: local
+  tasks:
+    - name: "Run LiteLLM setup if group exists"
+      include_tasks: roles/litellm/tasks/setup.yml
+      run_once: true
+      when: groups['litellm'] is defined and groups['litellm'] | length > 0

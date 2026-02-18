@@ -435,3 +435,10 @@
     - role: searxng
       tags:
         - searxng
+
+- hosts: "litellm"
+  remote_user: ansible
+  roles:
+    - role: litellm
+      tags:
+        - litellm
