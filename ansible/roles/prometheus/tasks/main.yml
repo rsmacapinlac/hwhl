@@ -1,18 +1,27 @@
 ---
 # Environment file validation
-- name: Check if environment file exists
+- name: Check if host-specific environment file exists
   ansible.builtin.stat:
-    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/environment"
-  register: env_file
+    path: "{{ playbook_dir }}/../homelab_config/hosts/{{ inventory_hostname_short }}/prometheus/environment"
+  register: host_env_file
   delegate_to: localhost
   become: false
 
-- name: Fail if environment file doesn't exist
+- name: Check if base environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/environment"
+  register: base_env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if no environment file exists
   fail:
     msg: |
-      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/environment
+      Environment file not found. Checked:
+        - {{ playbook_dir }}/../homelab_config/hosts/{{ inventory_hostname_short }}/prometheus/environment
+        - {{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/environment
       Please run site-setup.yml first to create the environment file.
-  when: not env_file.stat.exists
+  when: not host_env_file.stat.exists and not base_env_file.stat.exists
 
 - name: Check if Prometheus container exists
   community.docker.docker_container_info:
@@ -47,22 +56,29 @@
     group: "65534"
     mode: '0755'
 
-- name: Deploy default Prometheus config if not present
+- name: Deploy Prometheus config
   become: true
-  template:
-    src: prometheus.yml.j2
+  copy:
+    src: "{{ item }}"
     dest: /data/containers/prometheus/config/prometheus.yml
     owner: ansible
     group: docker
     mode: '0644'
+  with_first_found:
+    - "{{ playbook_dir }}/../homelab_config/hosts/{{ inventory_hostname_short }}/prometheus/prometheus.yml"
+    - "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/prometheus.yml"
+  notify: restart prometheus
 
 - name: Copy environment configuration
   copy:
-    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/environment"
+    src: "{{ item }}"
     dest: /data/services/prometheus/.env
     owner: ansible
     group: docker
     mode: '0640'
+  with_first_found:
+    - "{{ playbook_dir }}/../homelab_config/hosts/{{ inventory_hostname_short }}/prometheus/environment"
+    - "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/environment"
   notify: restart prometheus
 
 - name: Deploy Prometheus docker-compose file

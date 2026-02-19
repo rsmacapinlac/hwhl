@@ -95,7 +95,6 @@
   tasks:
     - name: "Run Prometheus setup if group exists"
       include_tasks: roles/prometheus/tasks/setup.yml
-      run_once: true
       when: groups['prometheus'] is defined and groups['prometheus'] | length > 0
 
 - name: "Setup Semaphore"

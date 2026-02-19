@@ -4,3 +4,4 @@ homelab_config/terraform.tfvars
 homelab_config/ansible/group_vars
 homelab_config/ansible/inventory
 homelab_config/ansible/files
+homelab_config/hosts

@@ -70,6 +70,16 @@
 # Update the DNS records as well
 - include_tasks: update_routes.yml
 
+- name: Deploy host-specific traefik config.d files
+  copy:
+    src: "{{ item }}"
+    dest: "/data/containers/traefik/config.d/"
+    owner: ansible
+    group: docker
+  with_fileglob:
+    - "{{ playbook_dir }}/../homelab_config/hosts/{{ inventory_hostname_short }}/traefik/*.yml"
+  notify: restart traefik
+
 # ONLY this task should be conditional!
 - name: Run traefik container
   community.docker.docker_compose_v2:

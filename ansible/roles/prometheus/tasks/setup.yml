@@ -39,6 +39,29 @@
   delegate_to: localhost
   become: false
 
+- name: Create host-specific config directory for prometheus
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/../homelab_config/hosts/{{ inventory_hostname_short }}/prometheus"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+  become: false
+
+- name: Check if host-specific prometheus.yml exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/hosts/{{ inventory_hostname_short }}/prometheus/prometheus.yml"
+  register: host_prom_config_stat
+  delegate_to: localhost
+  become: false
+
+- name: Create host-specific prometheus.yml from base
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/prometheus.yml"
+    dest: "{{ playbook_dir }}/../homelab_config/hosts/{{ inventory_hostname_short }}/prometheus/prometheus.yml"
+  when: not host_prom_config_stat.stat.exists
+  delegate_to: localhost
+  become: false
+
 - name: Display setup instructions
   debug:
     msg: |
@@ -50,10 +73,9 @@
       Please review and customize this file with your desired configuration before running site.yml
       {% endif %}
       {% if prom_config_stat.stat.exists %}
-      prometheus.yml already exists at {{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/prometheus.yml
-      Skipping creation to preserve your custom configuration.
+      Base prometheus.yml already exists at {{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/prometheus.yml
       {% else %}
       Default prometheus.yml has been created at {{ playbook_dir }}/../homelab_config/ansible/files/config/prometheus/prometheus.yml
-      Please review and customize this file with your desired configuration before running site.yml
       {% endif %}
-      After customization, you can run site.yml to deploy the services.
+      Host-specific config at {{ playbook_dir }}/../homelab_config/hosts/{{ inventory_hostname_short }}/prometheus/prometheus.yml
+      Customize per-host prometheus.yml files before running site.yml.

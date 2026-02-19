@@ -283,12 +283,6 @@
       tags:
         - wg-easy
         - edge
-  tasks:
-    - name: "Update external routes"
-      include_tasks: roles/traefik/tasks/update_routes_external.yml
-      tags:
-        - traefik
-        - containers
 
 - hosts: "prometheus"
   remote_user: ansible
