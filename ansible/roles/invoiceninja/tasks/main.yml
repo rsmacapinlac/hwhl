@@ -1,0 +1,95 @@
+---
+- name: Check if environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/invoiceninja/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/invoiceninja/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+- name: Check if invoiceninja container exists
+  community.docker.docker_container_info:
+    name: invoiceninja
+  register: invoiceninja_container
+  ignore_errors: true
+
+- name: Create services folder
+  become: true
+  file:
+    path: /data/services/invoiceninja
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not invoiceninja_container.container.State.Running | default(false)
+
+- name: Create nginx config directory
+  become: true
+  file:
+    path: /data/services/invoiceninja/nginx
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not invoiceninja_container.container.State.Running | default(false)
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/invoiceninja/environment"
+    dest: /data/services/invoiceninja/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart invoiceninja
+
+- name: Deploy PHP-FPM listen override configuration
+  template:
+    src: php-fpm-listen.conf.j2
+    dest: /data/services/invoiceninja/php-fpm-listen.conf
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart invoiceninja
+
+- name: Deploy nginx server block configuration
+  template:
+    src: nginx-laravel.conf.j2
+    dest: /data/services/invoiceninja/nginx/laravel.conf
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart invoiceninja
+
+- name: Deploy nginx global configuration
+  template:
+    src: nginx-invoiceninja.conf.j2
+    dest: /data/services/invoiceninja/nginx/invoiceninja.conf
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart invoiceninja
+
+- name: Setup docker compose file for InvoiceNinja
+  template:
+    src: docker-compose.j2
+    dest: /data/services/invoiceninja/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart invoiceninja
+
+- name: Run InvoiceNinja containers
+  community.docker.docker_compose_v2:
+    project_src: /data/services/invoiceninja
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not invoiceninja_container.container.State.Running | default(false)
+  notify: restart invoiceninja

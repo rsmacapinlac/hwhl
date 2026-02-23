@@ -1,0 +1,44 @@
+---
+- name: Create config directory for invoiceninja
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/invoiceninja"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if invoiceninja environment file exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/invoiceninja/environment"
+  register: env_file_stat
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create invoiceninja environment file
+  template:
+    src: "{{ playbook_dir }}/roles/invoiceninja/templates/environment.j2"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/invoiceninja/environment"
+    mode: '0640'
+  when: not env_file_stat.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      {% if env_file_stat.stat.exists %}
+      Environment file already exists at {{ playbook_dir }}/../homelab_config/ansible/files/config/invoiceninja/environment
+      Skipping creation to preserve your custom configuration.
+      {% else %}
+      Environment file created at {{ playbook_dir }}/../homelab_config/ansible/files/config/invoiceninja/environment
+
+      IMPORTANT - Before running site.yml:
+        1. Generate APP_KEY:
+           docker run --rm invoiceninja/invoiceninja-debian php artisan key:generate --show
+        2. Set APP_KEY in the environment file (replace the placeholder)
+        3. Set secure values for DB_PASSWORD and DB_ROOT_PASSWORD
+           (also update MYSQL_PASSWORD and MYSQL_ROOT_PASSWORD to match)
+        4. Set IN_USER_EMAIL and IN_PASSWORD for the initial admin account
+        5. Configure MAIL_* settings if email delivery is needed
+      {% endif %}
+      After customization, run: ansible-playbook site.yml --limit invoiceninja

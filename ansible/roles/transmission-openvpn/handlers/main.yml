@@ -1,9 +1,24 @@
 ---
-- name: restart transmission-openvpn
+- name: stop transmission-openvpn
+  community.docker.docker_compose_v2:
+    project_src: /data/services/transmission-openvpn
+    files:
+      - compose.yml
+    state: absent
+  listen: restart transmission-openvpn
+
+- name: wait for port release
+  ansible.builtin.wait_for:
+    port: 9091
+    state: stopped
+    timeout: 30
+  listen: restart transmission-openvpn
+
+- name: start transmission-openvpn
   community.docker.docker_compose_v2:
     project_src: /data/services/transmission-openvpn
     files:
       - compose.yml
     state: present
-    recreate: always
     remove_orphans: false
+  listen: restart transmission-openvpn

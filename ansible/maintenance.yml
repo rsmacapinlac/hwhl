@@ -335,6 +335,15 @@
       tags:
         - litellm
 
+- hosts: "invoiceninja"
+  remote_user: ansible
+  tasks:
+    - name: "Update InvoiceNinja"
+      include_tasks: roles/invoiceninja/tasks/update.yml
+      when: groups['invoiceninja'] is defined and groups['invoiceninja'] | length > 0
+      tags:
+        - invoiceninja
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

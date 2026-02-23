@@ -429,3 +429,12 @@
       include_tasks: roles/litellm/tasks/setup.yml
       run_once: true
       when: groups['litellm'] is defined and groups['litellm'] | length > 0
+
+- name: "Setup InvoiceNinja"
+  hosts: invoiceninja
+  connection: local
+  tasks:
+    - name: "Run InvoiceNinja setup if group exists"
+      include_tasks: roles/invoiceninja/tasks/setup.yml
+      run_once: true
+      when: groups['invoiceninja'] is defined and groups['invoiceninja'] | length > 0

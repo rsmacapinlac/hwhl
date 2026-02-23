@@ -259,6 +259,3 @@
     mode: '0644'
   notify: Restart openclaw gateway
 
-- name: Configure traefik for openclaw
-  include_tasks: traefik.yml
-  when: "'containers' in group_names or 'edge' in group_names"

@@ -56,3 +56,4 @@ managed_hosts:
     openclaw:
     searxng:
     litellm:
+    invoiceninja:

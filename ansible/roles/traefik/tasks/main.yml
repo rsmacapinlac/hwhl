@@ -70,14 +70,29 @@
 # Update the DNS records as well
 - include_tasks: update_routes.yml
 
+- name: Check for host-specific traefik config directory
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/hosts/{{ inventory_hostname_short }}/traefik"
+  delegate_to: localhost
+  become: false
+  register: traefik_host_config_dir
+
+- name: Find host-specific traefik config files
+  find:
+    paths: "{{ playbook_dir }}/../homelab_config/hosts/{{ inventory_hostname_short }}/traefik"
+    patterns: "*.yml"
+  delegate_to: localhost
+  become: false
+  register: traefik_host_config_files
+  when: traefik_host_config_dir.stat.exists
+
 - name: Deploy host-specific traefik config.d files
   copy:
-    src: "{{ item }}"
+    src: "{{ item.path }}"
     dest: "/data/containers/traefik/config.d/"
     owner: ansible
     group: docker
-  with_fileglob:
-    - "{{ playbook_dir }}/../homelab_config/hosts/{{ inventory_hostname_short }}/traefik/*.yml"
+  loop: "{{ traefik_host_config_files.files | default([]) }}"
   notify: restart traefik
 
 # ONLY this task should be conditional!

@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: all:!proxmox_control_node_by_ip
   gather_facts: true  # Explicitly gather facts for this play
 
 # Note: Initial host setup (ansible user creation) is handled by host-setup.yml
@@ -436,3 +436,10 @@
     - role: litellm
       tags:
         - litellm
+
+- hosts: "invoiceninja"
+  remote_user: ansible
+  roles:
+    - role: invoiceninja
+      tags:
+        - invoiceninja
