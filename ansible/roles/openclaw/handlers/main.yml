@@ -2,15 +2,13 @@
 - name: Restart openclaw gateway
   become: true
   become_user: ansible
-  block:
-    - name: Reload systemd user daemon
-      command: systemctl --user daemon-reload
+  shell: |
+    systemctl --user daemon-reload
+    systemctl --user restart openclaw-gateway.service
 
-    - name: Restart openclaw-gateway systemd service
-      command: systemctl --user restart openclaw-gateway.service
-
-    - name: Wait for openclaw gateway port
-      wait_for:
-        port: 18789
-        host: 127.0.0.1
-        timeout: 30
+- name: Wait for openclaw gateway port
+  wait_for:
+    port: 18789
+    host: 127.0.0.1
+    timeout: 30
+  listen: Restart openclaw gateway
