@@ -3,12 +3,4 @@
   become: true
   become_user: ansible
   shell: |
-    systemctl --user daemon-reload
-    systemctl --user restart openclaw-gateway.service
-
-- name: Wait for openclaw gateway port
-  wait_for:
-    port: 18789
-    host: 127.0.0.1
-    timeout: 30
-  listen: Restart openclaw gateway
+    /home/ansible/.npm-global/bin/openclaw gateway restart

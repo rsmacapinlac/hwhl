@@ -1,0 +1,32 @@
+---
+# Update tasks for Openclaw
+# Runs openclaw update and restarts the gateway service
+# Run via: ansible-playbook maintenance.yml
+
+- name: Update openclaw
+  become: true
+  become_user: ansible
+  shell: |
+    /home/ansible/.npm-global/bin/openclaw update
+  register: openclaw_update
+
+- name: Restart openclaw gateway
+  become: true
+  become_user: ansible
+  shell: |
+    /home/ansible/.npm-global/bin/openclaw gateway restart
+
+- name: Run openclaw doctor
+  become: true
+  become_user: ansible
+  shell: |
+    /home/ansible/.npm-global/bin/openclaw doctor
+  register: openclaw_doctor
+
+- name: Display update status
+  debug:
+    msg: "Openclaw has been updated and is running"
+
+- name: Display doctor output
+  debug:
+    msg: "{{ openclaw_doctor.stdout }}"

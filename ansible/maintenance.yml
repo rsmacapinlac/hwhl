@@ -344,6 +344,14 @@
       tags:
         - invoiceninja
 
+- hosts: "openclaw"
+  remote_user: ansible
+  tasks:
+    - name: "Update Openclaw"
+      include_tasks: roles/openclaw/tasks/update.yml
+      tags:
+        - openclaw
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:

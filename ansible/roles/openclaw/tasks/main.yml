@@ -1,5 +1,10 @@
 ---
 
+- name: Check if chromium is already installed
+  stat:
+    path: /usr/bin/chromium
+  register: chromium_installed
+
 - name: Install Chromium and headless dependencies
   become: true
   apt:
@@ -27,7 +32,7 @@
       - libxrandr2
       - xdg-utils
     state: present
-    update_cache: true
+  when: not chromium_installed.stat.exists
 
 - name: Install openclaw
   become: true
@@ -35,7 +40,7 @@
   shell: |
     curl -fsSL https://openclaw.ai/install.sh | bash -s -- --no-onboard
   args:
-    creates: "{{ ansible_facts['env']['HOME'] }}/.local/bin/openclaw"
+    creates: "/home/ansible/.npm-global/bin/openclaw"
 
 - name: Install QMD (memory search backend)
   become: true
