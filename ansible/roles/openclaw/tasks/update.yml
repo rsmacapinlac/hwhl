@@ -20,7 +20,7 @@
   become: true
   become_user: ansible
   shell: |
-    /home/ansible/.npm-global/bin/openclaw doctor
+    /home/ansible/.npm-global/bin/openclaw doctor --fix
   register: openclaw_doctor
 
 - name: Display update status
