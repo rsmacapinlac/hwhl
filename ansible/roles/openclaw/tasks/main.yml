@@ -10,6 +10,7 @@
   apt:
     name:
       - chromium
+      - git
       - jq
       - unzip
       - build-essential
@@ -57,6 +58,14 @@
     name: "@bitwarden/cli"
     global: true
     state: present
+
+- name: Ensure ~/.local/bin exists
+  become: true
+  become_user: ansible
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.local/bin"
+    state: directory
+    mode: '0755'
 
 - name: Install gogcli (Google Suite CLI)
   become: true
@@ -127,6 +136,7 @@
         state: absent
 
 - name: Enable linger for ansible user
+  become: true
   copy:
     content: ""
     dest: /var/lib/systemd/linger/ansible
@@ -177,7 +187,7 @@
   become: true
   become_user: ansible
   file:
-    path: "{{ ansible_facts['env']['HOME'] }}/.openclaw/agents/main/agent"
+    path: "{{ ansible_facts['env']['HOME'] }}/.openclaw/agents/primary/agent"
     state: directory
     owner: "ansible"
     group: "ansible"
@@ -188,7 +198,7 @@
   become_user: ansible
   copy:
     src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/auth-profiles.json"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.openclaw/agents/main/agent/auth-profiles.json"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.openclaw/agents/primary/agent/auth-profiles.json"
     mode: '0600'
 
 - name: Ensure .ssh directory exists
@@ -234,16 +244,13 @@
           IdentityFile ~/.ssh/openclaw_bot_ed25519
           IdentitiesOnly yes
 
-- name: Clone workspace repository
+
+- name: Install openclaw gateway systemd service
   become: true
   become_user: ansible
-  git:
-    repo: "{{ workspace_repository }}"
-    dest: "{{ ansible_facts['env']['HOME'] }}/.openclaw/workspace"
-    key_file: "{{ ansible_facts['env']['HOME'] }}/.ssh/openclaw_bot_ed25519"
-    accept_hostkey: true
-    update: false
-  ignore_errors: true
+  command: /home/ansible/.npm-global/bin/openclaw gateway install
+  args:
+    creates: "{{ ansible_facts['env']['HOME'] }}/.config/systemd/user/openclaw-gateway.service"
 
 - name: Create systemd override directory for openclaw-gateway
   become: true

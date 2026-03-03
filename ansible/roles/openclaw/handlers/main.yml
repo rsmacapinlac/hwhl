@@ -3,4 +3,4 @@
   become: true
   become_user: ansible
   shell: |
-    /home/ansible/.npm-global/bin/openclaw gateway restart
+    /home/ansible/.npm-global/bin/openclaw gateway install --force && systemctl --user restart openclaw-gateway
