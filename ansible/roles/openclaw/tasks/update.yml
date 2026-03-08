@@ -7,6 +7,8 @@
   become: true
   become_user: ansible
   shell: |
+    export XDG_RUNTIME_DIR=/run/user/$(id -u)
+    export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
     /home/ansible/.npm-global/bin/openclaw update
   register: openclaw_update
 
@@ -14,6 +16,8 @@
   become: true
   become_user: ansible
   shell: |
+    export XDG_RUNTIME_DIR=/run/user/$(id -u)
+    export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
     /home/ansible/.npm-global/bin/openclaw gateway restart
 
 - name: Run openclaw doctor

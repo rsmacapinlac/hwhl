@@ -1,15 +1,18 @@
 ---
 
-- name: Check if chromium is already installed
-  stat:
-    path: /usr/bin/chromium
-  register: chromium_installed
-
-- name: Install Chromium and headless dependencies
+- name: Remove legacy browser packages
   become: true
   apt:
     name:
       - chromium
+      - xdg-utils
+    state: absent
+    autoremove: true
+
+- name: Install system dependencies
+  become: true
+  apt:
+    name:
       - git
       - jq
       - unzip
@@ -31,9 +34,22 @@
       - libxfixes3
       - libxkbcommon0
       - libxrandr2
-      - xdg-utils
     state: present
-  when: not chromium_installed.stat.exists
+
+- name: Install agent-browser
+  become: true
+  become_user: ansible
+  community.general.npm:
+    name: agent-browser
+    global: true
+    state: present
+
+- name: Install agent-browser Playwright browsers
+  become: true
+  become_user: ansible
+  command: /home/ansible/.npm-global/bin/agent-browser install
+  args:
+    creates: "{{ ansible_facts['env']['HOME'] }}/.cache/ms-playwright"
 
 - name: Install openclaw
   become: true
@@ -244,6 +260,25 @@
           IdentityFile ~/.ssh/openclaw_bot_ed25519
           IdentitiesOnly yes
 
+
+- name: Ensure openclaw cron directory exists
+  become: true
+  become_user: ansible
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.openclaw/cron"
+    state: directory
+    owner: "ansible"
+    group: "ansible"
+    mode: '0700'
+
+- name: Deploy openclaw cron jobs
+  become: true
+  become_user: ansible
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/cron/jobs.json"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.openclaw/cron/jobs.json"
+    mode: '0600'
+  notify: Restart openclaw gateway
 
 - name: Install openclaw gateway systemd service
   become: true
