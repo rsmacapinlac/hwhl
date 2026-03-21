@@ -115,6 +115,15 @@
       run_once: true
       when: groups['jellyfin'] is defined and groups['jellyfin'] | length > 0
 
+- name: "Setup Jellyseerr"
+  hosts: jellyseerr
+  connection: local
+  tasks:
+    - name: "Run Jellyseerr setup if group exists"
+      include_tasks: roles/jellyseerr/tasks/setup.yml
+      run_once: true
+      when: groups['jellyseerr'] is defined and groups['jellyseerr'] | length > 0
+
 - name: "Setup Kavita"
   hosts: kavita
   connection: local

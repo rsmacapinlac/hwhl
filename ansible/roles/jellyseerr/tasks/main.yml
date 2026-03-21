@@ -1,25 +1,73 @@
-- name: Create services folder (JellySeerr)
+---
+# Environment file validation
+- name: Check if environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/jellyseerr/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/jellyseerr/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status check
+- name: Check if seerr container exists
+  community.docker.docker_container_info:
+    name: seerr
+  register: seerr_container
+  ignore_errors: true
+
+# Directory creation
+- name: Create jellyseerr service folder
   become: true
   ansible.builtin.file:
     path: /data/services/jellyseerr
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
 
-- name: Setup docker compose file (JellySeerr)
+# Ensure config directory is owned by node user (uid 1000) inside container
+- name: Set ownership of seerr config directory
+  become: true
+  ansible.builtin.file:
+    path: /data/containers/jellyseerr
+    state: directory
+    owner: 1000
+    group: 1000
+    recurse: true
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/jellyseerr/environment"
+    dest: /data/services/jellyseerr/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart seerr
+
+# Docker Compose deployment
+- name: Setup docker compose file for seerr
   template:
     src: docker-compose.j2
     dest: /data/services/jellyseerr/compose.yml
     owner: ansible
     group: docker
+    mode: '0644'
+  notify: restart seerr
 
-- name: Setup docker compose file (JellySeerr)
-  template:
-    src: docker-compose.j2
-    dest: /data/services/jellyseerr/compose.yml
-    owner: ansible
-    group: docker
-
-- name: Run container (JellySeerr)
-  shell:
-    cmd: "docker compose -f /data/services/jellyseerr/compose.yml up -d"
+# Container deployment
+- name: Run seerr container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/jellyseerr
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not seerr_container.container.State.Running | default(false)
+  notify: restart seerr

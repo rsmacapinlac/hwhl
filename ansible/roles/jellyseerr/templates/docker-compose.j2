@@ -1,27 +1,26 @@
 ---
 services:
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
-    environment:
-      - LOG_LEVEL=debug
-      - TZ={{ timezone }}
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    env_file:
+      - .env
     ports:
-      - 5055:5055
+      - {{ seerr_port }}:5055
     volumes:
       - /data/containers/jellyseerr:/app/config
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.jellyseerr.entrypoints=http"
-      - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-      - "traefik.http.middlewares.jellyseerr-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.routers.jellyseerr.middlewares=jellyseerr-https-redirect"
-      - "traefik.http.routers.jellyseerr-secure.entrypoints=https"
-      - "traefik.http.routers.jellyseerr-secure.rule=Host(`jellyseerr.{{ ansible_hostname }}.{{ homelab_domain }}`)"
-      - "traefik.http.routers.jellyseerr-secure.tls=true"
-      - "traefik.http.routers.jellyseerr-secure.service=jellyseerr"
-      - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"
+      - "traefik.http.routers.seerr.entrypoints=http"
+      - "traefik.http.routers.seerr.rule=Host(`jellyseerr.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.seerr-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.seerr.middlewares=seerr-https-redirect"
+      - "traefik.http.routers.seerr-secure.entrypoints=https"
+      - "traefik.http.routers.seerr-secure.rule=Host(`jellyseerr.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.seerr-secure.tls=true"
+      - "traefik.http.routers.seerr-secure.service=seerr"
+      - "traefik.http.services.seerr.loadbalancer.server.port=5055"
       - "traefik.docker.network=proxy"
     networks:
       - proxy

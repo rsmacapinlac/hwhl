@@ -1,0 +1,38 @@
+---
+# Setup tasks for Seerr environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create jellyseerr config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/jellyseerr"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/jellyseerr/environment"
+  register: seerr_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: "{{ playbook_dir }}/roles/jellyseerr/templates/environment.j2"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/jellyseerr/environment"
+    mode: '0640'
+  when: not seerr_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Seerr environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/jellyseerr/environment
+
+      Please review and update configuration as needed.
+      After configuration, deploy with: ansible-playbook site.yml --limit jellyseerr
+  when: not seerr_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

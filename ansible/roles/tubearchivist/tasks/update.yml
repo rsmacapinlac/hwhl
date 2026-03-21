@@ -38,3 +38,8 @@
   command: docker image prune -f
   changed_when: true
   when: compose_update is succeeded
+
+# Patch yt-dlp to fix YouTube n-challenge solving failures
+- name: Apply yt-dlp patches after update
+  ansible.builtin.include_tasks: patch_ytdlp.yml
+  when: compose_update is succeeded

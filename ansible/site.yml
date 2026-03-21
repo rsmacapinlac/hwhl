@@ -100,6 +100,8 @@
   remote_user: ansible
   roles:
     - role: jellyseerr
+      tags:
+        - jellyseerr
 
 - hosts: "overseer"
   remote_user: ansible

@@ -70,3 +70,7 @@
     remove_orphans: false
   when: not tubearchivist_container.container.State.Running | default(false)
   notify: restart tubearchivist
+
+# Patch yt-dlp to fix YouTube n-challenge solving failures
+- name: Apply yt-dlp patches
+  ansible.builtin.include_tasks: patch_ytdlp.yml

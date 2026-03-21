@@ -1,0 +1,32 @@
+---
+# Patch yt-dlp inside tubearchivist container to fix YouTube n-challenge issues.
+# - Upgrades yt-dlp to latest version (bundled image version lags behind)
+# - Patches OBS_BASE to enable remote JS solver components from GitHub
+# This must run after every container deploy/recreate since changes live in the
+# container's writable layer and are lost on image updates.
+
+- name: Upgrade yt-dlp to latest version
+  community.docker.docker_container_exec:
+    container: tubearchivist
+    command: pip install --quiet --upgrade yt-dlp
+  register: ytdlp_upgrade
+  changed_when: "'Successfully installed yt-dlp' in ytdlp_upgrade.stdout"
+
+- name: Enable remote JS solver components in yt-dlp base config
+  community.docker.docker_container_exec:
+    container: tubearchivist
+    command: >-
+      python3 -c "import re, sys;
+      f='/app/download/src/yt_dlp_base.py';
+      c=open(f).read();
+      '\"remote_components\"' in c and sys.exit(0);
+      patched=re.sub(r'(\"extractor_retries\": \d+,)',r'\1\n        \"remote_components\": [\"ejs:github\"],',c);
+      open(f,'w').write(patched);
+      print('patched')"
+  register: patch_result
+  changed_when: "'patched' in patch_result.stdout"
+
+- name: Restart tubearchivist to load patched code
+  ansible.builtin.command: docker restart tubearchivist
+  when: patch_result.changed or ytdlp_upgrade.changed
+  changed_when: true

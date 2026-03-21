@@ -12,6 +12,14 @@
     /home/ansible/.npm-global/bin/openclaw update
   register: openclaw_update
 
+- name: Reinstall openclaw gateway systemd service
+  become: true
+  become_user: ansible
+  shell: |
+    export XDG_RUNTIME_DIR=/run/user/$(id -u)
+    export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
+    /home/ansible/.npm-global/bin/openclaw gateway install --force
+
 - name: Restart openclaw gateway
   become: true
   become_user: ansible

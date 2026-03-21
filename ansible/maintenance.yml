@@ -42,6 +42,12 @@
       tags:
         - nextcloud
 
+- hosts: "homeassistant"
+  remote_user: ansible
+  tasks:
+    - name: "Update Home Assistant"
+      include_tasks: roles/homeassistant/tasks/update.yml
+
 - hosts: "n8n"
   remote_user: ansible
   tasks:
@@ -102,6 +108,13 @@
   tasks:
     - name: "Update Jellyfin"
       include_tasks: roles/jellyfin/tasks/update.yml
+
+- hosts: "jellyseerr"
+  remote_user: ansible
+  tasks:
+    - name: "Update Jellyseerr"
+      include_tasks: roles/jellyseerr/tasks/update.yml
+      when: groups['jellyseerr'] is defined and groups['jellyseerr'] | length > 0
 
 - hosts: "kavita"
   remote_user: ansible
