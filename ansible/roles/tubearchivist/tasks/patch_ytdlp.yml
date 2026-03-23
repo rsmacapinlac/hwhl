@@ -1,16 +1,21 @@
 ---
-# Patch yt-dlp inside tubearchivist container to fix YouTube n-challenge issues.
-# - Upgrades yt-dlp to latest version (bundled image version lags behind)
-# - Patches OBS_BASE to enable remote JS solver components from GitHub
-# This must run after every container deploy/recreate since changes live in the
-# container's writable layer and are lost on image updates.
+# Safer yt-dlp patch strategy:
+# 1) Keep runtime package upgrades disabled by default.
+# 2) Apply only an idempotent config patch for remote components by default.
 
-- name: Upgrade yt-dlp to latest version
+- name: Optionally upgrade yt-dlp package (disabled by default)
   community.docker.docker_container_exec:
     container: tubearchivist
-    command: pip install --quiet --upgrade yt-dlp
+    command: >-
+      pip install --quiet --upgrade
+      {% if tubearchivist_ytdlp_version | length > 0 %}
+      yt-dlp=={{ tubearchivist_ytdlp_version }}
+      {% else %}
+      yt-dlp
+      {% endif %}
   register: ytdlp_upgrade
   changed_when: "'Successfully installed yt-dlp' in ytdlp_upgrade.stdout"
+  when: tubearchivist_enable_ytdlp_runtime_upgrade | bool
 
 - name: Enable remote JS solver components in yt-dlp base config
   community.docker.docker_container_exec:
@@ -19,14 +24,25 @@
       python3 -c "import re, sys;
       f='/app/download/src/yt_dlp_base.py';
       c=open(f).read();
-      '\"remote_components\"' in c and sys.exit(0);
+      '\"remote_components\"' in c and print('already_patched') and sys.exit(0);
+      '\"extractor_retries\":' not in c and print('patch_anchor_missing') and sys.exit(0);
       patched=re.sub(r'(\"extractor_retries\": \d+,)',r'\1\n        \"remote_components\": [\"ejs:github\"],',c);
       open(f,'w').write(patched);
       print('patched')"
   register: patch_result
   changed_when: "'patched' in patch_result.stdout"
+  when: tubearchivist_enable_ytdlp_remote_components_patch | bool
+
+- name: Warn when yt-dlp patch anchor is missing
+  ansible.builtin.debug:
+    msg: "yt_dlp_base patch skipped: expected anchor not found in /app/download/src/yt_dlp_base.py"
+  when:
+    - tubearchivist_enable_ytdlp_remote_components_patch | bool
+    - "'patch_anchor_missing' in patch_result.stdout"
 
 - name: Restart tubearchivist to load patched code
   ansible.builtin.command: docker restart tubearchivist
-  when: patch_result.changed or ytdlp_upgrade.changed
+  when:
+    - tubearchivist_enable_ytdlp_remote_components_patch | bool or tubearchivist_enable_ytdlp_runtime_upgrade | bool
+    - patch_result.changed or ytdlp_upgrade.changed
   changed_when: true

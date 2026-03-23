@@ -7,3 +7,12 @@ tubearchivist_port: 8000
 # User/Group IDs
 tubearchivist_puid: 1001
 tubearchivist_pgid: 1001
+
+# Apply the lightweight yt-dlp base config patch (idempotent).
+tubearchivist_enable_ytdlp_remote_components_patch: true
+
+# Keep runtime package mutation off by default to avoid import breakage.
+tubearchivist_enable_ytdlp_runtime_upgrade: false
+
+# Optional pinned version when runtime upgrades are explicitly enabled.
+tubearchivist_ytdlp_version: ""
