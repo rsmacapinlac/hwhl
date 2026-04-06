@@ -1,0 +1,23 @@
+---
+- name: Create cura config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/cura"
+    state: directory
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if cura environment file exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/cura/environment"
+  register: env_file_stat
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create cura environment file from template
+  template:
+    src: "{{ playbook_dir }}/roles/cura/templates/environment.j2"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/cura/environment"
+    mode: '0640'
+  delegate_to: 127.0.0.1
+  become: false
+  when: not env_file_stat.stat.exists

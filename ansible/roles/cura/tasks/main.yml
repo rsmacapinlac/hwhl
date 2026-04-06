@@ -1,18 +1,57 @@
-- name: Create services folder (cura)
+---
+- name: Check if environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/cura/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/cura/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+- name: Check if cura container exists
+  community.docker.docker_container_info:
+    name: cura
+  register: cura_container
+  ignore_errors: true
+
+- name: Create cura services folder
   become: true
-  ansible.builtin.file:
+  file:
     path: /data/services/cura
     state: directory
     owner: ansible
     group: docker
+    mode: '0755'
+  when: not cura_container.container.State.Running | default(false)
 
-- name: Setup docker compose file (cura) 
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/cura/environment"
+    dest: /data/services/cura/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+
+- name: Setup docker compose file for cura
   template:
     src: docker-compose.j2
     dest: /data/services/cura/compose.yml
     owner: ansible
     group: docker
+    mode: '0644'
+  notify: restart cura
 
-- name: Run container
-  shell:
-    cmd: "docker compose -f /data/services/cura/compose.yml up -d"
+- name: Run cura container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/cura
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not cura_container.container.State.Running | default(false)
+  notify: restart cura

@@ -169,6 +169,15 @@
       run_once: true
       when: groups['tubearchivist'] is defined and groups['tubearchivist'] | length > 0
 
+- name: "Setup Cura"
+  hosts: cura
+  connection: local
+  tasks:
+    - name: "Run Cura setup if group exists"
+      include_tasks: roles/cura/tasks/setup.yml
+      run_once: true
+      when: groups['cura'] is defined and groups['cura'] | length > 0
+
 - name: "Setup Obsidian"
   hosts: obsidian
   connection: local

@@ -1,0 +1,10 @@
+# Cura Environment Configuration
+# User and Group IDs
+PUID={{ cura_puid | default('1000') }}
+PGID={{ cura_pgid | default('1000') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# Disable Wayland mode (not supported in LXC containers)
+PIXELFLUX_WAYLAND=false

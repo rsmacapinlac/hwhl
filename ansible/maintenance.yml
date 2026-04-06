@@ -145,7 +145,9 @@
   remote_user: ansible
   tasks:
     - name: "Update TubeArchivist"
-      include_tasks: roles/tubearchivist/tasks/update.yml
+      ansible.builtin.include_role:
+        name: tubearchivist
+        tasks_from: update
 
 - hosts: "blinko"
   remote_user: ansible
@@ -356,6 +358,15 @@
       when: groups['invoiceninja'] is defined and groups['invoiceninja'] | length > 0
       tags:
         - invoiceninja
+
+- hosts: "cura"
+  remote_user: ansible
+  tasks:
+    - name: "Update Cura"
+      include_tasks: roles/cura/tasks/update.yml
+      when: groups['cura'] is defined and groups['cura'] | length > 0
+      tags:
+        - cura
 
 - hosts: "openclaw"
   remote_user: ansible
