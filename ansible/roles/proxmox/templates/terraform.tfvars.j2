@@ -41,63 +41,55 @@ datastore       = "local-lvm"
 network_bridge  = "vmbr0"
 
 # ============================================
-# DNS Containers
+# Service Containers
 # ============================================
-# Update these with your desired configuration
+# All containers defined here with explicit resource allocation,
+# startup ordering, and Ansible group membership.
 
-dns_containers = {
+services_containers = {
   "dns-01" = {
-    vmid       = 301
-    node       = "pve-01"
-    ip_address = "10.1.0.2/24"
-    gateway    = "{{ default_gateway | default('10.1.0.1') }}"
-    nameserver = "1.1.1.1, 1.0.0.1"
-    memory     = 2048
-    swap       = 4096
-    cores      = 1
-    disk_size  = 32
-    mount_points = []  # No mount points for DNS containers
+    vmid           = 301
+    node           = "pve-01"
+    ip_address     = "10.1.0.2/24"
+    gateway        = "{{ default_gateway | default('10.1.0.1') }}"
+    nameserver     = "1.1.1.1, 1.0.0.1"
+    disk_size      = 32
+    cores          = 1
+    memory         = 2048
+    swap           = 4096
+    startup_order  = 1
+    ansible_groups = ["pihole"]
+    extra_tags     = ["dns"]
+    mount_points   = []
   }
   "dns-02" = {
-    vmid       = 302
-    node       = "pve-01"
-    ip_address = "10.1.0.3/24"
-    gateway    = "{{ default_gateway | default('10.1.0.1') }}"
-    nameserver = "1.1.1.1, 1.0.0.1"
-    memory     = 2048
-    swap       = 4096
-    cores      = 1
-    disk_size  = 32
-    mount_points = []  # No mount points for DNS containers
+    vmid           = 302
+    node           = "pve-01"
+    ip_address     = "10.1.0.3/24"
+    gateway        = "{{ default_gateway | default('10.1.0.1') }}"
+    nameserver     = "1.1.1.1, 1.0.0.1"
+    disk_size      = 32
+    cores          = 1
+    memory         = 2048
+    swap           = 4096
+    startup_order  = 1
+    ansible_groups = ["pihole"]
+    extra_tags     = ["dns"]
+    mount_points   = []
   }
-}
-
-# ============================================
-# Edge Service Containers
-# ============================================
-# Traefik, Authelia, Cloudflare DDNS, WireGuard
-
-edge_containers = {
   "edge-01" = {
-    vmid       = 400
-    node       = "pve-01"
-    ip_address = "10.1.0.10/24"
-    gateway    = "{{ default_gateway | default('10.1.0.1') }}"
-    nameserver = "10.1.0.3, 10.1.0.2"  # Use local DNS container
-    memory     = 4096
-    swap       = 8192
-    cores      = 1
-    disk_size  = 64
-    # Mount NFS shares from Proxmox host into container
-    # These paths must exist on the Proxmox host (mounted via Ansible)
-    mount_points = [
-      # Example: Mount ContainerBackups NFS share
-      # {
-      #   host_path      = "/mnt/ContainerBackups"  # Path on Proxmox host (from proxmox_nfs_shares)
-      #   container_path  = "/mnt/backups"           # Path inside container
-      # }
-    ]
+    vmid           = 400
+    node           = "pve-01"
+    ip_address     = "10.1.0.10/24"
+    gateway        = "{{ default_gateway | default('10.1.0.1') }}"
+    nameserver     = "10.1.0.3, 10.1.0.2"
+    disk_size      = 64
+    cores          = 1
+    memory         = 4096
+    swap           = 8192
+    startup_order  = 2
+    ansible_groups = ["edge"]
+    extra_tags     = ["edge"]
+    mount_points   = []
   }
 }
-
-

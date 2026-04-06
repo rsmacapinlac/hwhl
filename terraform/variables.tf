@@ -91,57 +91,8 @@ variable "network_bridge" {
 # Container Definitions
 # ============================================
 
-variable "dns_containers" {
-  description = "Map of DNS container configurations"
-  type = map(object({
-    vmid        = number
-    node        = string
-    ip_address  = string
-    gateway     = string
-    nameserver  = string
-    mount_points = optional(list(object({
-      host_path      = string
-      container_path = string
-    })), [])
-  }))
-  default = {}
-}
-
-variable "edge_containers" {
-  description = "Map of Edge service container configurations"
-  type = map(object({
-    vmid        = number
-    node        = string
-    ip_address  = string
-    gateway     = string
-    nameserver  = string
-    mount_points = optional(list(object({
-      host_path      = string
-      container_path = string
-    })), [])
-  }))
-  default = {}
-}
-
-variable "monitoring_containers" {
-  description = "Map of Monitoring service container configurations"
-  type = map(object({
-    vmid        = number
-    node        = string
-    ip_address  = string
-    gateway     = string
-    nameserver  = string
-    disk_size   = optional(number, 64)  # Default 64GB, but configurable
-    mount_points = optional(list(object({
-      host_path      = string
-      container_path = string
-    })), [])
-  }))
-  default = {}
-}
-
 variable "services_containers" {
-  description = "Map of generic service container configurations with flexible resource allocation"
+  description = "Map of service container configurations with flexible resource allocation"
   type = map(object({
     vmid           = number
     node           = string
@@ -152,6 +103,7 @@ variable "services_containers" {
     cores          = optional(number, 2)
     memory         = optional(number, 4096)
     swap           = optional(number, 8192)
+    startup_order  = optional(number, 4)
     ansible_groups = optional(list(string), [])  # Groups for Ansible inventory
     extra_tags     = optional(list(string), [])  # Additional Proxmox tags
     tun_device     = optional(bool, false)       # Enable /dev/net/tun for VPN containers

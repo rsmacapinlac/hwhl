@@ -14,38 +14,13 @@ resource "local_file" "ansible_inventory" {
 # Do not edit manually - changes will be overwritten.
 # ===========================================
 
-[pihole]
-%{for name, container in module.dns_containers~}
-${name}.int.${var.homelab_domain} ansible_host=${split("/", container.ip_address)[0]}
+%{for item in local.services_by_group~}
+[${item.group}]
+%{for name in item.containers~}
+${name}.int.${var.homelab_domain} ansible_host=${split("/", module.services_containers[name].ip_address)[0]}
 %{endfor~}
 
-[edge]
-%{for name, container in module.edge_containers~}
-${name}.int.${var.homelab_domain} ansible_host=${split("/", container.ip_address)[0]}
 %{endfor~}
-
-[containers]
-%{for name, container in module.monitoring_containers~}
-${name}.int.${var.homelab_domain} ansible_host=${split("/", container.ip_address)[0]}
-%{endfor~}
-
-[prometheus]
-%{for name, container in module.monitoring_containers~}
-${name}.int.${var.homelab_domain}
-%{endfor~}
-
-[services]
-%{for name, container in module.services_containers~}
-${name}.int.${var.homelab_domain} ansible_host=${split("/", container.ip_address)[0]}
-%{endfor~}
-%{for group, containers in local.services_by_group~}
-
-[${group}]
-%{for name in containers~}
-${name}.int.${var.homelab_domain}
-%{endfor~}
-%{endfor~}
-
 [proxmox_control_node_by_ip]
 %{for name, ip in var.proxmox_node_ips~}
 ${ip}
