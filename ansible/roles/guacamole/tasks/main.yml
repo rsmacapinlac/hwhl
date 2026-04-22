@@ -1,0 +1,126 @@
+---
+- name: Check if environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/guacamole/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/guacamole/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+- name: Check if guacamole container exists
+  community.docker.docker_container_info:
+    name: guacamole
+  register: guacamole_container
+  ignore_errors: true
+
+- name: Create services folder
+  become: true
+  file:
+    path: /data/services/guacamole
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not guacamole_container.container.State.Running | default(false)
+
+- name: Create postgres data directory
+  become: true
+  file:
+    path: /data/containers/guacamole_postgres
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not guacamole_container.container.State.Running | default(false)
+
+- name: Check if initdb SQL already exists
+  ansible.builtin.stat:
+    path: /data/services/guacamole/initdb.sql
+  register: initdb_sql
+  when: not guacamole_container.container.State.Running | default(false)
+
+- name: Generate guacamole database init SQL
+  command: docker run --rm guacamole/guacamole:1.6.0 /opt/guacamole/bin/initdb.sh --postgresql
+  register: initdb_sql_content
+  when:
+    - not guacamole_container.container.State.Running | default(false)
+    - not initdb_sql.stat.exists | default(true)
+
+- name: Write database init SQL
+  become: true
+  copy:
+    content: "{{ initdb_sql_content.stdout }}"
+    dest: /data/services/guacamole/initdb.sql
+    owner: ansible
+    group: docker
+    mode: '0640'
+  when:
+    - not guacamole_container.container.State.Running | default(false)
+    - not initdb_sql.stat.exists | default(true)
+
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/guacamole/environment"
+    dest: /data/services/guacamole/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart guacamole
+
+- name: Setup docker compose file for guacamole
+  template:
+    src: docker-compose.j2
+    dest: /data/services/guacamole/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart guacamole
+
+- name: Start postgres container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/guacamole
+    files:
+      - compose.yml
+    services:
+      - guacamole-db
+    state: present
+    remove_orphans: false
+  when: not guacamole_container.container.State.Running | default(false)
+
+- name: Wait for postgres to be ready
+  community.docker.docker_container_info:
+    name: guacamole-db
+  register: db_info
+  until: db_info.container.State.Health.Status == 'healthy'
+  retries: 15
+  delay: 5
+  when: not guacamole_container.container.State.Running | default(false)
+  ignore_errors: true
+
+- name: Check if guacamole schema is initialized
+  command: docker exec guacamole-db psql -U guacamole_user -d guacamole_db -tAc "SELECT COUNT(*) FROM information_schema.tables WHERE table_name='guacamole_user'"
+  register: schema_check
+  when: not guacamole_container.container.State.Running | default(false)
+  changed_when: false
+
+- name: Apply guacamole database schema
+  shell: docker exec -i guacamole-db psql -U guacamole_user -d guacamole_db < /data/services/guacamole/initdb.sql
+  when:
+    - not guacamole_container.container.State.Running | default(false)
+    - schema_check.stdout | default('0') | trim == '0'
+
+- name: Run full guacamole stack
+  community.docker.docker_compose_v2:
+    project_src: /data/services/guacamole
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not guacamole_container.container.State.Running | default(false)
+  notify: restart guacamole

@@ -1,0 +1,62 @@
+---
+services:
+  guacd:
+    container_name: guacd
+    image: guacamole/guacd:1.6.0
+    restart: unless-stopped
+    networks:
+      - guacamole-internal
+
+  guacamole-db:
+    container_name: guacamole-db
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRESQL_DATABASE}
+      POSTGRES_USER: ${POSTGRESQL_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+    volumes:
+      - /data/containers/guacamole_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U guacamole_user -d guacamole_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - guacamole-internal
+
+  guacamole:
+    container_name: guacamole
+    image: guacamole/guacamole:1.6.0
+    env_file:
+      - .env
+    ports:
+      - "{{ guacamole_port }}:8080"
+    depends_on:
+      - guacd
+      - guacamole-db
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.guacamole.entrypoints=http"
+      - "traefik.http.routers.guacamole.rule=Host(`guacamole.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.guacamole-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.guacamole.middlewares=guacamole-https-redirect"
+      - "traefik.http.routers.guacamole-secure.entrypoints=https"
+      - "traefik.http.routers.guacamole-secure.rule=Host(`guacamole.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.guacamole-secure.tls=true"
+      - "traefik.http.routers.guacamole-secure.service=guacamole"
+      - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
+      - "traefik.docker.network=proxy"
+    networks:
+      - guacamole-internal
+      - proxy
+
+networks:
+  guacamole-internal:
+    name: guacamole-internal
+    driver: bridge
+  proxy:
+    name: proxy
+    external: true

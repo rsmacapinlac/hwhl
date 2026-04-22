@@ -1,0 +1,17 @@
+---
+- name: Create guacamole config directory locally
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/guacamole"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+  become: false
+
+- name: Create guacamole environment file if it doesn't exist
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/../ansible/roles/guacamole/templates/environment.j2"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/guacamole/environment"
+    mode: '0640'
+    force: false
+  delegate_to: localhost
+  become: false

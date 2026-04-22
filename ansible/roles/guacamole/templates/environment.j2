@@ -1,0 +1,14 @@
+# Guacamole daemon connection
+GUACD_HOSTNAME=guacd
+GUACD_PORT=4822
+
+# Database connection (used by guacamole container)
+# NOTE: POSTGRESQL_USERNAME (not USER) is what the 1.6.0 entrypoint expects
+POSTGRESQL_DATABASE=guacamole_db
+POSTGRESQL_HOSTNAME=guacamole-db
+POSTGRESQL_PORT=5432
+POSTGRESQL_USERNAME=guacamole_user
+POSTGRESQL_PASSWORD=change_this_password
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}

@@ -447,3 +447,10 @@
     - role: invoiceninja
       tags:
         - invoiceninja
+
+- hosts: "guacamole"
+  remote_user: ansible
+  roles:
+    - role: guacamole
+      tags:
+        - guacamole

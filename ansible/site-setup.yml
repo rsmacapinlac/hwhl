@@ -456,3 +456,12 @@
       include_tasks: roles/invoiceninja/tasks/setup.yml
       run_once: true
       when: groups['invoiceninja'] is defined and groups['invoiceninja'] | length > 0
+
+- name: "Setup Guacamole"
+  hosts: guacamole
+  connection: local
+  tasks:
+    - name: "Run Guacamole setup if group exists"
+      include_tasks: roles/guacamole/tasks/setup.yml
+      run_once: true
+      when: groups['guacamole'] is defined and groups['guacamole'] | length > 0

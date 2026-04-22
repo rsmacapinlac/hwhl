@@ -376,6 +376,15 @@
       tags:
         - openclaw
 
+- hosts: "guacamole"
+  remote_user: ansible
+  tasks:
+    - name: "Update Guacamole"
+      include_tasks: roles/guacamole/tasks/update.yml
+      when: groups['guacamole'] is defined and groups['guacamole'] | length > 0
+      tags:
+        - guacamole
+
 #- hosts: 'managed_hosts'
 #  remote_user: ansible
 #  tasks:
