@@ -151,6 +151,26 @@
         path: "{{ himalaya_temp.path }}"
         state: absent
 
+- name: Ensure ~/.config/himalaya directory exists
+  become: true
+  become_user: ansible
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/himalaya"
+    state: directory
+    owner: "ansible"
+    group: "ansible"
+    mode: '0700'
+
+- name: Copy himalaya config to ~/.config/himalaya/config.toml
+  become: true
+  become_user: ansible
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/credentials/himalaya/config.toml"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/himalaya/config.toml"
+    owner: "ansible"
+    group: "ansible"
+    mode: '0600'
+
 - name: Enable linger for ansible user
   become: true
   copy:
