@@ -1,0 +1,17 @@
+---
+- name: Create azuracast config directory locally
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/azuracast"
+    state: directory
+    mode: '0755'
+  delegate_to: localhost
+  become: false
+
+- name: Create azuracast environment file if it doesn't exist
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/../ansible/roles/azuracast/templates/environment.j2"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/azuracast/environment"
+    mode: '0640'
+    force: false
+  delegate_to: localhost
+  become: false

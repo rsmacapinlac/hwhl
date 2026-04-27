@@ -376,14 +376,14 @@
       run_once: true
       when: groups['tdarr'] is defined and groups['tdarr'] | length > 0
 
-- name: "Setup OpenClaw"
-  hosts: openclaw
+- name: "Setup Claude"
+  hosts: claude
   connection: local
   tasks:
-    - name: "Run OpenClaw setup if group exists"
-      include_tasks: roles/openclaw/tasks/setup.yml
+    - name: "Run Claude setup if group exists"
+      include_tasks: roles/claude/tasks/setup.yml
       run_once: true
-      when: groups['openclaw'] is defined and groups['openclaw'] | length > 0
+      when: groups['claude'] is defined and groups['claude'] | length > 0
 
 - name: "Setup Linkding"
   hosts: linkding
@@ -465,3 +465,12 @@
       include_tasks: roles/guacamole/tasks/setup.yml
       run_once: true
       when: groups['guacamole'] is defined and groups['guacamole'] | length > 0
+
+- name: "Setup AzuraCast"
+  hosts: azuracast
+  connection: local
+  tasks:
+    - name: "Run AzuraCast setup if group exists"
+      include_tasks: roles/azuracast/tasks/setup.yml
+      run_once: true
+      when: groups['azuracast'] is defined and groups['azuracast'] | length > 0

@@ -1,0 +1,6 @@
+---
+azuracast_port: 10080            # Maps to container internal port 80 (avoids host 80/443 conflict)
+azuracast_sftp_port: 2022        # SFTP for station media uploads
+azuracast_stream_port_min: 8000  # Radio stream port range start
+azuracast_stream_port_max: 8005  # Radio stream port range end (6 ports = 3 stations x 2)
+azuracast_external_domain: radio.macapinlac.network

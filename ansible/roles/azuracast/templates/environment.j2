@@ -1,0 +1,21 @@
+# AzuraCast Application Configuration
+APPLICATION_ENV={{ azuracast_app_env | default('production') }}
+LOG_LEVEL={{ azuracast_log_level | default('notice') }}
+
+# Database Configuration (MariaDB runs inside the container)
+MYSQL_HOST={{ azuracast_mysql_host | default('localhost') }}
+MYSQL_PORT={{ azuracast_mysql_port | default('3306') }}
+MYSQL_USER={{ azuracast_mysql_user | default('azuracast') }}
+MYSQL_PASSWORD={{ azuracast_mysql_password | default('CHANGE_THIS_MYSQL_PASSWORD') }}
+MYSQL_DATABASE={{ azuracast_mysql_db | default('azuracast') }}
+MYSQL_RANDOM_ROOT_PASSWORD=yes
+
+# Redis Cache (runs inside the container)
+ENABLE_REDIS={{ azuracast_enable_redis | default('true') }}
+
+# Radio Station Stream Ports
+AUTO_ASSIGN_PORT_MIN={{ azuracast_stream_port_min | default('8000') }}
+AUTO_ASSIGN_PORT_MAX={{ azuracast_stream_port_max | default('8005') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}

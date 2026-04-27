@@ -413,12 +413,12 @@
       tags:
         - bentopdf
 
-- hosts: "openclaw"
+- hosts: "claude"
   remote_user: ansible
   roles:
-    - role: openclaw
+    - role: claude
       tags:
-        - openclaw
+        - claude
 
 - hosts: "vaultwarden"
   remote_user: ansible
@@ -454,3 +454,10 @@
     - role: guacamole
       tags:
         - guacamole
+
+- hosts: "azuracast"
+  remote_user: ansible
+  roles:
+    - role: azuracast
+      tags:
+        - azuracast

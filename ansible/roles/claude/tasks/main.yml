@@ -1,0 +1,257 @@
+---
+- name: Create claude user
+  become: true
+  ansible.builtin.user:
+    name: "{{ claude_user }}"
+    shell: /bin/bash
+    create_home: true
+
+- name: Ensure .ssh directory exists for claude user
+  become: true
+  ansible.builtin.file:
+    path: "/home/{{ claude_user }}/.ssh"
+    state: directory
+    mode: "0700"
+    owner: "{{ claude_user }}"
+    group: "{{ claude_user }}"
+
+- name: Read SSH public key content
+  ansible.builtin.slurp:
+    src: "{{ lookup('env', 'HOME') }}/.ssh/id_rsa_homelab_ansible.pub"
+  register: ssh_key_content
+  delegate_to: localhost
+  become: false
+
+- name: Set authorized key for claude user
+  become: true
+  ansible.builtin.lineinfile:
+    path: "/home/{{ claude_user }}/.ssh/authorized_keys"
+    line: "{{ ssh_key_content.content | b64decode | trim }}"
+    regexp: "^{{ (ssh_key_content.content | b64decode | trim) | regex_escape() }}$"
+    state: present
+    create: true
+    mode: "0600"
+    owner: "{{ claude_user }}"
+    group: "{{ claude_user }}"
+
+- name: Install sudo
+  become: true
+  ansible.builtin.apt:
+    name: sudo
+    state: present
+
+- name: Allow claude user to sudo without password
+  become: true
+  community.general.sudoers:
+    name: "{{ claude_user }}-as-root"
+    state: present
+    user: "{{ claude_user }}"
+    runas: root
+    commands: ALL
+
+- name: Install system dependencies
+  become: true
+  ansible.builtin.apt:
+    name:
+      - curl
+      - git
+      - jq
+      - unzip
+      - build-essential
+      - fonts-liberation
+      - libasound2
+      - libatk-bridge2.0-0
+      - libatk1.0-0
+      - libcups2
+      - libdbus-1-3
+      - libdrm2
+      - libgbm1
+      - libgtk-3-0
+      - libnspr4
+      - libnss3
+      - libxcomposite1
+      - libxdamage1
+      - libxfixes3
+      - libxkbcommon0
+      - libxrandr2
+    state: present
+    update_cache: true
+
+- name: Add NodeSource repository for Node.js 22
+  become: true
+  ansible.builtin.shell: |
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.list
+
+- name: Install Node.js
+  become: true
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: true
+
+- name: Ensure npm global directory exists for claude user
+  become: true
+  ansible.builtin.file:
+    path: "/home/{{ claude_user }}/.npm-global"
+    state: directory
+    mode: "0755"
+    owner: "{{ claude_user }}"
+    group: "{{ claude_user }}"
+
+- name: Configure npm global prefix for claude user
+  become: true
+  ansible.builtin.shell: |
+    su - {{ claude_user }} -c "npm config set prefix ~/.npm-global"
+  args:
+    creates: "/home/{{ claude_user }}/.npmrc"
+
+- name: Ensure .npm-global/bin and .local/bin are in PATH via .bashrc
+  become: true
+  ansible.builtin.blockinfile:
+    path: "/home/{{ claude_user }}/.bashrc"
+    create: true
+    mode: "0644"
+    owner: "{{ claude_user }}"
+    group: "{{ claude_user }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - npm global"
+    block: |
+      export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"
+
+- name: Install Claude Code CLI
+  become: true
+  ansible.builtin.shell: |
+    su - {{ claude_user }} -c "npm install -g @anthropic-ai/claude-code"
+  args:
+    creates: "/home/{{ claude_user }}/.npm-global/bin/claude"
+  environment:
+    HOME: "/home/{{ claude_user }}"
+
+- name: Install agent-browser
+  become: true
+  ansible.builtin.shell: |
+    su - {{ claude_user }} -c "npm install -g agent-browser"
+  args:
+    creates: "/home/{{ claude_user }}/.npm-global/bin/agent-browser"
+  environment:
+    HOME: "/home/{{ claude_user }}"
+
+- name: Install agent-browser Playwright browsers
+  become: true
+  ansible.builtin.shell: |
+    su - {{ claude_user }} -c "/home/{{ claude_user }}/.npm-global/bin/agent-browser install"
+  args:
+    creates: "/home/{{ claude_user }}/.cache/ms-playwright"
+  environment:
+    HOME: "/home/{{ claude_user }}"
+
+- name: Install Bitwarden CLI
+  become: true
+  ansible.builtin.shell: |
+    su - {{ claude_user }} -c "npm install -g @bitwarden/cli"
+  args:
+    creates: "/home/{{ claude_user }}/.npm-global/bin/bw"
+  environment:
+    HOME: "/home/{{ claude_user }}"
+
+- name: Ensure ~/.local/bin exists
+  become: true
+  ansible.builtin.file:
+    path: "/home/{{ claude_user }}/.local/bin"
+    state: directory
+    mode: "0755"
+    owner: "{{ claude_user }}"
+    group: "{{ claude_user }}"
+
+- name: Create temp directory for gogcli
+  become: true
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: gogcli
+  register: gogcli_temp
+
+- name: Download gogcli
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/steipete/gogcli/releases/download/v0.9.0/gogcli_0.9.0_linux_amd64.tar.gz"
+    dest: "{{ gogcli_temp.path }}/gogcli.tar.gz"
+    mode: "0644"
+
+- name: Extract gogcli
+  become: true
+  ansible.builtin.unarchive:
+    src: "{{ gogcli_temp.path }}/gogcli.tar.gz"
+    dest: "{{ gogcli_temp.path }}"
+    remote_src: true
+
+- name: Install gogcli binary
+  become: true
+  ansible.builtin.copy:
+    src: "{{ gogcli_temp.path }}/gog"
+    dest: "/home/{{ claude_user }}/.local/bin/gog"
+    remote_src: true
+    owner: "{{ claude_user }}"
+    group: "{{ claude_user }}"
+    mode: "0755"
+
+- name: Cleanup gogcli temp directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ gogcli_temp.path }}"
+    state: absent
+
+- name: Create temp directory for himalaya
+  become: true
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: himalaya
+  register: himalaya_temp
+
+- name: Download himalaya
+  become: true
+  ansible.builtin.get_url:
+    url: "https://github.com/pimalaya/himalaya/releases/download/v1.1.0/himalaya.x86_64-linux.tgz"
+    dest: "{{ himalaya_temp.path }}/himalaya.tgz"
+    mode: "0644"
+
+- name: Extract himalaya
+  become: true
+  ansible.builtin.unarchive:
+    src: "{{ himalaya_temp.path }}/himalaya.tgz"
+    dest: "{{ himalaya_temp.path }}"
+    remote_src: true
+
+- name: Install himalaya binary
+  become: true
+  ansible.builtin.copy:
+    src: "{{ himalaya_temp.path }}/himalaya"
+    dest: "/home/{{ claude_user }}/.local/bin/himalaya"
+    remote_src: true
+    owner: "{{ claude_user }}"
+    group: "{{ claude_user }}"
+    mode: "0755"
+
+- name: Cleanup himalaya temp directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ himalaya_temp.path }}"
+    state: absent
+
+- name: Ensure ~/.config/himalaya directory exists
+  become: true
+  ansible.builtin.file:
+    path: "/home/{{ claude_user }}/.config/himalaya"
+    state: directory
+    owner: "{{ claude_user }}"
+    group: "{{ claude_user }}"
+    mode: "0700"
+
+- name: Copy himalaya config
+  become: true
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/openclaw/credentials/himalaya/config.toml"
+    dest: "/home/{{ claude_user }}/.config/himalaya/config.toml"
+    owner: "{{ claude_user }}"
+    group: "{{ claude_user }}"
+    mode: "0600"

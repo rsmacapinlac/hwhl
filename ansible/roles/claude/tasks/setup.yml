@@ -1,0 +1,6 @@
+---
+# No local setup required for the claude role.
+# Authentication is handled manually via 'claude login' after provisioning.
+- name: Claude setup complete
+  ansible.builtin.debug:
+    msg: "Claude role has no local setup steps. After provisioning, SSH in as {{ claude_user }} and run 'claude login'."

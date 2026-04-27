@@ -368,13 +368,21 @@
       tags:
         - cura
 
-- hosts: "openclaw"
+- hosts: "claude"
   remote_user: ansible
   tasks:
-    - name: "Update Openclaw"
-      include_tasks: roles/openclaw/tasks/update.yml
+    - name: "Update Claude Code CLI"
+      become: true
+      become_user: "{{ claude_user | default('ritchie') }}"
+      community.general.npm:
+        name: "@anthropic-ai/claude-code"
+        global: true
+        state: latest
+      environment:
+        PATH: "/home/{{ claude_user | default('ritchie') }}/.npm-global/bin:/usr/bin:/bin"
+        npm_config_prefix: "/home/{{ claude_user | default('ritchie') }}/.npm-global"
       tags:
-        - openclaw
+        - claude
 
 - hosts: "guacamole"
   remote_user: ansible
@@ -384,6 +392,15 @@
       when: groups['guacamole'] is defined and groups['guacamole'] | length > 0
       tags:
         - guacamole
+
+- hosts: "azuracast"
+  remote_user: ansible
+  tasks:
+    - name: "Update AzuraCast"
+      include_tasks: roles/azuracast/tasks/update.yml
+      when: groups['azuracast'] is defined and groups['azuracast'] | length > 0
+      tags:
+        - azuracast
 
 #- hosts: 'managed_hosts'
 #  remote_user: ansible

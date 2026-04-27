@@ -1,0 +1,62 @@
+---
+services:
+  azuracast:
+    container_name: azuracast
+    image: ghcr.io/azuracast/azuracast:latest
+    ports:
+      - "{{ azuracast_port }}:80"
+      - "{{ azuracast_sftp_port }}:2022"
+      - "{{ azuracast_stream_port_min }}-{{ azuracast_stream_port_max }}:{{ azuracast_stream_port_min }}-{{ azuracast_stream_port_max }}"
+    env_file:
+      - .env
+    volumes:
+      - azuracast_station_data:/var/azuracast/stations
+      - azuracast_db_data:/var/lib/mysql
+      - azuracast_uploads:/var/azuracast/storage/uploads
+      - azuracast_acme:/var/azuracast/storage/acme
+      - azuracast_sftp:/var/azuracast/storage/sftpgo
+      - azuracast_backups:/var/azuracast/backups
+      - /data/Yukari/Music:/data/music
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "5"
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.azuracast.entrypoints=http"
+      - "traefik.http.routers.azuracast.rule=Host(`azuracast.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`) || Host(`{{ azuracast_external_domain }}`)"
+      - "traefik.http.middlewares.azuracast-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.azuracast.middlewares=azuracast-https-redirect"
+      - "traefik.http.routers.azuracast-secure.entrypoints=https"
+      - "traefik.http.routers.azuracast-secure.rule=Host(`azuracast.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`) || Host(`{{ azuracast_external_domain }}`)"
+      - "traefik.http.routers.azuracast-secure.tls=true"
+      - "traefik.http.routers.azuracast-secure.service=azuracast"
+      - "traefik.http.services.azuracast.loadbalancer.server.port=80"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+volumes:
+  azuracast_station_data:
+    driver: local
+  azuracast_db_data:
+    driver: local
+  azuracast_uploads:
+    driver: local
+  azuracast_acme:
+    driver: local
+  azuracast_sftp:
+    driver: local
+  azuracast_backups:
+    driver: local
+
+networks:
+  proxy:
+    name: proxy
+    external: true
