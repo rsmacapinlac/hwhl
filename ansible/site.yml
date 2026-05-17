@@ -177,6 +177,13 @@
       tags:
         - cura
 
+- hosts: "bambustudio"
+  remote_user: ansible
+  roles:
+    - role: bambustudio
+      tags:
+        - bambustudio
+
 - hosts: "traggo"
   remote_user: ansible
   roles:

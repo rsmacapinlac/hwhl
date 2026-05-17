@@ -178,6 +178,15 @@
       run_once: true
       when: groups['cura'] is defined and groups['cura'] | length > 0
 
+- name: "Setup Bambustudio"
+  hosts: bambustudio
+  connection: local
+  tasks:
+    - name: "Run Bambustudio setup if group exists"
+      include_tasks: roles/bambustudio/tasks/setup.yml
+      run_once: true
+      when: groups['bambustudio'] is defined and groups['bambustudio'] | length > 0
+
 - name: "Setup Obsidian"
   hosts: obsidian
   connection: local

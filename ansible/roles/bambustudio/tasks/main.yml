@@ -1,0 +1,67 @@
+---
+- name: Check if bambustudio environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/bambustudio/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if bambustudio environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/bambustudio/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+- name: Check if bambustudio container exists
+  community.docker.docker_container_info:
+    name: bambustudio
+  register: bambustudio_container
+  ignore_errors: true
+
+- name: Create bambustudio services folder
+  become: true
+  file:
+    path: /data/services/bambustudio
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not bambustudio_container.container.State.Running | default(false)
+
+- name: Create bambustudio config volume directory
+  become: true
+  file:
+    path: /data/containers/bambustudio
+    state: directory
+    owner: "{{ bambustudio_puid }}"
+    group: "{{ bambustudio_pgid }}"
+    mode: '0755'
+
+- name: Copy bambustudio environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/bambustudio/environment"
+    dest: /data/services/bambustudio/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart bambustudio
+
+- name: Setup docker compose file for bambustudio
+  template:
+    src: docker-compose.j2
+    dest: /data/services/bambustudio/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart bambustudio
+
+- name: Run bambustudio container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/bambustudio
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not bambustudio_container.container.State.Running | default(false)
+  notify: restart bambustudio

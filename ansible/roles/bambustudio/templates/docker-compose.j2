@@ -1,0 +1,39 @@
+---
+services:
+  bambustudio:
+    container_name: bambustudio
+    image: lscr.io/linuxserver/bambustudio:latest
+    ports:
+      - {{ bambustudio_http_port }}:3000
+      - {{ bambustudio_https_port }}:3001
+    env_file:
+      - .env
+    environment:
+      - PIXELFLUX_WAYLAND=false
+      - CUSTOM_WS_PORT=8082
+    volumes:
+      - /data/containers/bambustudio:/config
+    shm_size: "1gb"
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      # HTTP router with redirect to HTTPS
+      - "traefik.http.routers.bambustudio.entrypoints=http"
+      - "traefik.http.routers.bambustudio.rule=Host(`bambustudio.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.bambustudio-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.bambustudio.middlewares=bambustudio-https-redirect"
+      # HTTPS router
+      - "traefik.http.routers.bambustudio-secure.entrypoints=https"
+      - "traefik.http.routers.bambustudio-secure.rule=Host(`bambustudio.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.bambustudio-secure.tls=true"
+      - "traefik.http.routers.bambustudio-secure.service=bambustudio"
+      - "traefik.http.services.bambustudio.loadbalancer.server.port=3000"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true

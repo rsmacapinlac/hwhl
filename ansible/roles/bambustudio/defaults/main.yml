@@ -1,0 +1,5 @@
+---
+bambustudio_http_port: 3003
+bambustudio_https_port: 3004
+bambustudio_puid: 1001
+bambustudio_pgid: 1001

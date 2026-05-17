@@ -1,0 +1,10 @@
+# Bambustudio Environment Configuration
+# User and Group IDs
+PUID={{ bambustudio_puid | default('1000') }}
+PGID={{ bambustudio_pgid | default('1000') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# UI Theme
+DARK_MODE={{ bambustudio_dark_mode | default('false') }}

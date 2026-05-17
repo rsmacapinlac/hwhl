@@ -1,0 +1,22 @@
+---
+- name: Create bambustudio config directory locally
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/bambustudio"
+    state: directory
+  delegate_to: localhost
+  become: false
+
+- name: Check if bambustudio environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/bambustudio/environment"
+  register: bambustudio_env_file
+  delegate_to: localhost
+  become: false
+
+- name: Create bambustudio environment file from template
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/roles/bambustudio/templates/environment.j2"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/bambustudio/environment"
+  delegate_to: localhost
+  become: false
+  when: not bambustudio_env_file.stat.exists

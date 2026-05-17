@@ -368,19 +368,24 @@
       tags:
         - cura
 
+- hosts: "bambustudio"
+  remote_user: ansible
+  tasks:
+    - name: "Update Bambustudio"
+      include_tasks: roles/bambustudio/tasks/update.yml
+      when: groups['bambustudio'] is defined and groups['bambustudio'] | length > 0
+      tags:
+        - bambustudio
+
 - hosts: "claude"
   remote_user: ansible
   tasks:
     - name: "Update Claude Code CLI"
       become: true
-      become_user: "{{ claude_user | default('ritchie') }}"
-      community.general.npm:
-        name: "@anthropic-ai/claude-code"
-        global: true
-        state: latest
+      ansible.builtin.shell: |
+        su - {{ claude_user | default('ritchie') }} -c "npm install -g @anthropic-ai/claude-code"
       environment:
-        PATH: "/home/{{ claude_user | default('ritchie') }}/.npm-global/bin:/usr/bin:/bin"
-        npm_config_prefix: "/home/{{ claude_user | default('ritchie') }}/.npm-global"
+        HOME: "/home/{{ claude_user | default('ritchie') }}"
       tags:
         - claude
 
