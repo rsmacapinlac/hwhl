@@ -1,0 +1,28 @@
+---
+- name: Pull latest Immich images and recreate containers
+  community.docker.docker_compose_v2:
+    project_src: /data/services/immich
+    files:
+      - compose.yml
+    state: present
+    pull: always
+    recreate: always
+    remove_orphans: true
+  register: compose_update
+  ignore_errors: true
+
+- name: Wait for immich_server to be healthy
+  community.docker.docker_container_info:
+    name: immich_server
+  register: service_status
+  until: service_status.container.State.Health.Status | default('') == 'healthy'
+  retries: 30
+  delay: 10
+  when: compose_update is succeeded
+
+- name: Remove dangling Immich images
+  community.docker.docker_prune:
+    images: true
+    images_filters:
+      dangling: true
+  ignore_errors: true

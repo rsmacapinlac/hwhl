@@ -1,0 +1,26 @@
+---
+- name: Pull latest Teslamate images and recreate containers
+  community.docker.docker_compose_v2:
+    project_src: /data/services/teslamate
+    files:
+      - compose.yml
+    state: present
+    pull: always
+    recreate: always
+    remove_orphans: false
+  register: compose_update
+  ignore_errors: true
+
+- name: Wait for teslamate container to be running
+  community.docker.docker_container_info:
+    name: teslamate
+  register: teslamate_status
+  until: teslamate_status.container.State.Running | default(false)
+  retries: 10
+  delay: 5
+  when: compose_update is succeeded
+
+- name: Remove dangling Teslamate images
+  command: docker image prune -f
+  changed_when: true
+  when: compose_update is succeeded

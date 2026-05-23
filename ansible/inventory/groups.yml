@@ -28,7 +28,6 @@ managed_hosts:
     nebula_sync:
     portainer:
     teslamate:
-    musicassistant:
     syncthing:
     kimai:
     navidrome:
