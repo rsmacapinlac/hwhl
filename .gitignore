@@ -1,4 +1,5 @@
 .facts.json
+tmp/
 
 homelab_config/terraform.tfvars
 homelab_config/ansible/group_vars
