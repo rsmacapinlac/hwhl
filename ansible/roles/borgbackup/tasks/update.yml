@@ -1,7 +1,22 @@
 ---
 # Update tasks for borgbackup
-# Pulls latest image and recreates container
+# Pulls latest image and recreates container when no backup job is active.
 # Run via: ansible-playbook maintenance.yml
+
+- name: Check for active borgbackup job
+  ansible.builtin.shell: |
+    docker exec borgbackup sh -c "ps -eo pid,args | awk '/[b]orgmatic|[b]org / && !/crond|cron|supercronic|awk/ {print}'"
+  register: borgbackup_active_job
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Display skip message when borgbackup job is active
+  ansible.builtin.debug:
+    msg: |
+      Skipped borgbackup update because an active borgbackup job is running:
+      {{ borgbackup_active_job.stdout }}
+  when: borgbackup_active_job.stdout | trim | length > 0
 
 - name: Update borgbackup container with latest image
   community.docker.docker_compose_v2:
@@ -14,6 +29,7 @@
     remove_orphans: false
   register: compose_update
   ignore_errors: true
+  when: borgbackup_active_job.stdout | trim | length == 0
 
 - name: Wait for borgbackup container to be running
   community.docker.docker_container_info:
@@ -22,19 +38,27 @@
   until: borgbackup_status.container.State.Running | default(false)
   retries: 5
   delay: 2
-  when: compose_update is succeeded
+  when:
+    - borgbackup_active_job.stdout | trim | length == 0
+    - compose_update is succeeded
 
 - name: Display update status
-  debug:
+  ansible.builtin.debug:
     msg: "borgbackup has been updated and is running"
-  when: compose_update is succeeded
+  when:
+    - borgbackup_active_job.stdout | trim | length == 0
+    - compose_update is succeeded
 
 - name: Display skip message when service unavailable
-  debug:
+  ansible.builtin.debug:
     msg: "Skipped borgbackup update - service unavailable or update failed"
-  when: compose_update is failed
+  when:
+    - borgbackup_active_job.stdout | trim | length == 0
+    - compose_update is failed
 
 - name: Remove dangling images
-  command: docker image prune -f
+  ansible.builtin.command: docker image prune -f
   changed_when: true
-  when: compose_update is succeeded
+  when:
+    - borgbackup_active_job.stdout | trim | length == 0
+    - compose_update is succeeded
