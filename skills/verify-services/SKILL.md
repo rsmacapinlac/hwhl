@@ -15,6 +15,7 @@ This skill assumes `AGENTS.md` has already been read for repository layout, safe
    - Resolve child groups recursively; `managed_hosts` may not list direct hosts.
 2. Use Ansible ad-hoc commands to collect actual Docker containers from each host/LXC.
 3. Compare expected services to actual containers.
+   - Nextcloud AIO sidecar containers on the Nextcloud host can be ignored when identifying unexpected/stale containers. These are created and managed by the `nextcloud-aio-mastercontainer` rather than directly by Ansible. Examples include `nextcloud-aio-apache`, `nextcloud-aio-clamav`, `nextcloud-aio-collabora`, `nextcloud-aio-database`, `nextcloud-aio-fulltextsearch`, `nextcloud-aio-imaginary`, `nextcloud-aio-nextcloud`, `nextcloud-aio-nextcloud-exporter`, `nextcloud-aio-notify-push`, `nextcloud-aio-redis`, and `nextcloud-aio-whiteboard`.
 4. Report results both to files under `tmp/` and directly in the console/chat. The report should include:
    - missing expected services
    - stopped or unhealthy containers
