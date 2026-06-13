@@ -15,24 +15,34 @@
   tasks:
     - name: "Update PiHole"
       include_tasks: roles/pihole/tasks/update.yml
+      tags:
+        - pihole
 
 - hosts: 'pihole_exporter'
   remote_user: ansible
   tasks:
     - name: "Update PiHole Exporter"
       include_tasks: roles/pihole-exporter/tasks/update.yml
+      tags:
+        - pihole-exporter
+        - pihole_exporter
 
 - hosts: "prometheus"
   remote_user: ansible
   tasks:
     - name: "Update Prometheus"
       include_tasks: roles/prometheus/tasks/update.yml
+      tags:
+        - prometheus
 
 - hosts: "nebula_sync"
   remote_user: ansible
   tasks:
     - name: "Update Nebula Sync"
       include_tasks: roles/nebula-sync/tasks/update.yml
+      tags:
+        - nebula-sync
+        - nebula_sync
 
 - hosts: "nextcloud"
   remote_user: ansible
@@ -47,6 +57,8 @@
   tasks:
     - name: "Update Home Assistant"
       include_tasks: roles/homeassistant/tasks/update.yml
+      tags:
+        - homeassistant
 
 - hosts: "teslamate"
   remote_user: ansible
@@ -61,6 +73,8 @@
   tasks:
     - name: "Update N8N"
       include_tasks: roles/n8n/tasks/update.yml
+      tags:
+        - n8n
 
 - hosts: "monica"
   remote_user: ansible
@@ -68,20 +82,28 @@
     - name: "Update Monica"
       include_tasks: roles/monica/tasks/update.yml
       when: groups['monica'] is defined and groups['monica'] | length > 0
+      tags:
+        - monica
 
 - hosts: "containers"
   remote_user: ansible
   tasks:
     - name: "Update Traefik"
       include_tasks: roles/traefik/tasks/update.yml
+      tags:
+        - traefik
     - name: "Update Portainer"
       include_tasks: roles/portainer/tasks/update.yml
+      tags:
+        - portainer
 
 - hosts: "diun"
   remote_user: ansible
   tasks:
     - name: "Update Diun"
       include_tasks: roles/diun/tasks/update.yml
+      tags:
+        - diun
 
 - hosts: "syncthing"
   remote_user: ansible
@@ -89,16 +111,27 @@
     - name: "Update Syncthing"
       include_tasks: roles/syncthing/tasks/update.yml
       when: groups['syncthing'] is defined and groups['syncthing'] | length > 0
+      tags:
+        - syncthing
 
 - hosts: "edge"
   remote_user: ansible
   tasks:
     - name: "Update Traefik"
       include_tasks: roles/traefik/tasks/update.yml
+      tags:
+        - traefik
+        - edge
     - name: "Update Cloudflare DDNS"
       include_tasks: roles/cloudflare-ddns/tasks/update.yml
+      tags:
+        - cloudflare-ddns
+        - edge
     - name: "Update WireGuard Easy"
       include_tasks: roles/wg-easy/tasks/update.yml
+      tags:
+        - wg-easy
+        - edge
     - name: "Update Authelia"
       include_tasks: roles/authelia/tasks/update.yml
       tags:
@@ -110,12 +143,16 @@
   tasks:
     - name: "Update Portainer"
       include_tasks: roles/portainer/tasks/update.yml
+      tags:
+        - portainer
 
 - hosts: "jellyfin"
   remote_user: ansible
   tasks:
     - name: "Update Jellyfin"
       include_tasks: roles/jellyfin/tasks/update.yml
+      tags:
+        - jellyfin
 
 - hosts: "jellyseerr"
   remote_user: ansible
@@ -123,6 +160,8 @@
     - name: "Update Jellyseerr"
       include_tasks: roles/jellyseerr/tasks/update.yml
       when: groups['jellyseerr'] is defined and groups['jellyseerr'] | length > 0
+      tags:
+        - jellyseerr
 
 - hosts: "kavita"
   remote_user: ansible
@@ -130,24 +169,32 @@
     - name: "Update Kavita"
       include_tasks: roles/kavita/tasks/update.yml
       when: groups['kavita'] is defined and groups['kavita'] | length > 0
+      tags:
+        - kavita
 
 - hosts: "navidrome"
   remote_user: ansible
   tasks:
     - name: "Update Navidrome"
       include_tasks: roles/navidrome/tasks/update.yml
+      tags:
+        - navidrome
 
 - hosts: "freshrss"
   remote_user: ansible
   tasks:
     - name: "Update FreshRSS"
       include_tasks: roles/freshrss/tasks/update.yml
+      tags:
+        - freshrss
 
 - hosts: "audiobookshelf"
   remote_user: ansible
   tasks:
     - name: "Update Audiobookshelf"
       include_tasks: roles/audiobookshelf/tasks/update.yml
+      tags:
+        - audiobookshelf
 
 - hosts: "tubearchivist"
   remote_user: ansible
@@ -156,24 +203,32 @@
       ansible.builtin.include_role:
         name: tubearchivist
         tasks_from: update
+      tags:
+        - tubearchivist
 
 - hosts: "blinko"
   remote_user: ansible
   tasks:
     - name: "Update Blinko"
       include_tasks: roles/blinko/tasks/update.yml
+      tags:
+        - blinko
 
 - hosts: "baserow"
   remote_user: ansible
   tasks:
     - name: "Update Baserow"
       include_tasks: roles/baserow/tasks/update.yml
+      tags:
+        - baserow
 
 - hosts: "outline"
   remote_user: ansible
   tasks:
     - name: "Update Outline"
       include_tasks: roles/outline/tasks/update.yml
+      tags:
+        - outline
 
 - hosts: "kimai"
   remote_user: ansible
@@ -181,6 +236,8 @@
     - name: "Update Kimai"
       include_tasks: roles/kimai/tasks/update.yml
       when: groups['kimai'] is defined and groups['kimai'] | length > 0
+      tags:
+        - kimai
 
 - hosts: "semaphore"
   remote_user: ansible
@@ -188,6 +245,8 @@
     - name: "Update Semaphore"
       include_tasks: roles/semaphore/tasks/update.yml
       when: groups['semaphore'] is defined and groups['semaphore'] | length > 0
+      tags:
+        - semaphore
 
 - hosts: "sabnzbd"
   remote_user: ansible
@@ -285,6 +344,8 @@
     - name: "Update Samba"
       include_tasks: roles/samba/tasks/update.yml
       when: groups['samba'] is defined and groups['samba'] | length > 0
+      tags:
+        - samba
 
 - hosts: "bentopdf"
   remote_user: ansible
