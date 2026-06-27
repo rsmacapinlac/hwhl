@@ -61,3 +61,68 @@
     remove_orphans: false
   when: not service_container.container.State.Running | default(false)
   notify: restart nextcloud
+
+# Reverse proxy trust: AIO seeds trusted_proxies with localhost and its internal
+# docker network only. When fronted by an upstream proxy (the external edge proxy
+# on another host, and/or Cloudflare), each such hop's IP must also be trusted or
+# Nextcloud attributes every request to the immediate proxy and brute-force
+# throttles all users. The edge proxy IP is site-specific (nextcloud_reverse_proxy_ip);
+# Cloudflare's ranges are added when nextcloud_trust_cloudflare is true. Both are
+# supplied via inventory and the whole block is skipped when neither yields entries.
+# Only runs once the AIO child container exists (not on a fresh install still spinning up).
+- name: Build desired Nextcloud trusted_proxies entries
+  ansible.builtin.set_fact:
+    nextcloud_desired_proxies: >-
+      {{ ([nextcloud_reverse_proxy_ip] if nextcloud_reverse_proxy_ip | length > 0 else [])
+         + (nextcloud_cloudflare_ips if nextcloud_trust_cloudflare | bool else []) }}
+
+- name: Check if nextcloud-aio-nextcloud child container is running
+  community.docker.docker_container_info:
+    name: nextcloud-aio-nextcloud
+  register: nextcloud_child_container
+  ignore_errors: true
+  when: nextcloud_desired_proxies | length > 0
+
+- name: Get current Nextcloud trusted_proxies
+  become: true
+  ansible.builtin.command:
+    cmd: docker exec --user www-data nextcloud-aio-nextcloud php occ config:system:get trusted_proxies
+  register: nextcloud_trusted_proxies
+  changed_when: false
+  check_mode: false
+  when:
+    - nextcloud_desired_proxies | length > 0
+    - nextcloud_child_container.container.State.Running | default(false)
+
+# occ stores trusted_proxies as a plain array but its "set by index" primitive is
+# unreliable for bulk edits: writing several indices in one pass collides and can
+# drop a pre-existing entry (e.g. the internal docker-network range). Order is
+# irrelevant to Nextcloud (it is a membership set), so the only deterministic way
+# to add entries is to delete the key and rebuild it from empty. We only do this
+# when something is actually missing, which keeps the task idempotent and preserves
+# whatever AIO seeded (those entries are carried through in nextcloud_final_proxies).
+- name: Compute missing trusted_proxies entries
+  ansible.builtin.set_fact:
+    nextcloud_missing_proxies: "{{ nextcloud_desired_proxies | reject('in', nextcloud_trusted_proxies.stdout_lines) | list }}"
+    nextcloud_final_proxies: "{{ nextcloud_trusted_proxies.stdout_lines + (nextcloud_desired_proxies | reject('in', nextcloud_trusted_proxies.stdout_lines) | list) }}"
+  when:
+    - nextcloud_desired_proxies | length > 0
+    - nextcloud_child_container.container.State.Running | default(false)
+
+- name: Ensure upstream proxy IPs are in Nextcloud trusted_proxies
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      set -euo pipefail
+      docker exec --user www-data nextcloud-aio-nextcloud php occ config:system:delete trusted_proxies
+      i=0
+      for v in {{ nextcloud_final_proxies | join(' ') }}; do
+        docker exec --user www-data nextcloud-aio-nextcloud \
+          php occ config:system:set trusted_proxies "$i" --value="$v" >/dev/null
+        i=$((i + 1))
+      done
+      echo "set ${i} trusted_proxies entries"
+  when:
+    - nextcloud_desired_proxies | length > 0
+    - nextcloud_child_container.container.State.Running | default(false)
+    - nextcloud_missing_proxies | length > 0
