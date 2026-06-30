@@ -48,7 +48,11 @@
   remote_user: ansible
   tasks:
     - name: "Update Nextcloud"
-      include_tasks: roles/nextcloud/tasks/update.yml
+      include_tasks:
+        file: roles/nextcloud/tasks/update.yml
+        apply:
+          tags:
+            - nextcloud
       tags:
         - nextcloud
 

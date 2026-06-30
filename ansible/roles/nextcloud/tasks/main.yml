@@ -113,7 +113,7 @@
   become: true
   ansible.builtin.shell:
     cmd: |
-      set -euo pipefail
+      set -eu
       docker exec --user www-data nextcloud-aio-nextcloud php occ config:system:delete trusted_proxies
       i=0
       for v in {{ nextcloud_final_proxies | join(' ') }}; do
