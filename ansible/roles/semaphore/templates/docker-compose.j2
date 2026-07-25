@@ -16,7 +16,7 @@ services:
     container_name: semaphore
     ports:
       - {{ semaphore_port }}:3000
-    image: semaphoreui/semaphore:v2.16.47
+    image: semaphoreui/semaphore:v2.18.28
     env_file:
       - .env
     depends_on:
