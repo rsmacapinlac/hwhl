@@ -1,0 +1,24 @@
+---
+# Whisper ASR Webservice default configuration
+# Docs: https://ahmetoner.github.io/whisper-asr-webservice
+# Image: https://hub.docker.com/r/onerahmet/openai-whisper-asr-webservice
+
+# Port configuration (host:container, container listens on 9000)
+whisper_port: 9000
+
+# Official image. Use the ':latest-gpu' tag on hosts with GPU passthrough.
+whisper_image: onerahmet/openai-whisper-asr-webservice:latest
+
+# ASR configuration
+# Engine: openai_whisper | faster_whisper | whisperx
+whisper_asr_engine: faster_whisper
+# Model: tiny | base | small | medium | large-v3 | ...
+whisper_asr_model: base
+# Device: cpu | cuda
+whisper_asr_device: cpu
+# Unload the model from memory after N seconds idle (0 = keep loaded)
+whisper_model_idle_timeout: 300
+
+# HuggingFace token for whisperx speaker diarization models.
+# Set the real value as a secret in group_vars/all.yml (whisper_hf_token).
+whisper_hf_token: ""

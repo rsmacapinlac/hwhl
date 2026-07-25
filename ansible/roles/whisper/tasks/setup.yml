@@ -1,0 +1,40 @@
+---
+# Setup tasks for Whisper ASR environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create whisper config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/whisper"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/whisper/environment"
+  register: whisper_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/whisper/environment"
+    mode: '0640'
+  when: not whisper_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Whisper ASR environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/whisper/environment
+
+      Review and update ASR_ENGINE / ASR_MODEL / ASR_DEVICE as needed.
+      Defaults: faster_whisper engine, base model, cpu device.
+
+      After configuration, deploy with: ansible-playbook site.yml --limit whisper
+  when: not whisper_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

@@ -1,0 +1,75 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/whisper/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/whisper/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if whisper container exists
+  community.docker.docker_container_info:
+    name: whisper
+  register: whisper_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create whisper service folder
+  become: true
+  file:
+    path: /data/services/whisper
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not whisper_container.container.State.Running | default(false)
+
+# Model cache directory (persisted volume mount)
+- name: Create whisper model cache folder
+  become: true
+  file:
+    path: /data/containers/whisper/cache
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not whisper_container.container.State.Running | default(false)
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/whisper/environment"
+    dest: /data/services/whisper/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart whisper
+
+# Docker Compose deployment
+- name: Setup docker compose file for whisper
+  template:
+    src: docker-compose.j2
+    dest: /data/services/whisper/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart whisper
+
+# Container deployment using docker_compose_v2
+- name: Run whisper container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/whisper
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not whisper_container.container.State.Running | default(false)
+  notify: restart whisper

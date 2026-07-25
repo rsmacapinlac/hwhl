@@ -468,3 +468,10 @@
     - role: azuracast
       tags:
         - azuracast
+
+- hosts: "whisper"
+  remote_user: ansible
+  roles:
+    - role: whisper
+      tags:
+        - whisper

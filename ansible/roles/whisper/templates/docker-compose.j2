@@ -1,0 +1,15 @@
+---
+services:
+  whisper:
+    container_name: whisper
+    image: {{ whisper_image | default('onerahmet/openai-whisper-asr-webservice:latest') }}
+    ports:
+      - "{{ whisper_port | default(9000) }}:9000"
+    env_file:
+      - .env
+    volumes:
+      # Persist downloaded models across container recreation
+      - /data/containers/whisper/cache:/root/.cache
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"

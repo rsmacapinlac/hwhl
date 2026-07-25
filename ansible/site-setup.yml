@@ -483,3 +483,12 @@
       include_tasks: roles/azuracast/tasks/setup.yml
       run_once: true
       when: groups['azuracast'] is defined and groups['azuracast'] | length > 0
+
+- name: "Setup Whisper ASR"
+  hosts: whisper
+  connection: local
+  tasks:
+    - name: "Run Whisper ASR setup if group exists"
+      include_tasks: roles/whisper/tasks/setup.yml
+      run_once: true
+      when: groups['whisper'] is defined and groups['whisper'] | length > 0

@@ -498,6 +498,15 @@
       tags:
         - azuracast
 
+- hosts: "whisper"
+  remote_user: ansible
+  tasks:
+    - name: "Update Whisper ASR"
+      include_tasks: roles/whisper/tasks/update.yml
+      when: groups['whisper'] is defined and groups['whisper'] | length > 0
+      tags:
+        - whisper
+
 - hosts: 'managed_hosts'
   remote_user: ansible
   tasks:
