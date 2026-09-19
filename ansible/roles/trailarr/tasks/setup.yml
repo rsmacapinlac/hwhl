@@ -1,0 +1,52 @@
+---
+# Setup tasks for Trailarr environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create trailarr config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/trailarr"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/trailarr/environment"
+  register: trailarr_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: ../templates/environment.j2
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/trailarr/environment"
+    mode: '0640'
+  when: not trailarr_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Trailarr environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/trailarr/environment
+
+      Please review and update the following settings:
+      - PUID/PGID: User and group IDs for container permissions (must match radarr/sonarr)
+      - TZ: Timezone for the service
+
+      Media library volumes are configured in your inventory file using the
+      'trailarr_volumes' variable. Use the SAME container paths that radarr and
+      sonarr use, so Trailarr resolves their reported paths without Path Mappings.
+      Example:
+        trailarr_volumes:
+          - { name: "Yukari_Movies", host_folder: "/data/Yukari/Movies", container: "/Yukari_Movies" }
+          - { name: "Yukari_TV", host_folder: "/data/Yukari/TV", container: "/Yukari_TV" }
+
+      Default web UI login is admin / trailarr - change it under
+      Settings > About > Password after the first sign in.
+
+      After configuration, deploy with: ansible-playbook site.yml --limit trailarr
+  when: not trailarr_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

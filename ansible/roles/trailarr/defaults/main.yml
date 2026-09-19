@@ -1,0 +1,19 @@
+---
+# Trailarr default configuration variables
+
+# Port configuration
+trailarr_port: 7889
+
+# User/Group IDs
+trailarr_puid: 1001
+trailarr_pgid: 1001
+
+# Media volumes mounted into the container.
+# Use the SAME container paths that radarr/sonarr use, so Trailarr resolves the
+# paths reported by those APIs without needing Path Mappings in its connections.
+# Set per-host in the inventory, e.g.:
+#   trailarr_volumes:
+#     - name: Yukari_Movies
+#       host_folder: /data/Yukari/Movies
+#       container: /Yukari_Movies
+trailarr_volumes: []

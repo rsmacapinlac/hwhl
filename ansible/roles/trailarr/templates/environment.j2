@@ -1,0 +1,13 @@
+# Trailarr Environment Configuration
+
+# User/Group Configuration
+PUID={{ trailarr_puid | default('1001') }}
+PGID={{ trailarr_pgid | default('1001') }}
+
+# Timezone
+TZ={{ timezone | default('America/Vancouver') }}
+
+# Web UI login defaults to admin / trailarr.
+# Uncomment and set to reset or change the password, then comment it out again -
+# while this variable is set it overrides the password on every container start.
+#WEBUI_PASSWORD=

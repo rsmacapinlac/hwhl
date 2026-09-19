@@ -331,6 +331,15 @@
       run_once: true
       when: groups['bazarr'] is defined and groups['bazarr'] | length > 0
 
+- name: "Setup Trailarr"
+  hosts: trailarr
+  connection: local
+  tasks:
+    - name: "Run Trailarr setup if group exists"
+      include_tasks: roles/trailarr/tasks/setup.yml
+      run_once: true
+      when: groups['trailarr'] is defined and groups['trailarr'] | length > 0
+
 - name: "Setup Lidarr"
   hosts: lidarr
   connection: local

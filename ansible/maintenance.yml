@@ -315,6 +315,15 @@
         - bazarr
         - arrs
 
+- hosts: "trailarr"
+  remote_user: ansible
+  tasks:
+    - name: "Update Trailarr"
+      include_tasks: roles/trailarr/tasks/update.yml
+      tags:
+        - trailarr
+        - arrs
+
 - hosts: "lidarr"
   remote_user: ansible
   tasks:

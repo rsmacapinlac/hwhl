@@ -41,6 +41,14 @@
         - bazarr
         - arrs
 
+- hosts: "trailarr"
+  remote_user: ansible
+  roles:
+    - role: trailarr
+      tags:
+        - trailarr
+        - arrs
+
 - hosts: "lidarr"
   remote_user: ansible
   roles:

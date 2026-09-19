@@ -1,0 +1,74 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/trailarr/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/trailarr/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if trailarr container exists
+  community.docker.docker_container_info:
+    name: trailarr
+  register: trailarr_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create trailarr service folder
+  become: true
+  file:
+    path: /data/services/trailarr
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+# Trailarr runs as PUID/PGID inside the container and writes its database,
+# logs and .env to /config, so the bind mount source must be owned by that uid.
+- name: Create trailarr config folder
+  become: true
+  file:
+    path: /data/containers/trailarr/config
+    state: directory
+    owner: "{{ trailarr_puid }}"
+    group: "{{ trailarr_pgid }}"
+    mode: '0755'
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/trailarr/environment"
+    dest: /data/services/trailarr/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart trailarr
+
+# Docker Compose deployment
+- name: Setup docker compose file for trailarr
+  template:
+    src: docker-compose.j2
+    dest: /data/services/trailarr/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart trailarr
+
+# Container deployment using docker_compose_v2
+- name: Run trailarr container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/trailarr
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not trailarr_container.container.State.Running | default(false)
+  notify: restart trailarr

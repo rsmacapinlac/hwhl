@@ -1,0 +1,35 @@
+---
+services:
+  trailarr:
+    container_name: trailarr
+    image: nandyalu/trailarr:latest
+    env_file:
+      - .env
+    volumes:
+      - /data/containers/trailarr/config:/config
+{% for item in trailarr_volumes | default([]) %}
+      - {{ item.host_folder }}:{{ item.container }}
+{% endfor %}
+    ports:
+      - {{ trailarr_port }}:7889
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.trailarr.entrypoints=http"
+      - "traefik.http.routers.trailarr.rule=Host(`trailarr.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.trailarr-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.trailarr.middlewares=trailarr-https-redirect"
+      - "traefik.http.routers.trailarr-secure.entrypoints=https"
+      - "traefik.http.routers.trailarr-secure.rule=Host(`trailarr.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.trailarr-secure.tls=true"
+      - "traefik.http.routers.trailarr-secure.service=trailarr"
+      - "traefik.http.services.trailarr.loadbalancer.server.port=7889"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true
