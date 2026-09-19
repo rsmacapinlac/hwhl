@@ -9,8 +9,9 @@ ASR_MODEL={{ whisper_asr_model | default('base') }}
 # Inference device: cpu | cuda
 ASR_DEVICE={{ whisper_asr_device | default('cpu') }}
 
-# Unload the model from memory after N seconds of inactivity (0 = never)
-MODEL_IDLE_TIMEOUT={{ whisper_model_idle_timeout | default('300') }}
+# Unload the model from memory after N seconds of inactivity (0 = never).
+# Leave at 0 for WhisperX; the upstream image currently fails to reload after idle unload.
+MODEL_IDLE_TIMEOUT={{ whisper_model_idle_timeout | default('0') }}
 
 # Speaker diarization (whisperx engine only). Requires a HuggingFace token with
 # accepted user conditions for pyannote/speaker-diarization-3.1 and

@@ -6,8 +6,16 @@
 # Port configuration (host:container, container listens on 9000)
 whisper_port: 9000
 
-# Official image. Use the ':latest-gpu' tag on hosts with GPU passthrough.
-whisper_image: onerahmet/openai-whisper-asr-webservice:latest
+# Official image. Append '-gpu' to the tag on hosts with GPU passthrough.
+#
+# Pinned to v1.9.1: v1.10.0 crash-loops with ASR_ENGINE=whisperx (upstream
+# issue #383). It ships lightning 2.6.5 + pyannote.audio 3.4.0, which break
+# whisperx startup twice — the pyannote VAD checkpoint fails torch's
+# weights_only unpickling, and the diarization pipeline calls
+# hf_hub_download(use_auth_token=...), removed in newer huggingface_hub.
+# v1.9.1 (lightning 2.5.2, pyannote.audio 3.3.2) loads both cleanly.
+# Unpin once upstream ships whisperx >= 3.8.6 / pyannote.audio >= 4.0.
+whisper_image: onerahmet/openai-whisper-asr-webservice:v1.9.1
 
 # ASR configuration
 # Engine: openai_whisper | faster_whisper | whisperx
@@ -16,8 +24,10 @@ whisper_asr_engine: faster_whisper
 whisper_asr_model: base
 # Device: cpu | cuda
 whisper_asr_device: cpu
-# Unload the model from memory after N seconds idle (0 = keep loaded)
-whisper_model_idle_timeout: 300
+# Unload the model from memory after N seconds idle (0 = keep loaded).
+# Keep disabled for WhisperX: the current upstream image fails to reload
+# after idle unload because its internal model dict is set to None.
+whisper_model_idle_timeout: 0
 
 # HuggingFace token for whisperx speaker diarization models.
 # Set the real value as a secret in group_vars/all.yml (whisper_hf_token).
