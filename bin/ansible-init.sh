@@ -41,4 +41,5 @@ fi
 # ansible-galaxy role install --force --roles-path galaxy/roles -r galaxy/requirements.yml
 # ansible-galaxy collection install --force --collections-path ~/code/personal/ansible/collections -r $ansible_path/requirements.yml
 
-ansible-galaxy collection install --force -r ansible/galaxy/requirements.yml
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ansible-galaxy collection install --force -r "$REPO_ROOT/ansible/galaxy/requirements.yml"
