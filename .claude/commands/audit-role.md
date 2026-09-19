@@ -1,1 +1,0 @@
-../../skills/audit-role/SKILL.md
