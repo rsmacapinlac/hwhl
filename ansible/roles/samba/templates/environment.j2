@@ -19,6 +19,13 @@ SHARE{{ loop.index }}={{ share }}
 {% endif %}
 {% endfor %}
 
+# Recycle bin
+# The dperson/samba image enables Samba's recycle VFS module in [global],
+# moving every SMB deletion into .deleted with keeptree/no size cap and no
+# expiry, so it grows without bound. Any non-empty value makes the image's
+# entrypoint strip it from smb.conf at startup.
+RECYCLE=1
+
 # Workgroup (optional)
 # WORKGROUP=WORKGROUP
 
