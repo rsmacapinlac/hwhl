@@ -1,0 +1,27 @@
+# Paperclip Environment Configuration
+# Docs: https://github.com/paperclipai/paperclip/blob/master/doc/DOCKER.md
+
+# Session signing secret (generated at setup)
+BETTER_AUTH_SECRET={{ paperclip_better_auth_secret | default(lookup('ansible.builtin.password', '/dev/null', chars=['hexdigits'], length=64)) }}
+
+# Tool action signing secret (generated at setup)
+PAPERCLIP_TOOL_ACTION_SIGNING_SECRET={{ paperclip_tool_action_signing_secret | default(lookup('ansible.builtin.password', '/dev/null', chars=['hexdigits'], length=64)) }}
+
+# Agent API token signing secret (generated at setup; falls back to BETTER_AUTH_SECRET if unset)
+PAPERCLIP_AGENT_JWT_SECRET={{ paperclip_agent_jwt_secret | default(lookup('ansible.builtin.password', '/dev/null', chars=['hexdigits'], length=64)) }}
+
+# "authenticated" requires login; "private" = LAN only
+PAPERCLIP_DEPLOYMENT_MODE=authenticated
+PAPERCLIP_DEPLOYMENT_EXPOSURE=private
+
+# Database Configuration
+{% set paperclip_db_password = paperclip_postgres_password | default(lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits'], length=32)) %}
+POSTGRES_USER={{ paperclip_postgres_user | default('paperclip') }}
+POSTGRES_PASSWORD={{ paperclip_db_password }}
+POSTGRES_DB={{ paperclip_postgres_db | default('paperclip') }}
+DATABASE_URL=postgres://{{ paperclip_postgres_user | default('paperclip') }}:{{ paperclip_db_password }}@paperclip-db:5432/{{ paperclip_postgres_db | default('paperclip') }}
+
+# Optional: LLM provider API keys. Leave unset to sign in with a Claude/ChatGPT
+# subscription from the Paperclip UI instead.
+# ANTHROPIC_API_KEY=sk-ant-your-anthropic-key
+# OPENAI_API_KEY=sk-your-openai-key

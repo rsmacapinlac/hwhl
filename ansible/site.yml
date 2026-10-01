@@ -463,6 +463,20 @@
       tags:
         - litellm
 
+- hosts: "paperclip"
+  remote_user: ansible
+  roles:
+    - role: paperclip
+      tags:
+        - paperclip
+
+- hosts: "hermes"
+  remote_user: ansible
+  roles:
+    - role: hermes
+      tags:
+        - hermes
+
 - hosts: "invoiceninja"
   remote_user: ansible
   roles:

@@ -1,0 +1,125 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/hermes/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/hermes/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if hermes container exists
+  community.docker.docker_container_info:
+    name: hermes
+  register: hermes_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create hermes service folder
+  become: true
+  file:
+    path: /data/services/hermes
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+# The image runs as the `hermes` user (UID/GID 10000)
+- name: Create hermes data folder
+  become: true
+  file:
+    path: /data/containers/hermes/data
+    state: directory
+    owner: '10000'
+    group: '10000'
+    mode: '0750'
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/hermes/environment"
+    dest: /data/services/hermes/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart hermes
+
+# Docker Compose deployment
+- name: Setup docker compose file for hermes
+  template:
+    src: docker-compose.j2
+    dest: /data/services/hermes/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart hermes
+
+# Container deployment using docker_compose_v2
+- name: Run hermes container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/hermes
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not hermes_container.container.State.Running | default(false)
+  notify: restart hermes
+
+# Dashboard reverse-proxy settings and any hermes_config_settings live in the
+# data volume's config.yaml, which the container creates on first start.
+- name: Wait for hermes config.yaml
+  community.docker.docker_container_exec:
+    container: hermes
+    command: test -f /opt/data/config.yaml
+  register: hermes_config_file
+  until: hermes_config_file.rc == 0
+  retries: 30
+  delay: 2
+  changed_when: false
+
+- name: Sync profile secrets into the data volume's .env
+  become: true
+  lineinfile:
+    path: /data/containers/hermes/data/.env
+    regexp: "^{{ item }}="
+    line: "{{ item }}={{ lookup('ansible.builtin.ini', item, type='properties', file=playbook_dir ~ '/../homelab_config/ansible/files/config/hermes/environment') }}"
+    create: true
+    owner: '10000'
+    group: '10000'
+    mode: '0600'
+  loop: "{{ hermes_profile_env_keys }}"
+  no_log: true
+  notify: restart hermes
+
+- name: Read hermes config settings
+  community.docker.docker_container_exec:
+    container: hermes
+    command: "hermes config get --json {{ item.key }}"
+  loop: "{{ hermes_settings | dict2items }}"
+  vars:
+    hermes_settings: "{{ dict(hermes_dashboard_settings | dict2items | map(attribute='key') | map('regex_replace', '^', 'dashboard.') | zip(hermes_dashboard_settings.values())) | combine(hermes_config_settings) }}"
+  register: hermes_config_current
+  failed_when: false
+  changed_when: false
+
+- name: Set hermes config settings
+  community.docker.docker_container_exec:
+    container: hermes
+    argv:
+      - hermes
+      - config
+      - set
+      - "{{ item.item.key }}"
+      - "{{ item.item.value if item.item.value is string else item.item.value | to_json }}"
+  loop: "{{ hermes_config_current.results }}"
+  loop_control:
+    label: "{{ item.item.key }}"
+  when: item.rc != 0 or (item.stdout | from_json) != item.item.value
+  notify: restart hermes

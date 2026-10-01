@@ -1,0 +1,42 @@
+---
+# Setup tasks for Hermes Agent environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create hermes config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/hermes"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/hermes/environment"
+  register: hermes_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: "{{ playbook_dir }}/roles/hermes/templates/environment.j2"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/hermes/environment"
+    mode: '0640'
+  when: not hermes_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Hermes environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/hermes/environment
+
+      The dashboard basic auth password and session secret were generated randomly.
+      Review the file before deploying.
+
+      After deploying with: ansible-playbook site.yml --limit hermes
+        1. Run the setup wizard on the host: docker exec -it hermes hermes setup
+        2. Open https://hermes.<host>.{{ homelab_domain }} and sign in with the dashboard credentials.
+  when: not hermes_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

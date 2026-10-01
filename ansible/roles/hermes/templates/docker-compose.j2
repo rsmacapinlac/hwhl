@@ -1,0 +1,42 @@
+---
+services:
+  hermes:
+    container_name: hermes
+    image: nousresearch/hermes-agent:{{ hermes_version }}
+    command: gateway run
+    shm_size: {{ hermes_shm_size }}
+    ports:
+      - {{ hermes_port }}:{{ hermes_dashboard_port }}
+    env_file:
+      - .env
+    environment:
+      - HERMES_DASHBOARD=1
+      - HERMES_DASHBOARD_PORT={{ hermes_dashboard_port }}
+      - HOME=/opt/data/home
+    volumes:
+      - /data/containers/hermes/data:/opt/data
+    deploy:
+      resources:
+        limits:
+          memory: {{ hermes_memory_limit }}
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.hermes.entrypoints=http"
+      - "traefik.http.routers.hermes.rule=Host(`hermes.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.hermes-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.hermes.middlewares=hermes-https-redirect"
+      - "traefik.http.routers.hermes-secure.entrypoints=https"
+      - "traefik.http.routers.hermes-secure.rule=Host(`hermes.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.hermes-secure.tls=true"
+      - "traefik.http.routers.hermes-secure.service=hermes"
+      - "traefik.http.services.hermes.loadbalancer.server.port={{ hermes_dashboard_port }}"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+    external: true

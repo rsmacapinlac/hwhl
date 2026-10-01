@@ -1,0 +1,62 @@
+---
+services:
+  paperclip:
+    container_name: paperclip
+    image: ghcr.io/paperclipai/paperclip:{{ paperclip_version }}
+    pids_limit: 2048
+    ports:
+      - {{ paperclip_port }}:3100
+    env_file:
+      - .env
+    environment:
+      - PAPERCLIP_PUBLIC_URL=https://paperclip.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}
+      - CLAUDE_LOGIN_TRUSTED_PROXIES={{ paperclip_claude_login_trusted_proxies }}
+    volumes:
+      - /data/containers/paperclip/data:/paperclip
+    depends_on:
+      paperclip-db:
+        condition: service_healthy
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.paperclip.entrypoints=http"
+      - "traefik.http.routers.paperclip.rule=Host(`paperclip.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.paperclip-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.paperclip.middlewares=paperclip-https-redirect"
+      - "traefik.http.routers.paperclip-secure.entrypoints=https"
+      - "traefik.http.routers.paperclip-secure.rule=Host(`paperclip.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.paperclip-secure.tls=true"
+      - "traefik.http.routers.paperclip-secure.service=paperclip"
+      - "traefik.http.services.paperclip.loadbalancer.server.port=3100"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+      - paperclip-internal
+
+  paperclip-db:
+    container_name: paperclip-db
+    image: postgres:17-alpine
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - /data/containers/paperclip/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - paperclip-internal
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+  paperclip-internal:
+    driver: bridge

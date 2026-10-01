@@ -475,6 +475,24 @@
       run_once: true
       when: groups['litellm'] is defined and groups['litellm'] | length > 0
 
+- name: "Setup Paperclip"
+  hosts: paperclip
+  connection: local
+  tasks:
+    - name: "Run Paperclip setup if group exists"
+      include_tasks: roles/paperclip/tasks/setup.yml
+      run_once: true
+      when: groups['paperclip'] is defined and groups['paperclip'] | length > 0
+
+- name: "Setup Hermes"
+  hosts: hermes
+  connection: local
+  tasks:
+    - name: "Run Hermes setup if group exists"
+      include_tasks: roles/hermes/tasks/setup.yml
+      run_once: true
+      when: groups['hermes'] is defined and groups['hermes'] | length > 0
+
 - name: "Setup InvoiceNinja"
   hosts: invoiceninja
   connection: local

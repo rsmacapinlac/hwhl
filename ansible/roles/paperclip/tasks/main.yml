@@ -1,0 +1,64 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/paperclip/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/paperclip/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if paperclip container exists
+  community.docker.docker_container_info:
+    name: paperclip
+  register: paperclip_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create paperclip service folder
+  become: true
+  file:
+    path: /data/services/paperclip
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not paperclip_container.container.State.Running | default(false)
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/paperclip/environment"
+    dest: /data/services/paperclip/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart paperclip
+
+# Docker Compose deployment
+- name: Setup docker compose file for paperclip
+  template:
+    src: docker-compose.j2
+    dest: /data/services/paperclip/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart paperclip
+
+# Container deployment using docker_compose_v2
+- name: Run paperclip container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/paperclip
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not paperclip_container.container.State.Running | default(false)
+  notify: restart paperclip

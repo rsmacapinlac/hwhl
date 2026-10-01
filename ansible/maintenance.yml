@@ -432,6 +432,22 @@
       tags:
         - litellm
 
+- hosts: "paperclip"
+  remote_user: ansible
+  tasks:
+    - name: "Update Paperclip"
+      include_tasks: roles/paperclip/tasks/update.yml
+      tags:
+        - paperclip
+
+- hosts: "hermes"
+  remote_user: ansible
+  tasks:
+    - name: "Update Hermes"
+      include_tasks: roles/hermes/tasks/update.yml
+      tags:
+        - hermes
+
 - hosts: "invoiceninja"
   remote_user: ansible
   tasks:

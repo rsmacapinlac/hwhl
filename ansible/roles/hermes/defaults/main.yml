@@ -1,0 +1,36 @@
+---
+# Hermes Agent default configuration variables
+
+# Image tag (nousresearch/hermes-agent)
+hermes_version: latest
+
+# Dashboard port inside the container
+hermes_dashboard_port: 9119
+
+# Host port the dashboard is published on (in addition to Traefik)
+hermes_port: 9119
+
+# Proxy peers allowed to forward requests to the dashboard. Without these,
+# Hermes ignores Traefik's X-Forwarded-Proto and issues non-Secure cookies.
+# Defaults to the external `proxy` Docker network that Traefik sits on.
+hermes_dashboard_trusted_proxies:
+  - 172.18.0.0/16
+
+# Dashboard settings enforced in the data volume's config.yaml
+hermes_dashboard_settings:
+  public_url: "https://hermes.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}"
+  trusted_proxies: "{{ hermes_dashboard_trusted_proxies }}"
+
+# Extra settings enforced in the data volume's config.yaml, keyed by dotted
+# config path (e.g. fallback_providers, providers.litellm). Set per-host or
+# per-group in the inventory.
+hermes_config_settings: {}
+
+# Container resource limits
+hermes_memory_limit: 3G
+hermes_shm_size: 1g
+
+# Keys copied from the Ansible environment file into the data volume's .env.
+# The gateway (Telegram etc.) resolves provider key_env only from that profile
+# .env, never from the container environment.
+hermes_profile_env_keys: []

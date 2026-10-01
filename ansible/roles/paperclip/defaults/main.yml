@@ -1,0 +1,12 @@
+---
+# Paperclip default configuration variables
+
+# Port configuration
+paperclip_port: 3100
+
+# Image tag (ghcr.io/paperclipai/paperclip)
+paperclip_version: latest
+
+# Proxy peers allowed to forward TLS for the in-app Claude subscription login.
+# Defaults to the external `proxy` Docker network that Traefik sits on.
+paperclip_claude_login_trusted_proxies: 172.18.0.0/16
