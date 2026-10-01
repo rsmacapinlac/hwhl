@@ -99,6 +99,7 @@ variable "services_containers" {
     ip_address     = string
     gateway        = string
     nameserver     = string
+    datastore      = optional(string)            # Overrides var.datastore for this container
     disk_size      = optional(number, 64)
     cores          = optional(number, 2)
     memory         = optional(number, 4096)

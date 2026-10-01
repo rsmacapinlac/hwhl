@@ -18,7 +18,7 @@ module "services_containers" {
   vmid           = each.value.vmid
   node           = each.value.node
   template       = var.debian_template
-  datastore      = var.datastore
+  datastore      = coalesce(each.value.datastore, var.datastore)
   disk_size      = each.value.disk_size
   cores          = each.value.cores
   memory         = each.value.memory
