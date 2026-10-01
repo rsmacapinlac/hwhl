@@ -474,11 +474,23 @@
     - name: "Update Claude Code CLI"
       become: true
       ansible.builtin.shell: |
-        su - {{ claude_user | default('ritchie') }} -c "npm install -g @anthropic-ai/claude-code"
+        su - {{ claude_ai_user | default('ritchie') }} -c "npm install -g @anthropic-ai/claude-code"
       environment:
-        HOME: "/home/{{ claude_user | default('ritchie') }}"
+        HOME: "/home/{{ claude_ai_user | default('ritchie') }}"
       tags:
         - claude
+
+- hosts: "codex"
+  remote_user: ansible
+  tasks:
+    - name: "Update Codex CLI"
+      become: true
+      ansible.builtin.shell: |
+        su - {{ codex_ai_user | default('ritchie') }} -c "npm install -g @openai/codex"
+      environment:
+        HOME: "/home/{{ codex_ai_user | default('ritchie') }}"
+      tags:
+        - codex
 
 - hosts: "guacamole"
   remote_user: ansible

@@ -399,9 +399,18 @@
   connection: local
   tasks:
     - name: "Run Claude setup if group exists"
-      include_tasks: roles/claude/tasks/setup.yml
+      include_tasks: roles/claude-ai/tasks/setup.yml
       run_once: true
       when: groups['claude'] is defined and groups['claude'] | length > 0
+
+- name: "Setup Codex"
+  hosts: codex
+  connection: local
+  tasks:
+    - name: "Run Codex setup if group exists"
+      include_tasks: roles/codex-ai/tasks/setup.yml
+      run_once: true
+      when: groups['codex'] is defined and groups['codex'] | length > 0
 
 - name: "Setup Linkding"
   hosts: linkding

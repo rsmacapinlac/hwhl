@@ -1,0 +1,6 @@
+---
+# No local setup required for the codex-ai role.
+# Authentication is handled manually via 'codex login' after provisioning.
+- name: Codex setup complete
+  ansible.builtin.debug:
+    msg: "Codex role has no local setup steps. After provisioning, SSH in as {{ codex_ai_user }} and run 'codex login'."

@@ -1,0 +1,67 @@
+---
+- name: Create codex user
+  become: true
+  ansible.builtin.user:
+    name: "{{ codex_ai_user }}"
+    shell: /bin/bash
+    create_home: true
+
+- name: Install system dependencies
+  become: true
+  ansible.builtin.apt:
+    name:
+      - curl
+      - git
+    state: present
+    update_cache: true
+
+- name: Add NodeSource repository for Node.js 22
+  become: true
+  ansible.builtin.shell: |
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.list
+
+- name: Install Node.js
+  become: true
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: true
+
+- name: Ensure npm global directory exists for codex user
+  become: true
+  ansible.builtin.file:
+    path: "/home/{{ codex_ai_user }}/.npm-global"
+    state: directory
+    mode: "0755"
+    owner: "{{ codex_ai_user }}"
+    group: "{{ codex_ai_user }}"
+
+- name: Configure npm global prefix for codex user
+  become: true
+  ansible.builtin.shell: |
+    su - {{ codex_ai_user }} -c "npm config set prefix ~/.npm-global"
+  args:
+    creates: "/home/{{ codex_ai_user }}/.npmrc"
+
+- name: Ensure .npm-global/bin and .local/bin are in PATH via .bashrc
+  become: true
+  ansible.builtin.blockinfile:
+    path: "/home/{{ codex_ai_user }}/.bashrc"
+    create: true
+    mode: "0644"
+    owner: "{{ codex_ai_user }}"
+    group: "{{ codex_ai_user }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - npm global"
+    block: |
+      export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"
+
+- name: Install Codex CLI
+  become: true
+  ansible.builtin.shell: |
+    su - {{ codex_ai_user }} -c "npm install -g @openai/codex"
+  args:
+    creates: "/home/{{ codex_ai_user }}/.npm-global/bin/codex"
+  environment:
+    HOME: "/home/{{ codex_ai_user }}"

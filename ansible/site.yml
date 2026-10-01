@@ -431,9 +431,16 @@
 - hosts: "claude"
   remote_user: ansible
   roles:
-    - role: claude
+    - role: claude-ai
       tags:
         - claude
+
+- hosts: "codex"
+  remote_user: ansible
+  roles:
+    - role: codex-ai
+      tags:
+        - codex
 
 - hosts: "vaultwarden"
   remote_user: ansible
