@@ -442,6 +442,13 @@
       tags:
         - codex
 
+- hosts: "herdr"
+  remote_user: ansible
+  roles:
+    - role: herdr
+      tags:
+        - herdr
+
 - hosts: "vaultwarden"
   remote_user: ansible
   roles:

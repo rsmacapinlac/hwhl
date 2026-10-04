@@ -508,6 +508,27 @@
       tags:
         - codex
 
+- hosts: "herdr"
+  remote_user: ansible
+  tasks:
+    - name: "Update herdr"
+      become: true
+      ansible.builtin.shell: |
+        su - {{ herdr_user | default('ritchie') }} -c "~/.local/bin/herdr update"
+      register: herdr_update
+      changed_when: "'already' not in herdr_update.stdout | lower"
+      tags:
+        - herdr
+
+    - name: "Restart herdr server"
+      become: true
+      ansible.builtin.systemd:
+        name: herdr
+        state: restarted
+      when: herdr_update is changed
+      tags:
+        - herdr
+
 - hosts: "guacamole"
   remote_user: ansible
   tasks:

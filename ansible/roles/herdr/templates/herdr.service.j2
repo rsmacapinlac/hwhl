@@ -1,0 +1,20 @@
+[Unit]
+Description=Herdr headless server ({{ herdr_user }})
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User={{ herdr_user }}
+Group={{ herdr_user }}
+WorkingDirectory={{ herdr_home }}
+Environment=HOME={{ herdr_home }}
+Environment=SHELL=/bin/bash
+Environment=TERM=xterm-256color
+Environment=PATH={{ herdr_home }}/.npm-global/bin:{{ herdr_home }}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart={{ herdr_bin }} server
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

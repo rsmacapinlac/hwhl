@@ -1,0 +1,8 @@
+---
+herdr_user: ritchie
+herdr_home: "/home/{{ herdr_user }}"
+herdr_bin: "{{ herdr_home }}/.local/bin/herdr"
+herdr_manifest_url: https://herdr.dev/latest.json
+herdr_arch_map:
+  x86_64: linux-x86_64
+  aarch64: linux-aarch64

@@ -1,0 +1,7 @@
+---
+- name: Restart herdr
+  become: true
+  ansible.builtin.systemd:
+    name: herdr
+    state: restarted
+    daemon_reload: true

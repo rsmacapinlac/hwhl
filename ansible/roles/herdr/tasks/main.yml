@@ -1,0 +1,70 @@
+---
+- name: Create herdr user
+  become: true
+  ansible.builtin.user:
+    name: "{{ herdr_user }}"
+    shell: /bin/bash
+    create_home: true
+
+- name: Ensure herdr install directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ herdr_bin | dirname }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ herdr_user }}"
+    group: "{{ herdr_user }}"
+
+- name: Check for existing herdr binary
+  become: true
+  ansible.builtin.stat:
+    path: "{{ herdr_bin }}"
+  register: herdr_bin_stat
+
+# Only install when missing; upgrades go through `herdr update` in maintenance.yml
+- name: Fetch herdr release manifest
+  ansible.builtin.uri:
+    url: "{{ herdr_manifest_url }}"
+    return_content: true
+  register: herdr_manifest
+  when: not herdr_bin_stat.stat.exists
+
+- name: Install herdr
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ herdr_manifest.json.assets[herdr_arch_map[ansible_architecture]] }}"
+    checksum: "sha256:{{ herdr_manifest.json.sha256[herdr_arch_map[ansible_architecture]] }}"
+    dest: "{{ herdr_bin }}"
+    mode: "0755"
+    owner: "{{ herdr_user }}"
+    group: "{{ herdr_user }}"
+  when: not herdr_bin_stat.stat.exists
+  notify: Restart herdr
+
+- name: Ensure .local/bin is in PATH via .bashrc
+  become: true
+  ansible.builtin.blockinfile:
+    path: "{{ herdr_home }}/.bashrc"
+    create: true
+    mode: "0644"
+    owner: "{{ herdr_user }}"
+    group: "{{ herdr_user }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - herdr"
+    block: |
+      export PATH="$HOME/.local/bin:$PATH"
+
+- name: Install herdr systemd service
+  become: true
+  ansible.builtin.template:
+    src: herdr.service.j2
+    dest: /etc/systemd/system/herdr.service
+    mode: "0644"
+  notify: Restart herdr
+
+- name: Enable and start herdr
+  become: true
+  ansible.builtin.systemd:
+    name: herdr
+    enabled: true
+    state: started
+    daemon_reload: true
