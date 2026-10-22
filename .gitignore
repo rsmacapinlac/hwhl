@@ -9,3 +9,6 @@ homelab_config/hosts
 
 # Generated reports, state snapshots and analysis data (see sop/documenting-cluster-state.md)
 reports/
+
+# Claude Code local settings (per-machine permissions)
+.claude/settings.local.json
