@@ -8,8 +8,8 @@ Objectives:
 
 | Objective | Done when | Phases |
 |---|---|---|
-| Retire midosuji, for other use | midosuji is out of `interhigh` (`pvecm status`: 3 nodes), nothing in the cluster, repo or inventory refers to it, its P400 is out, and it's labelled and off the LAN until it's reinstalled for the M720q cluster | 1, 2, 3 |
-| Utilize hardware better (GPU and storage space) | Both Jellyfins transcode on the P400; teshima's idle Quadro 4000s and unused 500G NVMe are out (the NVMe goes to the M720q plan). Storage: see the open question in §8.2 | 3, 4, 5, 6 |
+| Retire midosuji, for other use | midosuji is out of `interhigh` (`pvecm status`: 3 nodes), nothing in the cluster, repo or inventory refers to it, its P400 is out, and it's labelled and off the LAN until it's wiped for reuse | 1, 2, 3 |
+| Utilize hardware better (GPU and storage space) | Both Jellyfins transcode on the P400; teshima's idle Quadro 4000s and unused 500G NVMe are out. Storage: see the open question in §8.2 | 3, 4, 5, 6 |
 | Migrate to Proxmox 9 | fukutomi, izumida and teshima all run PVE 9, and the health check passes | 4 |
 | Relocate hardware downstairs | fukutomi and izumida run at teshima's location, and the first night's backups finish inside their window | 3 |
 
@@ -23,7 +23,7 @@ This plan groups physical work required so each machine is only opened once. Onl
 2. **Phase 2:** Retire midosuji in software
    - Destroy rollback CT 225 → power off midosuji → `pvecm delnode`
 3. **Phase 3:** Hardware moves
-   - Pull the P400 from midosuji (its MX500 stays in for reuse; it stays off the LAN until reinstalled)
+   - Pull the P400 from midosuji (its disks stay in; it stays off the LAN until it's wiped)
    - Turn off izumida
    - Install the P400 in izumida
    - izumida is re-racked downstairs (at teshima's location) and powered up
@@ -44,7 +44,7 @@ Why this order:
 - **The P400 can only be pulled once midosuji is off for good.** After `pvecm delnode`, midosuji must never boot onto the LAN with its old install, so it's unplugged from the network in Phase 2 and stays that way until it's repurposed.
 - **izumida moves before fukutomi, never at the same time.** With 3 nodes, quorum needs 2, so fukutomi only goes down once izumida is back and the cluster is quorate.
 
-**Out of scope:** everything about the **M720q cluster**. It becomes a **new, separate Proxmox cluster** (M720q + a reinstalled midosuji), not part of `interhigh`, and gets its own plan. This plan ends for midosuji once it has left the cluster and its P400 is out; its MX500 and Barracuda stay in the chassis.
+**Out of scope:** what midosuji, its disks and the M720q are used for next. That's undecided and isn't part of this plan. This plan ends for midosuji once it has left the cluster and its P400 is out; its MX500 and Barracuda stay in the chassis.
 
 ## 1. How to run this process
 
@@ -146,7 +146,7 @@ Record every step in the progress log (§8) as it's done, with the date and anyt
    pvesr list                               # expect no replication jobs
    ```
 3. **Back up the cluster config** on teshima: `tar czf /root/etc-pve-$(date +%F).tgz /etc/pve`.
-4. **Power midosuji off** (`poweroff` on midosuji). **[Ritchie]** Unplug its network cable. Wait until `pvecm status` on teshima shows it offline. It stays unplugged until it's reinstalled.
+4. **Power midosuji off** (`poweroff` on midosuji). **[Ritchie]** Unplug its network cable. Wait until `pvecm status` on teshima shows it offline. It stays unplugged until it's wiped for reuse.
 5. **Remove it from the cluster** (on teshima):
    ```bash
    pvecm delnode midosuji
@@ -195,8 +195,8 @@ health check runs with midosuji gone from the report and nothing new.
 
 1. **[Ritchie]** Unplug its power (the network is already unplugged).
 2. **[Ritchie]** Take out the **Quadro P400** (PCIe x16; no power cable).
-3. **[Ritchie]** Leave the MX500 (`sdb`) and the Barracuda (`sda`) in; the M720q cluster's plan decides what happens to them.
-4. **[Ritchie]** Label midosuji: **"Old interhigh install: don't connect to the LAN."** When it's reinstalled, boot the PVE installer from USB with the network unplugged and wipe the MX500, then reconnect.
+3. **[Ritchie]** Leave the MX500 (`sdb`) and the Barracuda (`sda`) in; what happens to them is decided later.
+4. **[Ritchie]** Label midosuji: **"Old interhigh install: don't connect to the LAN."** Before it's reused, boot an installer from USB with the network unplugged and wipe the MX500, then reconnect.
 
 **Steps, izumida:**
 
@@ -283,7 +283,7 @@ has nothing new. Only then start the next step.
    grep -n nvme /etc/pve/storage.cfg  # nothing
    ```
 2. `poweroff` teshima.
-3. **[Ritchie]** Remove the 500G NVMe with its PCIe adapter (it goes to the M720q plan), and both Quadro 4000s.
+3. **[Ritchie]** Remove the 500G NVMe with its PCIe adapter, and both Quadro 4000s. Keep the NVMe and adapter together; where they go is decided later.
 4. **[Ritchie]** Power on with no graphics card and watch the front LED and the beeps.
    - It boots and `ping 10.1.0.144` answers within a few minutes: carry on.
    - It halts with a "no video" beep code: put back the **smallest** card available (one Quadro 4000, or better a passive low-power card such as a GT 710) so it can complete POST. The Quadros still leave; plan a replacement card.
