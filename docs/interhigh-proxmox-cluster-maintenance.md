@@ -378,7 +378,7 @@ the host's `.run` file in the container.
 | 2026-10-22 | 1 | S3 Zigbee | Pass | 25 seen in 24h; only the 9 already-dead missing |
 | 2026-10-22 | 3 (prep) | DNS: dns1 → teshima, dns2 → izumida, dns3 retired | Done | One Pi-hole per node |
 | | 1 | §8.1 items fixed or accepted (step 3) | | |
-| | 1 | `pve8to9 --full` on all three nodes (step 4) | | |
+| 2026-10-22 | 1 | `pve8to9 --full` on all three nodes (step 4) | Pass | 0 FAILs. WARNs → §8.1. Output: `reports/health/2026-10-22/pve8to9.txt` |
 | | 1 | smarthome S1–S10 (step 5) | | |
 | | 1 | Health check, second run; exit gate (step 6) | | |
 | | 2 | Destroy 225 | | |
@@ -409,11 +409,14 @@ column. Evidence: analysis notes §5.
 |---|---|---|---|
 | izumida swap 79% | Phase 3 | Check ritchie/media/vcr memory sizing | Open |
 | VM 101 guest agent not answering; its QEMU process causes izumida's hung-task warnings | Phase 3 | **[Ritchie]** Install `qemu-guest-agent` in VM 101, or set `agent: 0`. Then check the hung tasks stop | Open |
-| pihole-exporter `10.1.0.15:9617` down on all Prometheus hosts | Phase 2 | Fix the exporter (check the uncommitted `pihole-exporter` `environment.j2` change) | Open |
+| pihole-exporter `10.1.0.15:9617` down on all Prometheus hosts | Phase 2 | Fixed 2026-10-22: its env file only had `changeme` placeholders. Real Pi-hole passwords set, and Compose now reads the file in `raw` format | Done |
 | vzdump errors 10-20 to 10-22 | Phase 2 | Confirm the next two nights are clean (causes already removed) | Open |
 | smarthome (226) has no backup yet | Phase 2 | Covered by S7 | Open |
 | smarthome has only one resolver (10.1.0.3) | Phase 4 | Add 10.1.0.2 as its second, so teshima's upgrade doesn't leave it without DNS | Open |
-| `pve8to9` FAILs | Phase 4 | Fill in after Phase 1 step 4 | Open |
+| `pve8to9` FAILs | Phase 4 | None on 2026-10-22; re-run before each node's upgrade | Done |
+| fukutomi: `grub-efi-amd64` not installed on a UEFI system; removable bootloader not managed by GRUB (`pve8to9` WARN) | Phase 4 | Install `grub-efi-amd64` (upgrade plan §3.3) | Open |
+| fukutomi and teshima: `intel-microcode` not installed (`pve8to9` WARN) | Phase 4 | Install it (needs the `non-free-firmware` component) | Open |
+| izumida and teshima: `systemd-boot` installed on legacy-boot systems (`pve8to9` WARN) | Phase 4 | Remove the `systemd-boot` package after confirming the bootloader is GRUB | Open |
 | midosuji MX500 `Current_Pending_ECC_Cnt` flipping 0 ↔ 1 | — | Watch; matters for midosuji's reuse, not this plan | Watch |
 | transmission-openvpn restarted once | — | Watch | Watch |
 

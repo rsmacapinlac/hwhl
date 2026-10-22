@@ -4,7 +4,11 @@ services:
     image: ekofr/pihole-exporter:latest
     ports:
       - "9617:9617"
-    env_file: .env
+    # raw: pass values through untouched, so a "$" or quote in a Pi-hole
+    # password isn't interpolated or stripped by Compose
+    env_file:
+      - path: .env
+        format: raw
     environment:
       TZ: '{{ timezone }}'
     restart: unless-stopped
