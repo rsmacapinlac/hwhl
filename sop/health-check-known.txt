@@ -1,0 +1,18 @@
+# Known exceptions for ansible/health-check.yml.
+# One extended regex per line, matched against each "Needs attention" line
+# ("<label>: <finding>"). A match moves the line to "Known exceptions" in the
+# report instead of hiding it. Put the reason and a date in a comment above
+# each pattern, and remove the pattern once the cause is gone.
+
+# Nextcloud AIO's watchtower exits by design after updates (health baseline §3.3).
+nextcloud-aio-watchtower[[:space:]]+Exited \(0\)
+# mail-tribble on ritchie is a run-to-completion job.
+mail-tribble[[:space:]]+Exited \(0\)
+# ofelia on family: health baseline H8, waiting on the Monica keep/retire decision.
+ofelia[[:space:]]+Exited \(0\)
+# bot (CT 300) was stopped by hand on 2026-10-19 with onboot 0.
+^bot[.:].*unreachable
+# midosuji's Barracuda: 16 pending sectors, unchanged since ~20k hours. Leaves with midosuji (interhigh maintenance Phase 3).
+^midosuji: disk sda .*Current_Pending_Sector=16 Offline_Uncorrectable=16 *$
+# teshima's boot SSD: 369 late bad blocks as of 2026-10-21. A different count shows up as a new finding.
+^teshima: disk sda .*Bad_Blk_Ct_Erl/Lat=0/369 *$

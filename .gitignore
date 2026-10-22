@@ -6,3 +6,6 @@ homelab_config/ansible/group_vars
 homelab_config/ansible/inventory
 homelab_config/ansible/files
 homelab_config/hosts
+
+# Generated reports, state snapshots and analysis data (see sop/documenting-cluster-state.md)
+reports/

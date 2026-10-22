@@ -1,0 +1,199 @@
+---
+# ============================================
+# Weekly Proxmox cluster health check (read-only)
+# ============================================
+# Runs the scripts in ../sop/scripts against every Proxmox node, the cluster,
+# the Prometheus hosts and every managed LXC, then writes the health report to
+# ../reports/health/<date>/report.txt and the current-state snapshot to
+# ../reports/state/<date>-<cluster>.md. reports/ is gitignored. Nothing on the
+# hosts is changed.
+#
+# Usage (from the repo root, after `ssh-add ~/.ssh/id_rsa` for the nodes' root login):
+#   ./bin/ansible-playbook.sh health-check.yml
+#
+# Procedure and how to read the report: sop/proxmox-cluster-health-check.md
+# ============================================
+
+- name: Proxmox nodes
+  hosts: proxmox_control_node_by_ip
+  remote_user: root
+  gather_facts: false
+  ignore_unreachable: true
+  vars: &report_vars
+    health_dir: "{{ playbook_dir }}/../reports/health/{{ lookup('pipe', 'date +%F') }}"
+    state_dir: "{{ playbook_dir }}/../reports/state"
+    health_scripts: "{{ playbook_dir }}/../sop/scripts"
+    health_known: "{{ playbook_dir }}/../sop/health-check-known.txt"
+  tasks:
+    - name: Create the report directory
+      ansible.builtin.file:
+        path: "{{ health_dir }}"
+        state: directory
+        mode: "0700"
+      delegate_to: localhost
+      become: false
+      run_once: true
+
+    - name: Run the node check
+      ansible.builtin.script: "{{ health_scripts }}/pve-node-health.sh"
+      register: node_health
+      changed_when: false
+      ignore_errors: true
+
+    - name: Save the node result
+      ansible.builtin.copy:
+        content: "{{ node_health.stdout | default('! ' ~ inventory_hostname ~ ' unreachable or failed: ' ~ (node_health.msg | default('?'))) }}\n"
+        dest: "{{ health_dir }}/1-node-{{ inventory_hostname }}.txt"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+
+    - name: Collect the node's state
+      ansible.builtin.script: "{{ health_scripts }}/pve-node-state.sh"
+      register: node_state
+      changed_when: false
+      ignore_errors: true
+
+    - name: Save the node's state
+      ansible.builtin.copy:
+        content: "{{ node_state.stdout | default('### ' ~ inventory_hostname ~ '\n\nUnreachable: ' ~ (node_state.msg | default('?'))) }}\n"
+        dest: "{{ health_dir }}/state-1-node-{{ inventory_hostname }}.md"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+
+    - name: Collect guests and protected backups (once)
+      ansible.builtin.script: "{{ health_scripts }}/pve-cluster-state.py"
+      register: cluster_state
+      changed_when: false
+      ignore_errors: true
+      run_once: true
+
+    - name: Save guests and protected backups
+      ansible.builtin.copy:
+        content: "{{ cluster_state.stdout | default('## Guests\n\nCollection failed: ' ~ (cluster_state.msg | default('?'))) }}\n"
+        dest: "{{ health_dir }}/state-2-cluster.md"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+      run_once: true
+
+    - name: Run the cluster check (once)
+      ansible.builtin.script: "{{ health_scripts }}/pve-cluster-health.sh"
+      register: cluster_health
+      changed_when: false
+      ignore_errors: true
+      run_once: true
+
+    - name: Save the cluster result
+      ansible.builtin.copy:
+        content: "{{ cluster_health.stdout | default('! cluster check failed: ' ~ (cluster_health.msg | default('?'))) }}\n"
+        dest: "{{ health_dir }}/2-cluster.txt"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+      run_once: true
+
+- name: Prometheus hosts
+  hosts: prometheus
+  become: true
+  gather_facts: false
+  ignore_unreachable: true
+  vars: *report_vars
+  tasks:
+    - name: Run the monitoring check
+      ansible.builtin.script: "{{ health_scripts }}/prometheus-health.sh"
+      register: prom_health
+      changed_when: false
+      ignore_errors: true
+
+    - name: Save the monitoring result
+      ansible.builtin.copy:
+        content: "## {{ inventory_hostname }}\n{{ prom_health.stdout | default('! unreachable or failed: ' ~ (prom_health.msg | default('?'))) }}\n"
+        dest: "{{ health_dir }}/3-prometheus-{{ inventory_hostname }}.txt"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+
+- name: Managed LXCs
+  hosts: "managed_hosts:!raspberrypi"
+  become: true
+  gather_facts: false
+  ignore_unreachable: true
+  vars: *report_vars
+  tasks:
+    - name: Run the container check
+      ansible.builtin.script: "{{ health_scripts }}/ct-health.sh"
+      register: ct_health
+      changed_when: false
+      ignore_errors: true
+
+    - name: Save the container result
+      ansible.builtin.copy:
+        content: "{{ ct_health.stdout | default('## ' ~ inventory_hostname ~ '\n! unreachable or failed: ' ~ (ct_health.msg | default('?'))) }}\n"
+        dest: "{{ health_dir }}/4-ct-{{ inventory_hostname }}.txt"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+
+- name: Assemble the report
+  hosts: localhost
+  gather_facts: false
+  vars: *report_vars
+  tasks:
+    - name: Write report.txt with the attention summary first
+      ansible.builtin.shell: |
+        set -e
+        cd "{{ health_dir }}"
+        # "!" lines from every result, labelled with the host named in its "## " header
+        for f in [1-4]-*.txt; do
+          tr -d '\r' < "$f" | awk -v f="${f%.txt}" '/^## /{h=$2} /^!/{print (h != "" ? h : f) ": " substr($0, 3)}'
+        done > all-findings.txt
+        grep -vE '^[[:space:]]*(#|$)' "{{ health_known }}" > .known || true
+        grep -vE -f .known all-findings.txt > attention.txt || true
+        grep -E -f .known all-findings.txt > known.txt || true
+        rm -f .known
+        prev=$(ls -d ../????-??-?? 2>/dev/null | grep -v "/$(basename "$PWD")$" | sort | tail -1)
+        {
+          echo "# Proxmox health check $(basename "$PWD")"
+          echo
+          echo "## Needs attention ($(wc -l < attention.txt))"
+          cat attention.txt
+          echo
+          if [ -n "$prev" ] && [ -f "$prev/attention.txt" ]; then
+            sort attention.txt > .cur; sort "$prev/attention.txt" > .prev
+            echo "## New since $(basename "$prev")"
+            comm -23 .cur .prev
+            echo
+            echo "## Cleared since $(basename "$prev")"
+            comm -13 .cur .prev
+            echo
+            rm -f .cur .prev
+          fi
+          echo "## Known exceptions ($(wc -l < known.txt), see sop/health-check-known.txt)"
+          cat known.txt
+          echo
+          echo "## Full output"
+          for f in [1-4]-*.txt; do tr -d '\r' < "$f"; echo; done
+        } > report.txt
+        {
+          echo "# Cluster state snapshot"
+          echo
+          echo "As of $(date '+%Y-%m-%d %H:%M %Z'). Generated by \`ansible/health-check.yml\`; don't edit, take a new one."
+          echo
+          echo "## Nodes"
+          echo
+          for f in state-1-node-*.md; do tr -d '\r' < "$f"; echo; done
+          tr -d '\r' < state-2-cluster.md
+        } > state.md
+        cluster=$(tr -d '\r' < state-2-cluster.md | sed -n 's/^## Guests (cluster \(.*\))$/\1/p')
+        mkdir -p "{{ state_dir }}"
+        cp state.md "{{ state_dir }}/$(basename "$PWD")-${cluster:-cluster}.md"
+        echo "$PWD/report.txt"
+        echo "$(cd "{{ state_dir }}" && pwd)/$(basename "$PWD")-${cluster:-cluster}.md"
+      register: report
+      changed_when: false
+
+    - name: Show where the report and the snapshot are
+      ansible.builtin.debug:
+        msg: "{{ report.stdout_lines }}"
