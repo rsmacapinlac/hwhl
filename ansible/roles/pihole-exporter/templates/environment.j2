@@ -4,7 +4,7 @@
 
 # PiHole connection settings
 # Format: hostname1,hostname2,hostname3
-PIHOLE_HOSTNAME={{ pihole_hostnames | default('dns0.int.macapinlac.network,dns1.int.macapinlac.network,dns2.int.macapinlac.network,dns3.int.macapinlac.network') }}
+PIHOLE_HOSTNAME={{ pihole_hostnames | default('dns0.int.macapinlac.network,dns1.int.macapinlac.network,dns2.int.macapinlac.network') }}
 
 # Protocol (if same for all instances, specify once)
 PIHOLE_PROTOCOL=http
