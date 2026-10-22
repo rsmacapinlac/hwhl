@@ -53,15 +53,6 @@
       run_once: true
       when: groups['monica'] is defined and groups['monica'] | length > 0
 
-- name: "Setup Kimai"
-  hosts: kimai
-  connection: local
-  tasks:
-    - name: "Run Kimai setup if group exists"
-      include_tasks: roles/kimai/tasks/setup.yml
-      run_once: true
-      when: groups['kimai'] is defined and groups['kimai'] | length > 0
-
 - name: "Setup Immich"
   hosts: immich
   connection: local
@@ -96,15 +87,6 @@
     - name: "Run Prometheus setup if group exists"
       include_tasks: roles/prometheus/tasks/setup.yml
       when: groups['prometheus'] is defined and groups['prometheus'] | length > 0
-
-- name: "Setup Semaphore"
-  hosts: semaphore
-  connection: local
-  tasks:
-    - name: "Run Semaphore setup if group exists"
-      include_tasks: roles/semaphore/tasks/setup.yml
-      run_once: true
-      when: groups['semaphore'] is defined and groups['semaphore'] | length > 0
 
 - name: "Setup Jellyfin"
   hosts: jellyfin

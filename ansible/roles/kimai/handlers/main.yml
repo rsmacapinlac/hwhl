@@ -1,9 +1,0 @@
----
-- name: restart kimai
-  community.docker.docker_compose_v2:
-    project_src: /data/services/kimai
-    files:
-      - compose.yml
-    state: present
-    recreate: always
-    remove_orphans: false 

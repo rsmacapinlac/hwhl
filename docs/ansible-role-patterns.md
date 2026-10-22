@@ -253,14 +253,13 @@ ansible-playbook maintenance.yml
 ```yaml
 # defaults/main.yml
 ---
-semaphore_port: 3000
+whisper_port: 9000
 
 # Inventory override
-semaphore:
+whisper:
   hosts:
     ritchie.int.macapinlac.network:
-      ansible_host: 10.1.0.36
-      semaphore_port: 3002  # Override for conflict resolution
+      whisper_port: 9010  # Override for conflict resolution (portainer has 9000)
 ```
 
 ### Environment File Template
@@ -528,7 +527,7 @@ labels:
 1. HTTP router that redirects all traffic to HTTPS
 2. HTTPS router that serves the actual service
 
-**Reference Implementation:** Compare with working roles like `kavita`, `semaphore`, or `jellyfin`.
+**Reference Implementation:** Compare with working roles like `kavita` or `jellyfin`.
 
 ### 4. Ansible Facts Deprecation
 
@@ -600,7 +599,7 @@ services:
 13. **Add container health checks** when implementing update workflows
 14. **Always add `become: false`** to tasks using `delegate_to: localhost`
 15. **Use modern `ansible_facts["fact_name"]` syntax** instead of deprecated `ansible_fact_name` variables
-16. **Compare Traefik labels** with working roles (kavita, semaphore, jellyfin) before deploying new services
+16. **Compare Traefik labels** with working roles (kavita, jellyfin) before deploying new services
 17. **Do NOT include DNS CNAME configuration tasks** - Traefik handles service discovery through Docker labels
 
 ## Reference Implementations
@@ -618,10 +617,8 @@ services:
 These roles implement various modern patterns but have not been formally audited:
 
 - **pihole-exporter** - Monitoring service with update tasks and Jinja2 defaults
-- **semaphore** - User-facing service with Traefik integration
 - **immich** - User-facing service with setup integration
 - **kasm** - Environment file management example
-- **kimai** - Template-based configuration
 - **prometheus** - Advanced configuration with custom templates
 
 > **Note:** To audit a role against these patterns, use `/audit-role {role-name}` slash command.

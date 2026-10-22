@@ -177,7 +177,7 @@ X/Y patterns correctly implemented
 
 ```bash
 /audit-role pihole-exporter
-/audit-role semaphore
+/audit-role kavita
 /audit-role prometheus
 ```
 

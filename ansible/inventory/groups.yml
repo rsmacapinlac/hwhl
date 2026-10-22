@@ -30,7 +30,6 @@ managed_hosts:
     portainer:
     teslamate:
     syncthing:
-    kimai:
     navidrome:
     jellyfin:
     kavita:
@@ -44,7 +43,6 @@ managed_hosts:
     n8n:
     monica:
     ofelia:
-    semaphore:
     ghostfolio:
     obsidian:
     cura:

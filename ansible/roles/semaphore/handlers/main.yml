@@ -1,9 +1,0 @@
----
-- name: restart semaphore
-  community.docker.docker_compose_v2:
-    project_src: /data/services/semaphore
-    files:
-      - compose.yml
-    state: present
-    recreate: always
-    remove_orphans: false

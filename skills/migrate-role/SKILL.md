@@ -52,7 +52,7 @@ Based on docker-compose.j2 analysis, determine:
 - Has Traefik labels
 - Connected to proxy network
 - Exposed via reverse proxy
-- Example: jellyfin, audiobookshelf, semaphore
+- Example: jellyfin, audiobookshelf, kavita
 
 **Monitoring/Backend Service:**
 - No Traefik labels
@@ -150,7 +150,7 @@ Mark each todo as in_progress → completed as you work through them.
 ### Execution Guidelines
 
 **When Creating Files:**
-1. **Reference existing implementations** - Read similar roles (jellyfin, semaphore, pihole-exporter) for patterns
+1. **Reference existing implementations** - Read similar roles (jellyfin, kavita, pihole-exporter) for patterns
 2. **Use proper file structure** - Follow documented patterns exactly
 3. **Set correct permissions** - Templates should be 644, environment files 640
 4. **Use relative paths** - In setup.yml, use `../templates/environment.j2` for template source
@@ -455,7 +455,7 @@ After: 35/35 patterns (100%)
 When creating new files, reference these fully compliant roles:
 - **jellyfin** - User-facing service (100% compliant)
 - **pihole-exporter** - Monitoring service with updates
-- **semaphore** - User-facing service with Traefik
+- **kavita** - User-facing service with Traefik
 
 Read these roles' files to ensure consistent implementation.
 
@@ -464,7 +464,7 @@ Read these roles' files to ensure consistent implementation.
 ```bash
 /migrate-role audiobookshelf
 /migrate-role pihole-exporter
-/migrate-role semaphore
+/migrate-role kavita
 ```
 
 The role name should match the directory name in `roles/`.

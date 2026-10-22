@@ -197,13 +197,6 @@
   roles:
     - role: traggo
 
-- hosts: "semaphore"
-  remote_user: ansible
-  roles:
-    - role: semaphore
-      tags:
-        - semaphore
-
 - hosts: "ghostfolio"
   remote_user: ansible
   roles:
@@ -380,13 +373,6 @@
     - role: syncthing
       tags:
         - syncthing
-
-- hosts: "kimai"
-  remote_user: ansible
-  roles:
-    - role: kimai
-      tags:
-        - kimai
 
 - hosts: "immich"
   remote_user: ansible
