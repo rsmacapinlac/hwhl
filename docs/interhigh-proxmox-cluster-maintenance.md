@@ -202,7 +202,7 @@ health check runs with midosuji gone from the report and nothing new.
 
 5. `poweroff` on izumida. Wait for it to power off.
 6. **[Ritchie]** Carry it downstairs to teshima's location.
-7. **[Ritchie]** Install the P400 in the **x16 slot (J6B2)**. Check by eye that the slot is free; the BIOS reports every slot "In Use". Install it **without** the dummy HDMI plug: NVENC transcoding doesn't need a display, and with a "monitor" attached the BIOS may send its output to the P400 instead of izumida's onboard video. Keep the plug in case a later use needs one.
+7. **[Ritchie]** Install the P400 in the **x16 slot (J6B2)**. The BIOS (F1) must have **Devices → Video Setup → Multi-Monitor Support: Enabled** (Select Active Video stays IGD), or the slot's root port is hidden and the card isn't seen. Check by eye that the slot is free; the BIOS reports every slot "In Use". Install it **without** the dummy HDMI plug: NVENC transcoding doesn't need a display, and with a "monitor" attached the BIOS may send its output to the P400 instead of izumida's onboard video. Keep the plug in case a later use needs one.
 8. **[Ritchie]** Cable it up and power it on.
 9. First boot checks:
    ```bash
@@ -392,12 +392,14 @@ the host's `.run` file in the container.
 | 2026-10-24 | 2 | Power off, unplug, `pvecm delnode midosuji` | Done | Powered off 06:46; Ritchie took it off the rack. `delnode`: 3 nodes, 3 expected votes, quorate. `/etc/pve/nodes/midosuji` removed (only certs, lrm_status and an empty `.osx-proxmox` marker) |
 | 2026-10-24 | 2 | Storage, tfvars, known exceptions, known_hosts cleanup | Done | `local-baracuda` removed; .142 out of tfvars and the inventory; Terraform `started` option added (bot false), `plan` clean; midosuji pattern out of `health-check-known.txt`; known_hosts cleaned (workstation and `/etc/pve/priv`) |
 | 2026-10-24 | 2 | Downbeat session told; **exit gate** | **Pass** | `pvecm status`: 3 nodes, 3 expected votes, quorate. Health check has no midosuji findings and nothing new (stale same-day midosuji files had to be deleted first) |
-| | 3 | Entry criteria | | |
 | 2026-10-24 | 1→3 | VM 101 guest agent (§8.1) | Done | Agent answers; hung tasks traced to the 10-22 08:40 I/O stall, not VM 101 |
 | 2026-10-24 | 3 | Pull P400 from midosuji, label it | Done | Ritchie, ahead of the visit (midosuji already off the rack). The P400 has a **low-profile** bracket; izumida needs a full-height one Full-height bracket fitted the same day; midosuji labelled. A dummy HDMI plug was on the card; it stays off (step 7). Both drives left in |
-| | 3 | Relocate izumida, install P400, boot checks | | |
-| | 3 | Relocate fukutomi, checks | | |
-| | 3 | Health check after the visit and after the first night; exit gate | | |
+| 2026-10-24 | 3 | Entry criteria | Pass | Swap accepted, VM 101 agent fixed, health check 06:53, protected pre-move backups of every guest on izumida and fukutomi (07:19–08:04), household asleep, Downbeat approved |
+| 2026-10-24 | 3 | Relocate izumida, install P400, boot checks | Done | Powered off **without a clean shutdown** at 08:05:35 during the move (journal recovery on every CT, all clean). P400 not detected until the BIOS change: Devices → Video Setup → Multi-Monitor Support **Enabled**, Select Active Video left on IGD. Now `01:00.0` GP107GL. Two clean reboots (08:26, 08:37). Boot checks pass: TSO/GSO off, 0 hangs, ARC 4G, `Media` healthy, 3 nodes quorate, all 8 guests up, containers up, DNS, UIs, Hermes. Downbeat confirmed 500/501 healthy. CTs 500/501 carry ext4 error flags from June 10–11, not new (Downbeat's to fsck). Jellyfin playback OK (Ritchie; CPU transcode, P400 not used until Phase 6) |
+| 2026-10-24 | 3 | fukutomi GRUB (upgrade plan §3.3) | Done | ESP backed up to `/root/esp-backup-2026-10-24.tgz`; `grub-pc` → `grub-efi-amd64`, removable path forced; EFI files rewritten (were from 2022). `pve8to9`: 0 FAIL, grub WARNs gone. Next boot also runs kernel 6.8.12-43 for the first time |
+| 2026-10-24 | 3 | Relocate fukutomi, checks | Done | Clean shutdown 08:49–08:50, back 08:57 on the new GRUB and kernel 6.8.12-43 (first boot of both). 3 nodes quorate; dns0, edge, monitor-fukutomi up (all containers); dns0/1/2 resolve; public sites 200; DDNS `vancouver` = current public IP; wg-easy running. WireGuard from a phone off Wi-Fi and external sites OK (Ritchie) |
+| 2026-10-24 | 3 | Health check after the visit (step 14) | Pass | Run at 08:58. New: fukutomi `pvescheduler` not active (it started at 08:59:08, 2 min after boot; check ran too early), dns0 `nebula-sync` 1 restart at boot (synced fine at 09:00), teshima swap (known watch item). All three nodes now on kernel 6.8.12-43 |
+| | 3 | Health check after the first night downstairs (step 15); exit gate | | |
 | | 4 | Entry criteria | | |
 | | 4 | izumida → PVE 9 | | |
 | | 4 | Terraform plan against PVE 9 | | |
@@ -416,7 +418,7 @@ column. Evidence: analysis notes §5.
 
 | Item | Before | Action | Status |
 |---|---|---|---|
-| izumida swap 79% | Phase 3 | Check ritchie/media/vcr memory sizing. 2026-10-22: `vm.swappiness = 10` (by hand, `/etc/sysctl.d/99-swappiness.conf`). 2026-10-23: vcr raised to 12G, swap flushed (analysis notes §7). 2026-10-24: regrew to full; ritchie raised to 16G (Postiz), swap flushed again (analysis notes §8). Close if swap doesn't regrow over two nights from 10-24; if it does, raise the guest with `memory.high` events (media 304 is next) | Watch |
+| izumida swap 79% | Phase 3 | Check ritchie/media/vcr memory sizing. 2026-10-22: `vm.swappiness = 10` (by hand, `/etc/sysctl.d/99-swappiness.conf`). 2026-10-23: vcr raised to 12G, swap flushed (analysis notes §7). 2026-10-24: regrew to full; ritchie raised to 16G (Postiz), swap flushed again (analysis notes §8). **Accepted 2026-10-24 by Ritchie without the two-night wait**: at 07:18 swap was 1.4G and rising (idle pages), but ritchie had no new `memory.high` events after the raise, si/so 0. Keep watching after the move; if a guest hits its limit again, raise it (media 304 is next) | Accepted |
 | izumida e1000e NIC hang | Phase 3 | TSO/GSO off since 2026-10-21; 0 hangs since. Re-check after izumida's move and first night downstairs | Watch |
 | bot (CT 300) is started by any Terraform apply; it is kept stopped on purpose | Phase 4 (Terraform plan against PVE 9) | Fixed 2026-10-24: `services_containers` has an optional `started` (default true); bot has `started = false`. `plan` is now fully clean | Done |
 | VM 101 guest agent not answering; its QEMU process causes izumida's hung-task warnings | Phase 3 | 2026-10-24: Ritchie installed and enabled `qemu-guest-agent` and rebooted VM 101; `qm agent 101 ping` answers (Ubuntu 26.04.1, 10.1.0.233). The hung tasks were **not** VM 101: all 10 are one I/O stall at 08:40:23 on 10-22 (jbd2, dockerd, Prometheus in 216, Java/Elasticsearch, .NET), before the ARC cap; none since. They leave the health check's 7-day window on 10-29 | Done |
