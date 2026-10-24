@@ -124,14 +124,20 @@ variable "proxmox_host" {
 variable "mount_points" {
   description = "List of bind mount points to attach to the container"
   type = list(object({
-    host_path      = string  # Path on Proxmox host (e.g., /mnt/ContainerBackups)
-    container_path = string  # Path inside container (e.g., /mnt/backups)
+    host_path      = string # Path on Proxmox host (e.g., /mnt/ContainerBackups)
+    container_path = string # Path inside container (e.g., /mnt/backups)
   }))
   default = []
 }
 
 variable "tun_device" {
   description = "Enable /dev/net/tun passthrough (required for VPN containers like transmission-openvpn)"
+  type        = bool
+  default     = false
+}
+
+variable "nvidia_gpu" {
+  description = "Pass the host's NVIDIA GPU device nodes into the container (needs the NVIDIA driver on the node)"
   type        = bool
   default     = false
 }

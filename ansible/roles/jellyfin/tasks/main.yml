@@ -42,6 +42,11 @@
     mode: '0640'
 
 # Docker Compose deployment
+# GPU userspace and Docker runtime, before the compose file asks for the GPU
+- name: Set up NVIDIA GPU support
+  ansible.builtin.include_tasks: nvidia.yml
+  when: jellyfin_nvidia_gpu | bool
+
 - name: Setup docker compose file for jellyfin
   template:
     src: docker-compose.j2

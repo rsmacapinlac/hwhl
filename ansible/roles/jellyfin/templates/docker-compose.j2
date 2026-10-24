@@ -7,6 +7,17 @@ services:
       - .env
     environment:
       - JELLYFIN_PublishedServerUrl=jellyfin.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}
+{% if jellyfin_nvidia_gpu | bool %}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, video, compute, utility]
+{% endif %}
     volumes:
       - /data/containers/jellyfin:/config
 {% for item in jellyfin_volumes %}

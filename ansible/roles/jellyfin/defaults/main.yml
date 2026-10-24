@@ -10,3 +10,8 @@ jellyfin_dlna_port: 1900
 # User/Group IDs
 jellyfin_puid: 1001
 jellyfin_pgid: 1001
+
+# NVIDIA GPU transcoding (NVENC). Needs the LXC to have the node's GPU passed
+# through (Terraform nvidia_gpu) and the same driver version as the node.
+jellyfin_nvidia_gpu: false
+nvidia_driver_version: "580.196.07"

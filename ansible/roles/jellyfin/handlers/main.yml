@@ -7,3 +7,9 @@
     state: present
     recreate: always
     remove_orphans: false
+
+- name: restart docker for nvidia
+  become: true
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted

@@ -151,6 +151,8 @@
   remote_user: ansible
   roles:
     - role: jellyfin
+      tags:
+        - jellyfin
 
 - hosts: "tdarr"
   remote_user: ansible

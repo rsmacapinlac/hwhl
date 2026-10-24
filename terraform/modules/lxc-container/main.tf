@@ -14,8 +14,8 @@ resource "proxmox_virtual_environment_container" "container" {
 
   # Startup order and delay
   startup {
-    order = var.startup_order
-    up_delay = 30
+    order      = var.startup_order
+    up_delay   = 30
     down_delay = 30
   }
 
@@ -165,9 +165,9 @@ resource "terraform_data" "configure_mount_points" {
       done
 
       # Add each mount point from configuration via pct set command
-%{ for idx, mount in var.mount_points ~}
+%{for idx, mount in var.mount_points~}
       ssh -o StrictHostKeyChecking=no root@${var.proxmox_host} "pct set ${var.vmid} -mp${idx} ${mount.host_path},mp=${mount.container_path}" || true
-%{ endfor ~}
+%{endfor~}
 
       # Start container after mount points are configured
       ssh -o StrictHostKeyChecking=no root@${var.proxmox_host} "pct start ${var.vmid}" || true
@@ -193,6 +193,31 @@ resource "terraform_data" "enable_tun_device" {
   provisioner "local-exec" {
     command = <<-EOT
       ssh -o StrictHostKeyChecking=no root@${var.proxmox_host} 'CONF="/etc/pve/lxc/${var.vmid}.conf" && grep -q "lxc.cdev.allow: c 10:200 rwm" "$CONF" || echo "lxc.cdev.allow: c 10:200 rwm" >> "$CONF" && grep -q "lxc.mount.entry: /dev/net" "$CONF" || echo "lxc.mount.entry: /dev/net dev/net none bind,create=dir" >> "$CONF" && pct reboot ${var.vmid}'
+    EOT
+  }
+}
+
+# NVIDIA GPU passthrough. Uses Proxmox's native devN passthrough, which handles
+# device majors and permissions itself (nvidia-uvm's major is dynamic). The
+# provider (bpg 0.66) has no device_passthrough block, so set it with pct like
+# the tun device above. The node needs the driver and its nvidia-devices.service
+# so /dev/nvidia-uvm and /dev/nvidia-modeset exist at boot.
+resource "terraform_data" "enable_nvidia_gpu" {
+  count = var.nvidia_gpu && var.proxmox_host != "" ? 1 : 0
+
+  depends_on = [
+    proxmox_virtual_environment_container.container,
+    terraform_data.configure_mount_points,
+  ]
+
+  triggers_replace = [
+    proxmox_virtual_environment_container.container.id,
+    var.nvidia_gpu,
+  ]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      ssh -o StrictHostKeyChecking=no root@${var.proxmox_host} 'pct set ${var.vmid} --dev0 /dev/nvidia0 --dev1 /dev/nvidiactl --dev2 /dev/nvidia-modeset --dev3 /dev/nvidia-uvm --dev4 /dev/nvidia-uvm-tools && if pct status ${var.vmid} | grep -q running; then pct reboot ${var.vmid}; fi'
     EOT
   }
 }

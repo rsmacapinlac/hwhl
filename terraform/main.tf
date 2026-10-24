@@ -35,5 +35,6 @@ module "services_containers" {
   tags            = concat(local.common_tags, each.value.extra_tags)
   mount_points    = each.value.mount_points
   tun_device      = each.value.tun_device
+  nvidia_gpu      = each.value.nvidia_gpu
   start_on_create = each.value.started
 }
