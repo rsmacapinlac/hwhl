@@ -387,7 +387,7 @@ Tier 4 is why §3.1 and the §7.1 protected backups are non-negotiable.
 | 2026-10-24 | fukutomi | §3.3 grub-efi | Done | ESP backed up first; rebooted fine on it the same day |
 | | all | §3.4 PVE 8 reboot | | |
 | 2026-10-24 | repo | R1, R3 | Done | R1: `roles/proxmox` includes `repos-bookworm.yml` or `repos-trixie.yml` (deb822, enterprise sources disabled, fails on leftover `.list` files); `--check` on the three bookworm nodes showed no source changes. R3: `serial: 1` on the node play in `maintenance.yml` |
-| | izumida | Upgrade | | |
-| | teshima | Upgrade | | |
-| | midosuji | Upgrade | | |
-| | fukutomi | Upgrade | | |
+| 2026-10-24 | izumida | Upgrade | Done | See interhigh maintenance Phase 4 |
+| 2026-10-24 | teshima | Upgrade | Done | See interhigh maintenance Phase 4 |
+| 2026-10-24 | midosuji | Upgrade | Not done | Removed from the cluster instead (interhigh Phase 2) |
+| 2026-10-24 | fukutomi | Upgrade | Done | See interhigh maintenance Phase 4 |
