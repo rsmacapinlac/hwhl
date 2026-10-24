@@ -510,3 +510,12 @@
       include_tasks: roles/whisper/tasks/setup.yml
       run_once: true
       when: groups['whisper'] is defined and groups['whisper'] | length > 0
+
+- name: "Setup Postiz"
+  hosts: postiz
+  connection: local
+  tasks:
+    - name: "Run Postiz setup if group exists"
+      include_tasks: roles/postiz/tasks/setup.yml
+      run_once: true
+      when: groups['postiz'] is defined and groups['postiz'] | length > 0

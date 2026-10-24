@@ -1,0 +1,9 @@
+---
+- name: restart postiz
+  community.docker.docker_compose_v2:
+    project_src: /data/services/postiz
+    files:
+      - compose.yml
+    state: present
+    recreate: always
+    remove_orphans: false

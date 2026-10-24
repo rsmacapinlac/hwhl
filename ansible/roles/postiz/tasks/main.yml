@@ -1,0 +1,91 @@
+---
+# Environment file validation
+- name: Check if environment file exists
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/postiz/environment"
+  register: env_file
+  delegate_to: localhost
+  become: false
+
+- name: Fail if environment file doesn't exist
+  fail:
+    msg: |
+      Environment file not found at {{ playbook_dir }}/../homelab_config/ansible/files/config/postiz/environment
+      Please run site-setup.yml first to create the environment file.
+  when: not env_file.stat.exists
+
+# Container status checking
+- name: Check if postiz container exists
+  community.docker.docker_container_info:
+    name: postiz
+  register: postiz_container
+  ignore_errors: true
+
+# Directory creation with proper permissions
+- name: Create postiz service folder
+  become: true
+  file:
+    path: /data/services/postiz
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+  when: not postiz_container.container.State.Running | default(false)
+
+# Elasticsearch runs as uid 1000 and cannot write a root-owned bind mount
+- name: Ensure temporal elasticsearch folder has the correct owner
+  become: true
+  file:
+    path: /data/containers/postiz/temporal-es
+    state: directory
+    recurse: true
+    owner: 1000
+
+# Environment file deployment
+- name: Copy environment configuration
+  copy:
+    src: "{{ playbook_dir }}/../homelab_config/ansible/files/config/postiz/environment"
+    dest: /data/services/postiz/.env
+    owner: ansible
+    group: docker
+    mode: '0640'
+  notify: restart postiz
+
+# Docker Compose deployment
+- name: Setup docker compose file for postiz
+  template:
+    src: docker-compose.j2
+    dest: /data/services/postiz/compose.yml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart postiz
+
+# Temporal dynamic config (mounted into the temporal container)
+- name: Create temporal dynamicconfig folder
+  file:
+    path: /data/services/postiz/dynamicconfig
+    state: directory
+    owner: ansible
+    group: docker
+    mode: '0755'
+
+- name: Setup temporal dynamic config
+  template:
+    src: temporal-dynamicconfig.yaml.j2
+    dest: /data/services/postiz/dynamicconfig/development-sql.yaml
+    owner: ansible
+    group: docker
+    mode: '0644'
+  notify: restart postiz
+
+# Container deployment using docker_compose_v2
+- name: Run postiz container
+  community.docker.docker_compose_v2:
+    project_src: /data/services/postiz
+    files:
+      - compose.yml
+    state: present
+    remove_orphans: false
+  when: not postiz_container.container.State.Running | default(false)
+  notify: restart postiz

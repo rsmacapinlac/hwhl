@@ -57,3 +57,4 @@ managed_hosts:
     litellm:
     invoiceninja:
     whisper:
+    postiz:

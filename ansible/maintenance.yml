@@ -547,6 +547,15 @@
       tags:
         - whisper
 
+- hosts: "postiz"
+  remote_user: ansible
+  tasks:
+    - name: "Update Postiz"
+      include_tasks: roles/postiz/tasks/update.yml
+      when: groups['postiz'] is defined and groups['postiz'] | length > 0
+      tags:
+        - postiz
+
 - hosts: 'managed_hosts'
   remote_user: ansible
   tasks:

@@ -1,0 +1,71 @@
+# Postiz Environment Configuration
+# Docs: https://docs.postiz.com/configuration/reference
+# Upstream compose: https://github.com/gitroomhq/postiz-docker-compose
+
+# JWT signing secret (generated at setup)
+JWT_SECRET={{ postiz_jwt_secret | default(lookup('ansible.builtin.password', '/dev/null', chars=['hexdigits'], length=64)) }}
+
+# Set to true after creating the first account
+DISABLE_REGISTRATION=false
+
+# Rate limit for the public API create-post endpoint (requests/hour)
+API_LIMIT=90
+
+# Postiz Database Configuration
+{% set postiz_db_password = postiz_postgres_password | default(lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits'], length=32)) %}
+POSTGRES_USER=postiz
+POSTGRES_PASSWORD={{ postiz_db_password }}
+POSTGRES_DB=postiz
+DATABASE_URL=postgresql://postiz:{{ postiz_db_password }}@postiz-db:5432/postiz
+
+# Temporal Database Configuration
+TEMPORAL_POSTGRES_PASSWORD={{ postiz_temporal_postgres_password | default(lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits'], length=32)) }}
+
+# Email (password resets, notifications). Set postiz_smtp_* in the inventory;
+# without them Postiz runs with no email provider and silently drops mail.
+{% if postiz_smtp_host is defined %}
+EMAIL_PROVIDER=nodemailer
+EMAIL_HOST={{ postiz_smtp_host }}
+EMAIL_PORT={{ postiz_smtp_port }}
+EMAIL_SECURE={{ (postiz_smtp_port | int == 465) | lower }}
+EMAIL_USER={{ postiz_smtp_username }}
+EMAIL_PASS={{ postiz_smtp_password }}
+EMAIL_FROM_NAME=Postiz
+EMAIL_FROM_ADDRESS={{ postiz_smtp_sender }}
+{% endif %}
+
+# Storage: "local" serves uploads from this instance. Instagram, Threads and
+# TikTok fetch media by URL, so they need a publicly reachable instance or
+# Cloudflare R2 (STORAGE_PROVIDER=cloudflare + CLOUDFLARE_* vars).
+STORAGE_PROVIDER=local
+UPLOAD_DIRECTORY=/uploads
+NEXT_PUBLIC_UPLOAD_DIRECTORY=/uploads
+
+# Social provider apps: register a developer app per platform and add its keys.
+# Callback URLs: https://<postiz host>/integrations/social/<provider>
+# See https://docs.postiz.com/providers for each provider's variables.
+# X_API_KEY=
+# X_API_SECRET=
+# LINKEDIN_CLIENT_ID=
+# LINKEDIN_CLIENT_SECRET=
+# FACEBOOK_APP_ID=
+# FACEBOOK_APP_SECRET=
+# THREADS_APP_ID=
+# THREADS_APP_SECRET=
+# YOUTUBE_CLIENT_ID=
+# YOUTUBE_CLIENT_SECRET=
+# TIKTOK_CLIENT_ID=
+# TIKTOK_CLIENT_SECRET=
+# PINTEREST_CLIENT_ID=
+# PINTEREST_CLIENT_SECRET=
+# REDDIT_CLIENT_ID=
+# REDDIT_CLIENT_SECRET=
+# DISCORD_CLIENT_ID=
+# DISCORD_CLIENT_SECRET=
+# DISCORD_BOT_TOKEN_ID=
+# MASTODON_URL=https://mastodon.social
+# MASTODON_CLIENT_ID=
+# MASTODON_CLIENT_SECRET=
+
+# Optional: AI features
+# OPENAI_API_KEY=

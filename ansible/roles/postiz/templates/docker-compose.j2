@@ -1,0 +1,162 @@
+---
+services:
+  postiz:
+    container_name: postiz
+    image: ghcr.io/gitroomhq/postiz-app:{{ postiz_version }}
+    ports:
+      - {{ postiz_port }}:5000
+    env_file:
+      - .env
+    environment:
+      - MAIN_URL={{ postiz_url }}
+      - FRONTEND_URL={{ postiz_url }}
+      - NEXT_PUBLIC_BACKEND_URL={{ postiz_url }}/api
+      - BACKEND_INTERNAL_URL=http://localhost:3000
+      - REDIS_URL=redis://postiz-redis:6379
+      - TEMPORAL_ADDRESS=postiz-temporal:7233
+      - IS_GENERAL=true
+      - RUN_CRON=true
+      - NX_ADD_PLUGINS=false
+    volumes:
+      - /data/containers/postiz/config:/config
+      - /data/containers/postiz/uploads:/uploads
+    depends_on:
+      postiz-db:
+        condition: service_healthy
+      postiz-redis:
+        condition: service_healthy
+      postiz-temporal:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "const r=require('http').get('http://localhost:5000/',res=>process.exit(res.statusCode<500?0:1));r.on('error',()=>process.exit(1));r.setTimeout(4000,()=>{r.destroy();process.exit(1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.postiz.entrypoints=http"
+      - "traefik.http.routers.postiz.rule=Host(`postiz.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.middlewares.postiz-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.postiz.middlewares=postiz-https-redirect"
+      - "traefik.http.routers.postiz-secure.entrypoints=https"
+      - "traefik.http.routers.postiz-secure.rule=Host(`postiz.{{ ansible_facts["hostname"] }}.{{ homelab_domain }}`)"
+      - "traefik.http.routers.postiz-secure.tls=true"
+      - "traefik.http.routers.postiz-secure.service=postiz"
+      - "traefik.http.services.postiz.loadbalancer.server.port=5000"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+      - postiz-internal
+
+  postiz-db:
+    container_name: postiz-db
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - /data/containers/postiz/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - postiz-internal
+
+  postiz-redis:
+    container_name: postiz-redis
+    image: redis:7.2
+    volumes:
+      - /data/containers/postiz/redis:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - postiz-internal
+
+  # Temporal workflow engine (Postiz uses it to run scheduled posts)
+  postiz-temporal-es:
+    container_name: postiz-temporal-es
+    image: elasticsearch:{{ postiz_temporal_es_version }}
+    environment:
+      - cluster.routing.allocation.disk.threshold_enabled=true
+      - cluster.routing.allocation.disk.watermark.low=512mb
+      - cluster.routing.allocation.disk.watermark.high=256mb
+      - cluster.routing.allocation.disk.watermark.flood_stage=128mb
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms256m -Xmx256m
+      - xpack.security.enabled=false
+    volumes:
+      - /data/containers/postiz/temporal-es:/usr/share/elasticsearch/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS \"http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s\" || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    networks:
+      - postiz-internal
+
+  postiz-temporal-db:
+    container_name: postiz-temporal-db
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=temporal
+      - POSTGRES_PASSWORD=${TEMPORAL_POSTGRES_PASSWORD}
+    volumes:
+      - /data/containers/postiz/temporal-postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - postiz-internal
+
+  postiz-temporal:
+    container_name: postiz-temporal
+    image: temporalio/auto-setup:{{ postiz_temporal_version }}
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=${TEMPORAL_POSTGRES_PASSWORD}
+      - POSTGRES_SEEDS=postiz-temporal-db
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+      - ENABLE_ES=true
+      - ES_SEEDS=postiz-temporal-es
+      - ES_VERSION=v7
+      - TEMPORAL_NAMESPACE=default
+    volumes:
+      - ./dynamicconfig:/etc/temporal/config/dynamicconfig
+    depends_on:
+      postiz-temporal-db:
+        condition: service_healthy
+      postiz-temporal-es:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "temporal", "operator", "cluster", "health", "--address", "postiz-temporal:7233"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - postiz-internal
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+  postiz-internal:
+    driver: bridge

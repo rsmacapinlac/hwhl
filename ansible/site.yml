@@ -497,3 +497,10 @@
     - role: whisper
       tags:
         - whisper
+
+- hosts: "postiz"
+  remote_user: ansible
+  roles:
+    - role: postiz
+      tags:
+        - postiz

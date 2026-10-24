@@ -1,0 +1,43 @@
+---
+# Setup tasks for Postiz environment file creation
+# Run via: ansible-playbook site-setup.yml
+
+- name: Create postiz config directory locally
+  file:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/postiz"
+    state: directory
+    mode: '0755'
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Check if environment file already exists
+  stat:
+    path: "{{ playbook_dir }}/../homelab_config/ansible/files/config/postiz/environment"
+  register: postiz_env_file
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Create environment file from template
+  template:
+    src: "{{ playbook_dir }}/roles/postiz/templates/environment.j2"
+    dest: "{{ playbook_dir }}/../homelab_config/ansible/files/config/postiz/environment"
+    mode: '0640'
+  when: not postiz_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: Display setup instructions
+  debug:
+    msg: |
+      Postiz environment file created at: {{ playbook_dir }}/../homelab_config/ansible/files/config/postiz/environment
+
+      JWT_SECRET and both Postgres passwords were generated randomly.
+      Add social provider app keys to the file as you register them.
+
+      After deploying with: ansible-playbook site.yml --limit postiz
+        1. Open https://postiz.<host>.{{ homelab_domain }} and create the first account.
+        2. Set DISABLE_REGISTRATION=true in the environment file and redeploy.
+        3. For n8n: Settings > Public API in Postiz, then install n8n-nodes-postiz in n8n.
+  when: not postiz_env_file.stat.exists
+  delegate_to: 127.0.0.1
+  become: false

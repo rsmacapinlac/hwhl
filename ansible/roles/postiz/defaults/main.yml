@@ -1,0 +1,15 @@
+---
+# Postiz default configuration variables
+
+# Host port for the Postiz web UI/API (container listens on 5000)
+postiz_port: 4007
+
+# Public URL Postiz builds links, OAuth callbacks and media URLs from. Override
+# it when the instance is exposed through edge under another hostname.
+postiz_url: "https://postiz.{{ ansible_facts['hostname'] }}.{{ homelab_domain }}"
+
+# Image tags. Temporal versions follow the upstream compose file
+# (github.com/gitroomhq/postiz-docker-compose).
+postiz_version: latest
+postiz_temporal_version: 1.28.1
+postiz_temporal_es_version: 7.17.27
