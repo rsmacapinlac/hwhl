@@ -8,6 +8,10 @@ PGID={{ media_pgid | default('1001') }}
 # OpenVPN Configuration
 OPENVPN_PROVIDER={{ transmission_openvpn_provider | default('PRIVADO') }}
 OPENVPN_CONFIG={{ transmission_openvpn_config | default('yvr-003') }}
+# Linux 6.16+ (PVE 9) has the in-kernel ovpn DCO driver; OpenVPN tries it first and
+# an unprivileged LXC isn't allowed to add a DCO peer ("Cannot add peer to DCO:
+# Operation not permitted"), so the tunnel never comes up. Use plain tun instead.
+OPENVPN_OPTS=--disable-dco
 OPENVPN_USERNAME={{ transmission_openvpn_username | default('change_this_username') }}
 OPENVPN_PASSWORD={{ transmission_openvpn_password | default('change_this_password') }}
 
