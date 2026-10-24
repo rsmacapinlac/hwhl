@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Planning |
+| **Status** | **Superseded 2026-10-24.** midosuji was retired without a replacement node: its guests moved to teshima and izumida, and it was removed from the cluster (see [interhigh-proxmox-cluster-maintenance.md](interhigh-proxmox-cluster-maintenance.md), Phase 2). Kept for history |
 | **Goal** | Replace midosuji (10.1.0.142) with a new machine, move all its guests over, and remove midosuji from the cluster |
 | **Placeholder names** | New node = **`NEWNODE`**, IP **`10.1.0.145`** (see §10 questions) |
 | **Related** | [proxmox-8-to-9-upgrade-plan.md](proxmox-8-to-9-upgrade-plan.md), [homelab-health-baseline.md](homelab-health-baseline.md) (H1, H2) |

@@ -12,7 +12,5 @@ mail-tribble[[:space:]]+Exited \(0\)
 ofelia[[:space:]]+Exited \(0\)
 # bot (CT 300) was stopped by hand on 2026-10-19 with onboot 0.
 ^bot[.:].*unreachable
-# midosuji's Barracuda: 16 pending sectors, unchanged since ~20k hours. Leaves with midosuji (interhigh maintenance Phase 3).
-^midosuji: disk sda .*Current_Pending_Sector=16 Offline_Uncorrectable=16 *$
 # teshima's boot SSD: 369 late bad blocks as of 2026-10-21. A different count shows up as a new finding.
 ^teshima: disk sda .*Bad_Blk_Ct_Erl/Lat=0/369 *$

@@ -4,7 +4,7 @@
 |---|---|
 | **Status** | Planning |
 | **Target window** | Sat 2026-10-03 – Sun 2026-10-04 (prep Fri 2026-10-02) |
-| **Scope** | 4-node cluster: fukutomi (.141), midosuji (.142), izumida (.143), teshima (.144) |
+| **Scope** | 3-node cluster: fukutomi (.141), izumida (.143), teshima (.144). midosuji (.142) was removed from the cluster on 2026-10-24 (interhigh maintenance Phase 2); its rows below are historical |
 | **Reference** | <https://pve.proxmox.com/wiki/Upgrade_from_8_to_9> |
 | **Survey date** | 2026-10-01 (read-only checks + `pve8to9 --full` on every node) |
 

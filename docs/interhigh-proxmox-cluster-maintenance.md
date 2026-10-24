@@ -155,7 +155,7 @@ Record every step in the progress log (§8) as it's done, with the date and anyt
    ```
 6. **Storage config:** `pvesm remove local-baracuda`. Drop `midosuji` from any `nodes` lists.
 7. **This repo:**
-   - `homelab_config/terraform.tfvars`: remove `"midosuji"` from `proxmox_node_ips`. Run `./bin/terraform.sh plan`; expect only the generated inventory to change (`[proxmox_control_node_by_ip]` loses .142). Apply with `-target=local_file.ansible_inventory` so the known `bot` `started` drift isn't applied.
+   - `homelab_config/terraform.tfvars`: remove `"midosuji"` from `proxmox_node_ips`. Run `./bin/terraform.sh plan`; expect only the generated inventory to change (`[proxmox_control_node_by_ip]` loses .142). `-target=local_file.ansible_inventory` does **not** avoid container drift (the inventory depends on every container), so the plan must show no container changes before applying.
    - Remove midosuji's pattern from `sop/health-check-known.txt`.
    - Update the docs and memory that list nodes .141–.144.
 8. **Workstation:** `ssh-keygen -R 10.1.0.142; ssh-keygen -R midosuji`. Also remove midosuji's line from `/etc/pve/priv/known_hosts`.
@@ -184,7 +184,7 @@ health check runs with midosuji gone from the report and nothing new.
 - [ ] Every §8.1 item due before Phase 3 is fixed or accepted.
 - [ ] The health check passes (rule 2) and today's protected backups exist for izumida's and fukutomi's guests (rule 3).
 - [ ] The household and the Downbeat session have been warned, and Downbeat has confirmed the boogienet downtime is OK.
-- [ ] **[Ritchie]** The P400's bracket fits izumida's case (it comes out of an M83 SFF, so it's probably low-profile now). The other bracket is on hand if needed.
+- [x] **[Ritchie]** The P400's bracket fits izumida's case. It came out low-profile; full-height bracket fitted 2026-10-24. Its dummy HDMI plug was removed and is not going into izumida (see step 7).
 - [ ] **[Ritchie]** Antistatic strap or mat.
 - [ ] **[Ritchie]** Downstairs network: free switch ports and a gigabit uplink
 - [ ] **[Ritchie]** Enough power outlets downstairs, on a UPS if there is one (analysis notes §3 has the power estimate).
@@ -202,7 +202,7 @@ health check runs with midosuji gone from the report and nothing new.
 
 5. `poweroff` on izumida. Wait for it to power off.
 6. **[Ritchie]** Carry it downstairs to teshima's location.
-7. **[Ritchie]** Install the P400 in the **x16 slot (J6B2)**. Check by eye that the slot is free; the BIOS reports every slot "In Use".
+7. **[Ritchie]** Install the P400 in the **x16 slot (J6B2)**. Check by eye that the slot is free; the BIOS reports every slot "In Use". Install it **without** the dummy HDMI plug: NVENC transcoding doesn't need a display, and with a "monitor" attached the BIOS may send its output to the P400 instead of izumida's onboard video. Keep the plug in case a later use needs one.
 8. **[Ritchie]** Cable it up and power it on.
 9. First boot checks:
    ```bash
@@ -292,7 +292,7 @@ has nothing new. Only then start the next step.
 
 **Exit gate:** all three nodes run PVE 9 (`pveversion`), `pvecm status` shows 3
 nodes and quorate, the health check has nothing new, and `./bin/terraform.sh plan`
-is clean apart from the known `bot` drift.
+is clean.
 
 **If it goes wrong:** follow upgrade plan §8: boot the previous kernel, or reinstall
 PVE 9 and restore from that day's protected backups. **Stop before the next node.**
@@ -377,15 +377,24 @@ the host's `.run` file in the container.
 | 2026-10-22 | 1 | Analysis notes written (step 2) | Done | `reports/state/2026-10-22-interhigh-analysis.md` |
 | 2026-10-22 | 1 | S3 Zigbee | Pass | 25 seen in 24h; only the 9 already-dead missing |
 | 2026-10-22 | 3 (prep) | DNS: dns1 → teshima, dns2 → izumida, dns3 retired | Done | One Pi-hole per node |
-| | 1 | §8.1 items fixed or accepted (step 3) | | |
+| 2026-10-23 | 1 | Nightly vzdump, night 1 of 2 | Pass | All tasks `OK`, every running guest backed up, 226 in snapshot mode (S7 half done). Analysis notes §7 |
+| 2026-10-23 | 1 | Morning spot check: S1, S2, S3 | Pass | 226 up since 10:00 10-22, 11/11 containers, 0 restarts; Zigbee 25/34 |
+| 2026-10-23 | 1 | izumida swap fix (§8.1) | Done | vcr memory 8G → 12G (tfvars; the apply restarted vcr); swap flushed 7G → 0. Analysis notes §7 |
+| 2026-10-24 | 1 | NIC check, all nodes | Pass | izumida 0 e1000e hangs since the 10-21 fix; fukutomi/teshima clean. Analysis notes §8 |
+| 2026-10-24 | 1 | izumida swap, night 1 after the fix | Fail | Swap full again (8.1G); ritchie hit 12G after Postiz. ritchie → 16G live, swap flushed. Analysis notes §8 |
+| 2026-10-24 | 1 | Nightly vzdump, night 2 of 2 | Pass | All four tasks `OK`; every running guest backed up 10-24; 226 in snapshot mode again (01:04–01:20) |
+| 2026-10-24 | 1 | §8.1 items fixed or accepted (step 3) | Done | Everything due before Phase 2 is done; the rest are due later or are watch items |
 | 2026-10-22 | 1 | `pve8to9 --full` on all three nodes (step 4) | Pass | 0 FAILs. WARNs → §8.1. Output: `reports/health/2026-10-22/pve8to9.txt` |
-| | 1 | smarthome S1–S10 (step 5) | | |
-| | 1 | Health check, second run; exit gate (step 6) | | |
-| | 2 | Destroy 225 | | |
-| | 2 | Power off, unplug, `pvecm delnode midosuji` | | |
-| | 2 | Storage, tfvars, known exceptions, known_hosts cleanup; exit gate | | |
+| 2026-10-24 | 1 | smarthome S1–S10 (step 5), run at 06:40 (44.5h, not 48h; both backup nights done) | Partial | Pass: S1–S8, S10. S3 24/34: the one extra missing device, `…78:78:a1` (Cheryl Bedside Lamp, IKEA bulb), is switched off at the lamp; accepted by Ritchie. S9 pass (Ritchie). Analysis notes §9 |
+| 2026-10-24 | 1 | Health check, second run (step 6) | Pass with exceptions | `reports/health/2026-10-24/report.txt`; the baseline for later phases |
+| 2026-10-24 | 1 | **Exit gate** | **Pass** | Both backup nights clean; §8.1 items due before Phase 2 done; S1–S10 pass (S3 lamp switched off, accepted) |
+| 2026-10-24 | 2 | Destroy 225 | Done | 06:44. Backups of 225 kept on the NAS (protected 10-01 and 10-22, plus 10-24). Nothing else referenced midosuji except `local-baracuda`. `/etc/pve` backup: teshima `/root/etc-pve-2026-10-24.tgz` |
+| 2026-10-24 | 2 | Power off, unplug, `pvecm delnode midosuji` | Done | Powered off 06:46; Ritchie took it off the rack. `delnode`: 3 nodes, 3 expected votes, quorate. `/etc/pve/nodes/midosuji` removed (only certs, lrm_status and an empty `.osx-proxmox` marker) |
+| 2026-10-24 | 2 | Storage, tfvars, known exceptions, known_hosts cleanup | Done | `local-baracuda` removed; .142 out of tfvars and the inventory; Terraform `started` option added (bot false), `plan` clean; midosuji pattern out of `health-check-known.txt`; known_hosts cleaned (workstation and `/etc/pve/priv`) |
+| 2026-10-24 | 2 | Downbeat session told; **exit gate** | **Pass** | `pvecm status`: 3 nodes, 3 expected votes, quorate. Health check has no midosuji findings and nothing new (stale same-day midosuji files had to be deleted first) |
 | | 3 | Entry criteria | | |
-| | 3 | Pull P400 from midosuji, label it | | |
+| 2026-10-24 | 1→3 | VM 101 guest agent (§8.1) | Done | Agent answers; hung tasks traced to the 10-22 08:40 I/O stall, not VM 101 |
+| 2026-10-24 | 3 | Pull P400 from midosuji, label it | Done | Ritchie, ahead of the visit (midosuji already off the rack). The P400 has a **low-profile** bracket; izumida needs a full-height one Full-height bracket fitted the same day; midosuji labelled. A dummy HDMI plug was on the card; it stays off (step 7). Both drives left in |
 | | 3 | Relocate izumida, install P400, boot checks | | |
 | | 3 | Relocate fukutomi, checks | | |
 | | 3 | Health check after the visit and after the first night; exit gate | | |
@@ -407,11 +416,13 @@ column. Evidence: analysis notes §5.
 
 | Item | Before | Action | Status |
 |---|---|---|---|
-| izumida swap 79% | Phase 3 | Check ritchie/media/vcr memory sizing | Open |
-| VM 101 guest agent not answering; its QEMU process causes izumida's hung-task warnings | Phase 3 | **[Ritchie]** Install `qemu-guest-agent` in VM 101, or set `agent: 0`. Then check the hung tasks stop | Open |
+| izumida swap 79% | Phase 3 | Check ritchie/media/vcr memory sizing. 2026-10-22: `vm.swappiness = 10` (by hand, `/etc/sysctl.d/99-swappiness.conf`). 2026-10-23: vcr raised to 12G, swap flushed (analysis notes §7). 2026-10-24: regrew to full; ritchie raised to 16G (Postiz), swap flushed again (analysis notes §8). Close if swap doesn't regrow over two nights from 10-24; if it does, raise the guest with `memory.high` events (media 304 is next) | Watch |
+| izumida e1000e NIC hang | Phase 3 | TSO/GSO off since 2026-10-21; 0 hangs since. Re-check after izumida's move and first night downstairs | Watch |
+| bot (CT 300) is started by any Terraform apply; it is kept stopped on purpose | Phase 4 (Terraform plan against PVE 9) | Fixed 2026-10-24: `services_containers` has an optional `started` (default true); bot has `started = false`. `plan` is now fully clean | Done |
+| VM 101 guest agent not answering; its QEMU process causes izumida's hung-task warnings | Phase 3 | 2026-10-24: Ritchie installed and enabled `qemu-guest-agent` and rebooted VM 101; `qm agent 101 ping` answers (Ubuntu 26.04.1, 10.1.0.233). The hung tasks were **not** VM 101: all 10 are one I/O stall at 08:40:23 on 10-22 (jbd2, dockerd, Prometheus in 216, Java/Elasticsearch, .NET), before the ARC cap; none since. They leave the health check's 7-day window on 10-29 | Done |
 | pihole-exporter `10.1.0.15:9617` down on all Prometheus hosts | Phase 2 | Fixed 2026-10-22: its env file only had `changeme` placeholders. Real Pi-hole passwords set, and Compose now reads the file in `raw` format | Done |
-| vzdump errors 10-20 to 10-22 | Phase 2 | Confirm the next two nights are clean (causes already removed) | Open |
-| smarthome (226) has no backup yet | Phase 2 | Covered by S7 | Open |
+| vzdump errors 10-20 to 10-22 | Phase 2 | Confirm the next two nights are clean (causes already removed). 10-23 and 10-24 clean | Done |
+| smarthome (226) has no backup yet | Phase 2 | Covered by S7. First backup 10-23, snapshot mode | Done |
 | smarthome has only one resolver (10.1.0.3) | Phase 4 | Add 10.1.0.2 as its second, so teshima's upgrade doesn't leave it without DNS | Open |
 | `pve8to9` FAILs | Phase 4 | None on 2026-10-22; re-run before each node's upgrade | Done |
 | fukutomi: `grub-efi-amd64` not installed on a UEFI system; removable bootloader not managed by GRUB (`pve8to9` WARN) | Phase 4 | Install `grub-efi-amd64` (upgrade plan §3.3) | Open |
@@ -419,6 +430,8 @@ column. Evidence: analysis notes §5.
 | izumida and teshima: `systemd-boot` installed on legacy-boot systems (`pve8to9` WARN) | Phase 4 | Remove the `systemd-boot` package after confirming the bootloader is GRUB | Open |
 | midosuji MX500 `Current_Pending_ECC_Cnt` flipping 0 ↔ 1 | — | Watch; matters for midosuji's reuse, not this plan | Watch |
 | transmission-openvpn restarted once | — | Watch | Watch |
+| family 305 (teshima) at its 40G limit, so teshima swap over 50%; dns0 200 (fukutomi) at its 2G limit | — | Check what grows in each (analysis notes §8) | Watch |
+| HA automation `walk_in_smart_switch_on_off` fails: `kelvin` is not a valid option (automations.yaml line 63) | — | **[Ritchie]** Replace `kelvin: 5094` with `color_temp_kelvin: 5094`. Not caused by the move: same HA 2026.9.4 image and config before and after | Open |
 
 ### 8.2 Open questions
 
