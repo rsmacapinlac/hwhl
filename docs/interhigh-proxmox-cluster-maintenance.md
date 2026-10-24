@@ -404,10 +404,12 @@ the host's `.run` file in the container.
 | | 4 | Entry criteria | | |
 | 2026-10-24 | 4 | Entry criteria | Pass (Phase 3 first-night check waived by Ritchie; today's manual backup run stands in) | `pve8to9` 0 FAIL on all three; PVE 8 updates applied; `/etc` snapshots; NIC names pinned with `/etc/systemd/network/10-pin-<nic>.link` (`pve-network-interface-pinning` refuses a pin to the current name); protected backups from today for every guest |
 | 2026-10-24 | 4 | izumida → PVE 9 | Done | Downbeat approved via Ritchie. 500/501: auto fsck refused (orphan list), `e2fsck -fy` approved by Ritchie, both now clean. Guests stopped 13:15, sources → trixie deb822, dist-upgrade 13:17–13:21 (exit 0), kept local `lvm.conf` (the new default drops the zvol `global_filter`), grub and issue. chrony failed until reboot (new chrony vs old PID 1). Rebooted 13:22–13:24: pve-manager 9.2.21, kernel 7.0.14-25-pve; `eno1`, TSO/GSO off, 0 hangs, ARC 4G, `Media` online, quorate, all guests up, chrony synced, P400 visible. **transmission-openvpn failed**: kernel 7.0's ovpn DCO isn't allowed in an unprivileged CT, fixed with `OPENVPN_OPTS=--disable-dco`; VPN exit IP confirmed. Downbeat's checks pass |
-| | 4 | Terraform plan against PVE 9 | | |
-| | 4 | teshima → PVE 9 (Quadros still in) | | |
+| 2026-10-24 | 4 | Terraform plan against PVE 9 | Pass | `plan`: No changes, with izumida on PVE 9 (bpg 0.66 still works) |
+| 2026-10-24 | 4 | teshima → PVE 9 (Quadros still in) | Done | Guests stopped 13:31, sources → trixie, dist-upgrade 13:33–13:41 (exit 0), same config choices as izumida. `pve8to9` then FAILed on `intel-microcode` (now installable from non-free-firmware): installed, 0 FAIL. Rebooted 13:43–13:44 on kernel 7.0.14-25-pve: `enp1s0`, quorate, `local-lvm` + `local-wdblue` active, HubZ `5160037E` on ttyUSB0/1, chrony active. All guests up (bot stays stopped), containers up, smarthome now has `nameserver 10.1.0.3 / 10.1.0.2`, Matter node 9 subscribed, Zigbee 24/34, dns1 resolves, Vaultwarden/photos/documents/nc/HA answer |
 | | 4 | teshima: pull NVMe + both Quadros, headless boot check | | |
-| | 4 | fukutomi → PVE 9; exit gate | | |
+| 2026-10-24 | 4 | fukutomi → PVE 9 | Done | Downbeat warned. Guests stopped 13:48, sources → trixie, dist-upgrade + `intel-microcode` 13:49–13:55 (exit 0); grub-install rewrote the EFI files at 13:54 (thanks to the §3.3 fix). Rebooted 13:56: kernel 7.0.14-25-pve, `enp2s0`, quorate, guests up, dns0/1/2 resolve, public sites 200, DDNS correct, backup storage active |
+| 2026-10-24 | 4 | Health check, all three on PVE 9 | Pass with exceptions | Only: the two stopped 09:03 backup tasks (age out 10-31), dns0 nebula-sync restart at boot, and teshima's SSD counter, which PVE 9's smartctl prints as `Lat/Erl` (known-exception pattern updated; value still 0/369) |
+| | 4 | Exit gate | | Waiting on step 4 (teshima hardware) |
 | | 5 | NVIDIA 580 driver (version: ___ ); exit gate | | |
 | | 6 | R1–R4 repo changes | | |
 | | 6 | ritchie + media GPU, NVENC test; exit gate | | |
