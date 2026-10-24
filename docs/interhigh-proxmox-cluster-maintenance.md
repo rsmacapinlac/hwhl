@@ -257,8 +257,8 @@ the rollback. This phase adds what's specific to this cluster.
 - [ ] Phase 3's exit gate is passed. Each node has rebooted cleanly on PVE 8 at its new location.
 - [ ] Every §8.1 item due before Phase 4 is fixed or accepted.
 - [ ] The health check passes on the day of the first upgrade.
-- [ ] fukutomi's grub-efi (upgrade plan §3.3) is fixed.
-- [ ] The `proxmox` role is trixie-aware. Until it is, don't run `proxmox-setup.yml` against an upgraded node.
+- [x] fukutomi's grub-efi (upgrade plan §3.3) is fixed (2026-10-24).
+- [x] The `proxmox` role is trixie-aware (R1, 2026-10-24).
 - [ ] `pve8to9 --full` reports 0 FAILs. Re-run it on each node right before that node's upgrade.
 
 **Steps:** one node at a time, in this order. Before each node: today's protected
@@ -426,11 +426,11 @@ column. Evidence: analysis notes §5.
 | pihole-exporter `10.1.0.15:9617` down on all Prometheus hosts | Phase 2 | Fixed 2026-10-22: its env file only had `changeme` placeholders. Real Pi-hole passwords set, and Compose now reads the file in `raw` format | Done |
 | vzdump errors 10-20 to 10-22 | Phase 2 | Confirm the next two nights are clean (causes already removed). 10-23 and 10-24 clean | Done |
 | smarthome (226) has no backup yet | Phase 2 | Covered by S7. First backup 10-23, snapshot mode | Done |
-| smarthome has only one resolver (10.1.0.3) | Phase 4 | Add 10.1.0.2 as its second, so teshima's upgrade doesn't leave it without DNS | Open |
+| smarthome has only one resolver (10.1.0.3) | Phase 4 | 2026-10-24: `pct set 226 --nameserver "10.1.0.3 10.1.0.2" --searchdomain macapinlac.network` (searchdomain was the IP `10.1.0.4` by mistake). Pending until CT 226's next start, which teshima's upgrade provides; confirm `/etc/resolv.conf` in 226 afterwards | Done (pending restart) |
 | `pve8to9` FAILs | Phase 4 | None on 2026-10-22; re-run before each node's upgrade | Done |
-| fukutomi: `grub-efi-amd64` not installed on a UEFI system; removable bootloader not managed by GRUB (`pve8to9` WARN) | Phase 4 | Install `grub-efi-amd64` (upgrade plan §3.3) | Open |
+| fukutomi: `grub-efi-amd64` not installed on a UEFI system; removable bootloader not managed by GRUB (`pve8to9` WARN) | Phase 4 | Done 2026-10-24 (upgrade plan §3.3); booted fine on it during the move | Done |
 | fukutomi and teshima: `intel-microcode` not installed (`pve8to9` WARN) | Phase 4 | Install it (needs the `non-free-firmware` component) | Open |
-| izumida and teshima: `systemd-boot` installed on legacy-boot systems (`pve8to9` WARN) | Phase 4 | Remove the `systemd-boot` package after confirming the bootloader is GRUB | Open |
+| izumida and teshima: `systemd-boot` installed on legacy-boot systems (`pve8to9` WARN) | Phase 4 | Removed 2026-10-24 on both (legacy boot, `proxmox-boot-tool` unused, `grub-pc` stays) | Done |
 | midosuji MX500 `Current_Pending_ECC_Cnt` flipping 0 ↔ 1 | — | Watch; matters for midosuji's reuse, not this plan | Watch |
 | transmission-openvpn restarted once | — | Watch | Watch |
 | family 305 (teshima) at its 40G limit, so teshima swap over 50%; dns0 200 (fukutomi) at its 2G limit | — | Check what grows in each (analysis notes §8) | Watch |

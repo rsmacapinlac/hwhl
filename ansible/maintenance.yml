@@ -1,6 +1,11 @@
 ---
+# Proxmox nodes are upgraded one at a time (serial: 1), so a bad package
+# set can only take down one node and the cluster keeps quorum.
+# Don't run this playbook while the cluster is mid PVE 8 -> 9 upgrade:
+# it would dist-upgrade nodes whose sources are half switched.
 - hosts: 'proxmox_control_node_by_ip'
   remote_user: root
+  serial: 1
   tasks:
     - name: apt update
       include_tasks: roles/common/tasks/apt-update.yml

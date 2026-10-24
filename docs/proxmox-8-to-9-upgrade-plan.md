@@ -141,7 +141,7 @@ echo 'grub-efi-amd64 grub2/force_efi_extra_removable boolean true' | debconf-set
 apt install --reinstall grub-efi-amd64
 ```
 
-- [ ] Re-run `pve8to9 --full` → grub warnings gone.
+- [x] Re-run `pve8to9 --full` → grub warnings gone (2026-10-24, fukutomi: 0 FAIL, 3 WARN).
 
 ### 3.4 Shake out the reboot path on PVE 8 (Friday)
 
@@ -150,7 +150,7 @@ Reboot each node once on PVE 8 *before* the upgrade. This boots the pending
 separates "can't reboot" from "upgrade broke it." Same node order as §6.
 
 - [ ] `apt update && apt dist-upgrade` (clears the libexpat1 warning)
-- [ ] `apt remove systemd-boot` on izumida and teshima
+- [x] `apt remove systemd-boot` on izumida and teshima (2026-10-24)
 - [ ] Purge PVE 7-era kernels on fukutomi/midosuji (`pve-kernel-5.11*`) and
   `proxmox-kernel-6.5*` everywhere it's installed
 - [ ] Reboot. Confirm `uname -r` = 6.8.12-43, all `onboot: 1` CTs running, NFS mounts present
@@ -384,9 +384,9 @@ Tier 4 is why §3.1 and the §7.1 protected backups are non-negotiable.
 | | midosuji | Phase 0 (health §5) complete | | |
 | 2026-10-01 | midosuji | §3.1 backups fixed | Done | Scheduler unstuck; all 6 CTs backed up and verified; 225/103 protected. Nightly still expected to fail on 225 (see health H2). |
 | | midosuji | §3.2 `/etc/hosts` | | |
-| | fukutomi | §3.3 grub-efi | | |
+| 2026-10-24 | fukutomi | §3.3 grub-efi | Done | ESP backed up first; rebooted fine on it the same day |
 | | all | §3.4 PVE 8 reboot | | |
-| | repo | R1, R3 | | |
+| 2026-10-24 | repo | R1, R3 | Done | R1: `roles/proxmox` includes `repos-bookworm.yml` or `repos-trixie.yml` (deb822, enterprise sources disabled, fails on leftover `.list` files); `--check` on the three bookworm nodes showed no source changes. R3: `serial: 1` on the node play in `maintenance.yml` |
 | | izumida | Upgrade | | |
 | | teshima | Upgrade | | |
 | | midosuji | Upgrade | | |

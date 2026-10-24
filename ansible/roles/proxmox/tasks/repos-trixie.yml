@@ -1,0 +1,69 @@
+---
+# Package sources for PVE 9 (Debian 13 trixie), deb822 .sources format.
+# Included from main.yml when ansible_distribution_release is trixie.
+# Matches docs/proxmox-8-to-9-upgrade-plan.md §7.2.
+
+- name: Write Debian sources (deb822)
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/debian.sources
+    mode: '0644'
+    content: |
+      Types: deb
+      URIs: http://deb.debian.org/debian
+      Suites: trixie trixie-updates
+      Components: main contrib non-free-firmware
+      Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+      Types: deb
+      URIs: http://security.debian.org/debian-security
+      Suites: trixie-security
+      Components: main contrib non-free-firmware
+      Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+- name: Write Proxmox no-subscription sources (deb822)
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/proxmox.sources
+    mode: '0644'
+    content: |
+      Types: deb
+      URIs: http://download.proxmox.com/debian/pve
+      Suites: trixie
+      Components: pve-no-subscription
+      Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg
+
+- name: Write Ceph Squid no-subscription sources (deb822)
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/ceph.sources
+    mode: '0644'
+    content: |
+      Types: deb
+      URIs: http://download.proxmox.com/debian/ceph-squid
+      Suites: trixie
+      Components: no-subscription
+      Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg
+
+- name: Check for the PVE enterprise sources file
+  ansible.builtin.stat:
+    path: /etc/apt/sources.list.d/pve-enterprise.sources
+  register: pve_enterprise_sources
+
+- name: Disable the PVE enterprise sources
+  ansible.builtin.lineinfile:
+    path: /etc/apt/sources.list.d/pve-enterprise.sources
+    regexp: '^Enabled:'
+    line: 'Enabled: false'
+    insertafter: '^Types:'
+  when: pve_enterprise_sources.stat.exists
+
+- name: Find leftover one-line .list sources
+  ansible.builtin.find:
+    paths: /etc/apt/sources.list.d
+    patterns: '*.list'
+  register: leftover_list_sources
+
+- name: Fail if bookworm-era .list sources remain
+  ansible.builtin.fail:
+    msg: >-
+      These .list files are still present on a trixie node: {{ leftover_list_sources.files | map(attribute='path') | join(', ') }}.
+      Move them out of /etc/apt/sources.list.d (upgrade plan §7.2) before running this role.
+  when: leftover_list_sources.matched > 0
