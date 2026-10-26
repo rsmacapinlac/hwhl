@@ -181,7 +181,7 @@ Before the upgrade weekend, roughly in this order:
 | 3 | `smartctl -t long /dev/sda` (runs in the background for hours; check `smartctl -l selftest`) | midosuji | — | [ ] |
 | 4 | H1: move 225/217 off `local-baracuda` per §4 | midosuji | 1h | [ ] |
 | 5 | H3: detach the missing ISO from VM 100 | teshima | 1m | [ ] |
-| 6 | H7: `newaliases` | teshima | 1m | [ ] |
+| 6 | H7: `newaliases` (now in the proxmox role, tag `mail`) | teshima | 1m | [x] 2026-10-26 |
 | 7 | H5: grow boogienet-core root | midosuji | 5m | [ ] |
 | 8 | H9: `maintenance.yml` for CTs with pending updates | all | 30m | [ ] |
 | 9 | Re-run the full health check (§6). Must match §3 except the fixed items. | all | 10m | [ ] |

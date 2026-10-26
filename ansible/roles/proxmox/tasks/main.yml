@@ -22,6 +22,11 @@
 - name: Configure package sources for {{ ansible_distribution_release }}
   ansible.builtin.include_tasks: "repos-{{ ansible_distribution_release }}.yml"
 
+- name: Configure the outbound mail relay
+  ansible.builtin.import_tasks: mail-relay.yml
+  tags:
+    - mail
+
 - name: Update LXC template repository
   ansible.builtin.shell:
     cmd: pveam update

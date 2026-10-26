@@ -1,0 +1,60 @@
+---
+# ============================================
+# Outbound mail relay
+# ============================================
+# The ISP blocks outbound port 25, so postfix cannot deliver straight to
+# Gmail's MX and root/vzdump/smartd mail sits deferred in the queue. Relay
+# through the homelab Gmail account on 465 (implicit TLS) instead.
+# ============================================
+
+- name: Install SASL modules for postfix auth
+  ansible.builtin.apt:
+    name: libsasl2-modules
+    state: present
+
+- name: Write the relay credentials
+  ansible.builtin.copy:
+    dest: /etc/postfix/sasl_passwd
+    content: "[{{ proxmox_smtp_relay_host }}]:{{ proxmox_smtp_relay_port }} {{ proxmox_smtp_relay_username }}:{{ proxmox_smtp_relay_password }}\n"
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+  register: proxmox_sasl_passwd
+
+- name: Hash the relay credentials
+  ansible.builtin.command:
+    cmd: postmap /etc/postfix/sasl_passwd
+  when: proxmox_sasl_passwd.changed
+
+- name: Read the current postfix settings
+  ansible.builtin.command:
+    cmd: postconf -n
+  register: proxmox_postconf_current
+  changed_when: false
+
+- name: Configure postfix to relay through {{ proxmox_smtp_relay_host }}
+  ansible.builtin.command:
+    cmd: "postconf -e '{{ item.key }} = {{ item.value }}'"
+  loop: "{{ proxmox_postfix_relay_settings | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when: (item.key ~ ' = ' ~ item.value) not in proxmox_postconf_current.stdout_lines
+  vars:
+    proxmox_postfix_relay_settings:
+      relayhost: "[{{ proxmox_smtp_relay_host }}]:{{ proxmox_smtp_relay_port }}"
+      smtp_sasl_auth_enable: "yes"
+      smtp_sasl_password_maps: "hash:/etc/postfix/sasl_passwd"
+      smtp_sasl_security_options: "noanonymous"
+      smtp_tls_wrappermode: "yes"
+      smtp_tls_security_level: "encrypt"
+      smtp_tls_CAfile: "/etc/ssl/certs/ca-certificates.crt"
+      # No IPv6 route out; skip the doomed AAAA attempts.
+      inet_protocols: "ipv4"
+  notify: Restart postfix
+
+# teshima had no aliases.db, so postfix logged an error on every local lookup.
+- name: Build the aliases database
+  ansible.builtin.command:
+    cmd: newaliases
+    creates: /etc/aliases.db

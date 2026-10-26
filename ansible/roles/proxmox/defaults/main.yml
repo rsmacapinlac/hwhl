@@ -49,3 +49,13 @@ proxmox_nfs_shares: []
 #   - timezone: Timezone (e.g., 'America/Vancouver')
 #   - default_gateway: Default gateway IP for LXC containers
 #   - lxc_root_password: Root password for LXC containers (consider using Ansible Vault)
+
+# ============================================
+# Outbound mail relay (tasks/mail-relay.yml)
+# ============================================
+# Root, vzdump and smartd mail relays through this account. Set the
+# password in the inventory alongside the other Gmail app password users.
+proxmox_smtp_relay_host: smtp.gmail.com
+proxmox_smtp_relay_port: 465
+proxmox_smtp_relay_username: homelab@macapinlac.com
+# proxmox_smtp_relay_password: (required, no default)
