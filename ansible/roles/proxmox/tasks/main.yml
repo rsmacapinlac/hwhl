@@ -4,14 +4,6 @@
 # Based on: https://technotim.live/posts/first-11-things-proxmox/
 # ============================================
 
-- name: Install required packages for Proxmox automation
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: yes
-  loop:
-    - python3-proxmoxer
-
 - name: Fail on an unsupported Debian release
   ansible.builtin.fail:
     msg: "The proxmox role only knows bookworm (PVE 8) and trixie (PVE 9), not {{ ansible_distribution_release }}"
@@ -19,8 +11,18 @@
 
 # PVE 8 keeps one-line .list sources; PVE 9 uses deb822 .sources files and
 # must not get bookworm lines added back to sources.list.
+# Runs before any apt cache refresh: a dist-upgrade can reinstall an enabled
+# pve-enterprise.sources, and its 401 would fail the refresh.
 - name: Configure package sources for {{ ansible_distribution_release }}
   ansible.builtin.include_tasks: "repos-{{ ansible_distribution_release }}.yml"
+
+- name: Install required packages for Proxmox automation
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - python3-proxmoxer
 
 - name: Configure the outbound mail relay
   ansible.builtin.import_tasks: mail-relay.yml
