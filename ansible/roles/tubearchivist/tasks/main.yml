@@ -41,6 +41,18 @@
     recurse: true
     owner: 1000
 
+# Since v0.6.0 the container runs as tubearchivist_puid and no longer fixes
+# ownership itself, so the cache and media mounts have to belong to that user.
+- name: Ensure tubearchivist cache and media folders are owned by the container user
+  become: true
+  ansible.builtin.shell: >-
+    find /data/containers/tubearchivist/cache
+    {% for item in tubearchivist %}{{ item.host_folder }} {% endfor %}
+    \( ! -uid {{ tubearchivist_puid }} -o ! -gid {{ tubearchivist_pgid }} \)
+    -print -exec chown {{ tubearchivist_puid }}:{{ tubearchivist_pgid }} {} +
+  register: tubearchivist_chown
+  changed_when: tubearchivist_chown.stdout | length > 0
+
 # Environment file deployment
 - name: Copy environment configuration
   copy:
@@ -70,6 +82,10 @@
     remove_orphans: false
   when: not tubearchivist_container.container.State.Running | default(false)
   notify: restart tubearchivist
+
+# Recreate with the new compose file before patching the running container
+- name: Apply pending tubearchivist restart
+  ansible.builtin.meta: flush_handlers
 
 # Patch yt-dlp to fix YouTube n-challenge solving failures
 - name: Apply yt-dlp patches

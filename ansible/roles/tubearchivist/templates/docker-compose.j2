@@ -4,6 +4,8 @@ services:
     container_name: tubearchivist
     restart: unless-stopped
     image: bbilly1/tubearchivist
+    # v0.6.0 dropped HOST_UID/HOST_GID and no longer chowns files itself
+    user: "{{ tubearchivist_puid | default('1001') }}:{{ tubearchivist_pgid | default('1001') }}"
     env_file:
       - .env
     ports:
@@ -13,9 +15,6 @@ services:
       - {{ item.host_folder }}:{{ item.container }}
 {% endfor %}
       - /data/containers/tubearchivist/cache:/cache
-    environment:
-      - HOST_UID={{ tubearchivist_puid | default('1001') }}
-      - HOST_GID={{ tubearchivist_pgid | default('1001') }}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 2m
