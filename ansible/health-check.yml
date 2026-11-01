@@ -116,7 +116,7 @@
       become: false
 
 - name: Managed LXCs
-  hosts: "managed_hosts:!raspberrypi"
+  hosts: "managed_hosts"
   become: true
   gather_facts: false
   ignore_unreachable: true

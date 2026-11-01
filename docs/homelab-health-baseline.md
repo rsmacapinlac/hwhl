@@ -228,7 +228,7 @@ Save as a script (the Docker Go templates must not go through Jinja, so use
 
 ```bash
 #!/bin/sh
-# ct-health.sh: run with: ansible 'managed_hosts:!raspberrypi' -b -m script -a ct-health.sh -f 20
+# ct-health.sh: run with: ansible managed_hosts -b -m script -a ct-health.sh -f 20
 echo "## $(hostname) | up $(uptime -p | sed 's/up //') | mem $(free -m | awk '/Mem/{printf "%d/%dM", $3, $2}') | root $(df -h / --output=pcent | tail -1)"
 echo "failed: $(systemctl --failed --no-legend --plain | awk '{print $1}' | tr '\n' ' ')"
 echo "dns: $(getent hosts google.com >/dev/null && echo ok || echo FAIL) | ntp: $(timedatectl show -p NTPSynchronized --value) | apt: $(apt list --upgradable 2>/dev/null | tail -n +2 | wc -l)"

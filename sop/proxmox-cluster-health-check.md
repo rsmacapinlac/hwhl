@@ -21,7 +21,7 @@ findings.
 | Proxmox nodes (every node in `proxmox_control_node_by_ip`) | PVE services, failed units, quorum and corosync links, time sync, memory and swap, every storage enabled on the node, LVM-thin data and metadata, ZFS pools, SMART health and bad-sector counters, NIC hangs, hung tasks, OOM kills, journal errors and their top sources, `onboot` guests not running, locked guests, VM guest agents, pve-ssl expiry, pending reboot for a new kernel, apt updates | `sop/scripts/pve-node-health.sh` |
 | Cluster (run once) | Quorum and votes, nodes online, HA and replication, every vzdump task in the last 7 days (status and duration), disk and memory use of **every** running guest (including ones Ansible doesn't manage), age of each guest's latest backup | `sop/scripts/pve-cluster-health.sh` |
 | Monitoring (`prometheus` group) | Prometheus targets down, firing alerts | `sop/scripts/prometheus-health.sh` |
-| Managed LXCs (`managed_hosts:!raspberrypi`) | Root disk, failed units, DNS, time sync, `/data/*` mounts present and not empty, Docker running/total, containers not up or unhealthy, restart counts, apt updates, journal errors | `sop/scripts/ct-health.sh` |
+| Managed LXCs (`managed_hosts`) | Root disk, failed units, DNS, time sync, `/data/*` mounts present and not empty, Docker running/total, containers not up or unhealthy, restart counts, apt updates, journal errors | `sop/scripts/ct-health.sh` |
 
 **Not covered automatically:** application-level behaviour (does Jellyfin play,
 does Vaultwarden log in), the inside of guests Ansible doesn't manage

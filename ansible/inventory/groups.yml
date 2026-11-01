@@ -1,6 +1,5 @@
 managed_hosts:
   children:
-    raspberrypi:
     pihole:
     dns:
     edge:

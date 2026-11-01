@@ -1,6 +1,6 @@
 #!/bin/sh
 # ct-health.sh: read-only health summary for one managed LXC.
-# Run from ansible/: ansible 'managed_hosts:!raspberrypi' -b -m script -a ../sop/scripts/ct-health.sh -f 20
+# Run from ansible/: ansible managed_hosts -b -m script -a ../sop/scripts/ct-health.sh -f 20
 # Uses -m script so the Docker Go templates never pass through Jinja.
 # Lines starting with "!" need attention.
 
