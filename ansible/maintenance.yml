@@ -98,19 +98,40 @@
   remote_user: ansible
   tasks:
     - name: "Update Traefik"
-      include_tasks: roles/traefik/tasks/update.yml
+      include_tasks:
+        file: roles/traefik/tasks/update.yml
+        apply:
+          tags:
+            - traefik
       tags:
         - traefik
     - name: "Update Portainer"
-      include_tasks: roles/portainer/tasks/update.yml
+      include_tasks:
+        file: roles/portainer/tasks/update.yml
+        apply:
+          tags:
+            - portainer
       tags:
         - portainer
+    # site.yml deploys diun to every `containers` host, not just the `diun` group
+    - name: "Update Diun"
+      include_tasks:
+        file: roles/diun/tasks/update.yml
+        apply:
+          tags:
+            - diun
+      tags:
+        - diun
 
 - hosts: "diun"
   remote_user: ansible
   tasks:
     - name: "Update Diun"
-      include_tasks: roles/diun/tasks/update.yml
+      include_tasks:
+        file: roles/diun/tasks/update.yml
+        apply:
+          tags:
+            - diun
       tags:
         - diun
 
