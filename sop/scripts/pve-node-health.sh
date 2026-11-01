@@ -88,3 +88,25 @@ openssl x509 -checkend 2592000 -noout -in /etc/pve/local/pve-ssl.pem >/dev/null 
 newest=$(ls /boot/vmlinuz-* | sed 's|/boot/vmlinuz-||' | sort -V | tail -1)
 [ "$newest" != "$(uname -r)" ] && echo "reboot pending: newest installed kernel is $newest"
 echo "pve-ssl expires: $end | apt upgradable: $(apt list --upgradable 2>/dev/null | tail -n +2 | wc -l)"
+
+# Package sources: a dist-upgrade can reinstall pve-enterprise.sources enabled,
+# and its 401 fails every apt cache refresh (maintenance.yml, 2026-11-01)
+for f in /etc/apt/sources.list.d/*enterprise*.sources; do
+  [ -f "$f" ] && ! grep -qi '^Enabled: *no\|^Enabled: *false' "$f" && echo "! enterprise sources enabled: $f"
+done
+# Refresh into a throwaway lists dir so the check stays read-only
+lists=$(mktemp -d); mkdir -p "$lists/partial"; chown -R _apt "$lists" 2>/dev/null
+srcerr=$(apt-get -o Dir::State::Lists="$lists" update 2>&1 | grep -E '^(E|W):' | head -3 | tr '\n' ' ')
+rm -rf "$lists"
+[ -n "$srcerr" ] && echo "! apt sources: $srcerr"
+
+# DKMS: every installed kernel needs each module built, or passthrough guests
+# (izumida's nvidia for CTs 303/304) won't start after the next reboot
+if command -v dkms >/dev/null; then
+  for k in $(ls /lib/modules | sort -V | grep "^$(uname -r | cut -d. -f1)\."); do
+    for m in $(dkms status 2>/dev/null | cut -d, -f1 | sort -u); do
+      dkms status "$m" -k "$k" 2>/dev/null | grep -q ': installed' || echo "! dkms $m not installed for kernel $k"
+    done
+  done
+  command -v nvidia-smi >/dev/null && { nvidia-smi -L >/dev/null 2>&1 && echo "gpu: $(nvidia-smi -L | cut -d'(' -f1 | tr '\n' ' ')" || echo "! nvidia-smi fails"; }
+fi
