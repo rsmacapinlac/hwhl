@@ -46,6 +46,11 @@ proxmox_nfs_shares: []
 proxmox_kernel_modules:
   - wireguard
 
+# Admin tools the PVE ISO doesn't ship.
+# lm-sensors: `sensors` for CPU/board temperatures in health checks.
+proxmox_admin_packages:
+  - lm-sensors
+
 # ============================================
 # Note: Additional variables used by this role
 # ============================================
