@@ -142,10 +142,12 @@ resource "terraform_data" "configure_mount_points" {
     terraform_data.enable_nesting,
   ]
 
-  # Re-run when container is recreated or mount points change
+  # Re-run when container is recreated or mount paths change. `shared` is left
+  # out so that flipping it doesn't stop every container; set it on existing
+  # containers with `pct set` (it applies at their next start)
   triggers_replace = [
     proxmox_virtual_environment_container.container.id,
-    jsonencode(var.mount_points),
+    jsonencode([for mount in var.mount_points : { host_path = mount.host_path, container_path = mount.container_path }]),
   ]
 
   provisioner "local-exec" {
@@ -166,7 +168,7 @@ resource "terraform_data" "configure_mount_points" {
 
       # Add each mount point from configuration via pct set command
 %{for idx, mount in var.mount_points~}
-      ssh -o StrictHostKeyChecking=no root@${var.proxmox_host} "pct set ${var.vmid} -mp${idx} ${mount.host_path},mp=${mount.container_path}" || true
+      ssh -o StrictHostKeyChecking=no root@${var.proxmox_host} "pct set ${var.vmid} -mp${idx} ${mount.host_path},mp=${mount.container_path}${mount.shared ? ",shared=1" : ""}" || true
 %{endfor~}
 
       # Start container after mount points are configured

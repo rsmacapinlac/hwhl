@@ -48,6 +48,7 @@ edge_containers = {
       {
         host_path      = "/mnt/ContainerBackups"  # Path on Proxmox host
         container_path  = "/mnt/backups"           # Path inside container
+        shared         = true                     # NFS share mounted on every node
       }
     ]
   }
@@ -64,10 +65,11 @@ terraform apply
 
 ## Mount Point Configuration
 
-Each mount point requires two paths:
+Each mount point requires two paths, and takes one optional flag:
 
 - **`host_path`**: The path on the Proxmox host where the NFS share is mounted (from `proxmox_nfs_shares` in Ansible)
 - **`container_path`**: The path inside the container where the share will be accessible
+- **`shared`** (default `false`): set it to `true` when `host_path` exists on every node, as the `proxmox_nfs_shares` mounts do. It adds `shared=1` to the mount, which `pct migrate` needs before it will move the container to another node. Leave it off for node-local paths such as izumida's `/Media` ZFS pool
 
 ### Example: Multiple Mount Points
 
@@ -76,10 +78,11 @@ mount_points = [
   {
     host_path      = "/mnt/ContainerBackups"
     container_path  = "/mnt/backups"
+    shared         = true
   },
   {
-    host_path      = "/mnt/vm-storage"
-    container_path  = "/mnt/storage"
+    host_path      = "/Media"
+    container_path  = "/data/LocalMedia"
   }
 ]
 ```
@@ -106,7 +109,17 @@ Mount points are configured when the container is created. To add mount points t
 - Run `terraform apply`
 - The container will be updated with the new mount points
 
-### 4. Backups
+### 4. Changing `shared` on an Existing Container
+
+Changing `shared` doesn't re-run the mount provisioner (only path changes do), so `terraform apply` won't stop the container for it. Set it on the node instead:
+
+```bash
+pct set <vmid> -mp0 /mnt/ContainerBackups,mp=/data/borgbackup,shared=1
+```
+
+On a running container this is a pending change that applies at its next start. On a stopped one it applies at once, which is enough for an offline `pct migrate`.
+
+### 5. Backups
 
 Bind-mounted directories are **not included** in Proxmox backups (`vzdump`). The NFS share itself should be backed up separately.
 

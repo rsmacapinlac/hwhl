@@ -113,6 +113,7 @@ variable "services_containers" {
     mount_points = optional(list(object({
       host_path      = string
       container_path = string
+      shared         = optional(bool, false) # true for NFS paths mounted on every node
     })), [])
   }))
   default = {}

@@ -124,8 +124,9 @@ variable "proxmox_host" {
 variable "mount_points" {
   description = "List of bind mount points to attach to the container"
   type = list(object({
-    host_path      = string # Path on Proxmox host (e.g., /mnt/ContainerBackups)
-    container_path = string # Path inside container (e.g., /mnt/backups)
+    host_path      = string                # Path on Proxmox host (e.g., /mnt/ContainerBackups)
+    container_path = string                # Path inside container (e.g., /mnt/backups)
+    shared         = optional(bool, false) # true when host_path exists on every node (NFS); lets pct migrate move the container
   }))
   default = []
 }
