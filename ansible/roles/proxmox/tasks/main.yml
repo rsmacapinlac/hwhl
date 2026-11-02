@@ -29,6 +29,11 @@
   tags:
     - mail
 
+- name: Load kernel modules guests need
+  ansible.builtin.import_tasks: kernel-modules.yml
+  tags:
+    - kernel-modules
+
 - name: Update LXC template repository
   ansible.builtin.shell:
     cmd: pveam update

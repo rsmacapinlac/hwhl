@@ -41,6 +41,11 @@ debian_template_version: "12.12-1"
 #   - name: Optional name/identifier for the share (optional)
 proxmox_nfs_shares: []
 
+# Loaded now and at every boot (/etc/modules-load.d/<name>.conf).
+# wireguard: wg-easy in edge (unprivileged LXC) needs it on whichever node runs edge.
+proxmox_kernel_modules:
+  - wireguard
+
 # ============================================
 # Note: Additional variables used by this role
 # ============================================
