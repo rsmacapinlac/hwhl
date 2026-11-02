@@ -109,6 +109,7 @@ variable "services_containers" {
     extra_tags     = optional(list(string), []) # Additional Proxmox tags
     tun_device     = optional(bool, false)      # Enable /dev/net/tun for VPN containers
     nvidia_gpu     = optional(bool, false)      # Pass the node's NVIDIA GPU into the container
+    intel_gpu      = optional(bool, false)      # Pass the node's Intel iGPU render node into the container
     started        = optional(bool, true)       # false keeps a container stopped on every apply
     mount_points = optional(list(object({
       host_path      = string

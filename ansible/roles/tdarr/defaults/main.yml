@@ -6,6 +6,9 @@ tdarr_webui_port: 8265
 tdarr_server_port: 8266
 tdarr_node_port: 8267
 
+# Pass the CT's Intel iGPU render node to Tdarr for Quick Sync (Terraform intel_gpu)
+tdarr_intel_gpu: false
+
 # User/Group IDs
 tdarr_puid: 1001
 tdarr_pgid: 1001

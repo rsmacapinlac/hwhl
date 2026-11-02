@@ -5,6 +5,10 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+{% if tdarr_intel_gpu | bool %}
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+{% endif %}
     ports:
       - {{ tdarr_webui_port }}:8265
       - {{ tdarr_server_port }}:8266

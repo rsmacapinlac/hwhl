@@ -137,6 +137,12 @@ variable "tun_device" {
   default     = false
 }
 
+variable "intel_gpu" {
+  description = "Pass the host's Intel iGPU render node (/dev/dri/renderD128) into the container, for Quick Sync / VA-API"
+  type        = bool
+  default     = false
+}
+
 variable "nvidia_gpu" {
   description = "Pass the host's NVIDIA GPU device nodes into the container (needs the NVIDIA driver on the node)"
   type        = bool

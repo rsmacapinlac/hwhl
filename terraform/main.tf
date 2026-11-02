@@ -36,5 +36,6 @@ module "services_containers" {
   mount_points    = each.value.mount_points
   tun_device      = each.value.tun_device
   nvidia_gpu      = each.value.nvidia_gpu
+  intel_gpu       = each.value.intel_gpu
   start_on_create = each.value.started
 }

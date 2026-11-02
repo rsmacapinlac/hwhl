@@ -224,6 +224,29 @@ resource "terraform_data" "enable_nvidia_gpu" {
   }
 }
 
+# Intel iGPU passthrough (Quick Sync / VA-API). Only the render node is needed
+# for encoding. mode=0666 so any user in the CT (and in its Docker containers)
+# can open it without matching the render group's GID across host, CT and image.
+resource "terraform_data" "enable_intel_gpu" {
+  count = var.intel_gpu && var.proxmox_host != "" ? 1 : 0
+
+  depends_on = [
+    proxmox_virtual_environment_container.container,
+    terraform_data.configure_mount_points,
+  ]
+
+  triggers_replace = [
+    proxmox_virtual_environment_container.container.id,
+    var.intel_gpu,
+  ]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      ssh -o StrictHostKeyChecking=no root@${var.proxmox_host} 'pct set ${var.vmid} --dev0 /dev/dri/renderD128,mode=0666 && if pct status ${var.vmid} | grep -q running; then pct reboot ${var.vmid}; fi'
+    EOT
+  }
+}
+
 # Note: Ansible user creation is handled by Ansible's common role
 # After Terraform creates the container, run Ansible to configure it:
 #   ansible-playbook site.yml --limit <container-group>
