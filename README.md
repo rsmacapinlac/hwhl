@@ -61,7 +61,7 @@ Add the following content to `ansible/inventory/proxmox.yml`:
 proxmox_control_node_by_ip:
   hosts:
     # Replace with your Proxmox server IP
-    10.1.0.141:
+    10.1.0.140:
 ```
 
 4. Run the Proxmox setup playbook:
