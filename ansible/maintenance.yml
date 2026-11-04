@@ -27,7 +27,12 @@
   remote_user: ansible
   tasks:
     - name: "Update PiHole Exporter"
-      include_tasks: roles/pihole-exporter/tasks/update.yml
+      include_tasks:
+        file: roles/pihole-exporter/tasks/update.yml
+        apply:
+          tags:
+            - pihole-exporter
+            - pihole_exporter
       tags:
         - pihole-exporter
         - pihole_exporter

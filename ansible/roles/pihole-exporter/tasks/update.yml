@@ -32,5 +32,7 @@
 
 - name: Remove dangling PiHole Exporter images
   command: docker image prune -f
+  tags:
+    - image-prune
   changed_when: true
   when: compose_update is succeeded
