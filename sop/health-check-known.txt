@@ -10,8 +10,6 @@ nextcloud-aio-watchtower[[:space:]]+Exited \(0\)
 mail-tribble[[:space:]]+Exited \(0\)
 # ofelia on family: health baseline H8, waiting on the Monica keep/retire decision.
 ofelia[[:space:]]+Exited \(0\)
-# media-support (CT 301) stopped on 2026-11-02 with onboot 0; replaced by transcoder on pve1.
-^media-support[.:].*unreachable
 # teshima's boot SSD: 369 late bad blocks as of 2026-10-21. A different count shows up as a new finding.
 # 2026-10-24: smartctl on PVE 9 prints the attribute as Lat/Erl instead of Erl/Lat; same counter.
 ^teshima: disk sda .*Bad_Blk_Ct_(Erl/Lat|Lat/Erl)=0/369 *$

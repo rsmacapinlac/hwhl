@@ -160,10 +160,6 @@ These services need to be updated to use `compose.yml` instead of `docker-compos
    - Status: Running container ✅
    - Issue: Uses `docker-compose.yml` instead of `compose.yml`
 
-5. **tdarr** - media-support host
-   - Status: Running container ✅
-   - Issue: Uses `docker-compose.yml` instead of `compose.yml`
-
 7. **homepage** - family host
    - Status: Running container ✅
    - Issue: Uses `docker-compose.yml` instead of `compose.yml`
